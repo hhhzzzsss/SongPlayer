@@ -85,6 +85,10 @@ public class PlayingThread extends Thread{
 		player.abilities.allowFlying = true;
 		player.abilities.flying = true;
 		SongPlayer.stage.movePlayerToStagePosition();
+		if (SongPlayer.fakePlayer != null) {
+			SongPlayer.fakePlayer.remove();
+			SongPlayer.fakePlayer = null;
+		}
 		
 		SongPlayer.addChatMessage("§6Finished playing.");
 		SongPlayer.mode = SongPlayer.Mode.IDLE;

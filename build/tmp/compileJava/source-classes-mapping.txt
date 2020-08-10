@@ -36,6 +36,7 @@ com/github/hhhzzzsss/songplayer/CommandProcessor.java
  com.github.hhhzzzsss.songplayer.CommandProcessor$setSurvivalCommandCommand
  com.github.hhhzzzsss.songplayer.CommandProcessor$songsCommand
  com.github.hhhzzzsss.songplayer.CommandProcessor$stopCommand
+ com.github.hhhzzzsss.songplayer.CommandProcessor$toggleFakePlayerCommand
 com/github/hhhzzzsss/songplayer/mixin/ClientPlayNetworkHandlerMixin.java
  com.github.hhhzzzsss.songplayer.mixin.ClientPlayNetworkHandlerMixin
 com/github/hhhzzzsss/songplayer/noteblocks/PlayingThread.java

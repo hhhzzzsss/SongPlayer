@@ -17,6 +17,8 @@ public class SongPlayer implements ModInitializer {
 	public static final File SONG_DIR = new File("songs");
 	public static Song song;
 	public static Stage stage;
+	public static boolean showFakePlayer = false;
+	public static FakePlayerEntity fakePlayer;
 	public static String creativeCommand = "/gmc";
 	public static String survivalCommand = "/gms";
 	

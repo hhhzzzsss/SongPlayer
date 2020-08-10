@@ -2,6 +2,7 @@ package com.github.hhhzzzsss.songplayer.noteblocks;
 
 import java.util.ArrayList;
 
+import com.github.hhhzzzsss.songplayer.FakePlayerEntity;
 import com.github.hhhzzzsss.songplayer.SongPlayer;
 import com.github.hhhzzzsss.songplayer.song.Song;
 
@@ -91,6 +92,12 @@ public class BuildingThread extends Thread {
 		player.abilities.allowFlying = true;
 		player.abilities.flying = true;
 		SongPlayer.stage.movePlayerToStagePosition();
+		if (SongPlayer.showFakePlayer) {
+			if (SongPlayer.fakePlayer != null) {
+				SongPlayer.fakePlayer.remove();
+			}
+			SongPlayer.fakePlayer = new FakePlayerEntity();
+		}
 		
     	for (int dy : new int[] {0,1,3}) {
     		for (int dx = -4; dx <= 4; dx++) {

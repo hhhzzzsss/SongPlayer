@@ -26,6 +26,7 @@ public class CommandProcessor {
 		commands.add(new songsCommand());
 		commands.add(new setCreativeCommandCommand());
 		commands.add(new setSurvivalCommandCommand());
+		commands.add(new toggleFakePlayerCommand());
 	}
 	
 	// returns true if it is a command and should be cancelled
@@ -176,6 +177,10 @@ public class CommandProcessor {
 				return true;
 			}
     		if (args.length() == 0) {
+    			if (SongPlayer.fakePlayer != null) {
+    				SongPlayer.fakePlayer.remove();
+    				SongPlayer.fakePlayer = null;
+    			}
     			SongPlayer.stage.movePlayerToStagePosition();
     			SongPlayer.mode = Mode.IDLE;
     			SongPlayer.song.loop = false;
@@ -330,7 +335,7 @@ public class CommandProcessor {
     	public boolean processCommand(String args) {
     		if (args.length() > 0) {
     			SongPlayer.creativeCommand = args;
-    			SongPlayer.addChatMessage("Set creative command to " + SongPlayer.creativeCommand);
+    			SongPlayer.addChatMessage("§6Set creative command to " + SongPlayer.creativeCommand);
 				return true;
     		}
     		else {
@@ -352,7 +357,7 @@ public class CommandProcessor {
     	public boolean processCommand(String args) {
     		if (args.length() > 0) {
     			SongPlayer.survivalCommand = args;
-    			SongPlayer.addChatMessage("Set survival command to " + SongPlayer.survivalCommand);
+    			SongPlayer.addChatMessage("§6Set survival command to " + SongPlayer.survivalCommand);
 				return true;
     		}
     		else {
@@ -360,4 +365,40 @@ public class CommandProcessor {
     		}
     	}
     }
+	
+	private static class toggleFakePlayerCommand extends Command {
+		public String getName() {
+    		return "toggleFakePlayer";
+    	}
+    	public String getSyntax() {
+    		return "$toggleFakePlayer";
+    	}
+    	public String getDescription() {
+    		return "Shows a fake player representing your true position when playing songs";
+    	}
+    	public boolean processCommand(String args) {
+    		if (args.length() == 0) {
+    			SongPlayer.showFakePlayer = !SongPlayer.showFakePlayer;
+    			if (SongPlayer.showFakePlayer) {
+    				if (SongPlayer.mode == Mode.PLAYING || SongPlayer.mode == Mode.BUILDING) {
+	    				if (SongPlayer.fakePlayer != null) {
+	    					SongPlayer.fakePlayer.remove();
+	    				}
+	    				SongPlayer.fakePlayer = new FakePlayerEntity();
+    				}
+    				SongPlayer.addChatMessage("§6Enabled fake player");
+    			}
+    			else {
+    				if (SongPlayer.fakePlayer != null) {
+    					SongPlayer.fakePlayer.remove();
+    				}
+    				SongPlayer.addChatMessage("§6Disabled fake player");
+    			}
+				return true;
+    		}
+    		else {
+    			return false;
+    		}
+    	}
+	}
 }

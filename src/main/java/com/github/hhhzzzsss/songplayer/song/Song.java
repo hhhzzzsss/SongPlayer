@@ -46,7 +46,6 @@ public class Song {
 		}
 		if (!songPath.exists()) {
 			songPath = new File(SongPlayer.SONG_DIR, file + ".mid");
-	    	System.out.println(file + ".mid");
 		}
 		if (!songPath.exists()) {
 			songPath = new File(SongPlayer.SONG_DIR, file + ".midi");
@@ -55,9 +54,6 @@ public class Song {
     	boolean isMidi = false;
     	String extension = getExtension(songPath);
     	if (extension.equalsIgnoreCase("mid") || extension.equalsIgnoreCase("midi")) isMidi = true;
-    	System.out.println(songPath.getName());
-    	System.out.println(extension);
-    	System.out.println(isMidi);
     	if (isMidi) {
     		BufferedInputStream bis = new BufferedInputStream(new FileInputStream(songPath));
     		song.notes.clear();

@@ -12,7 +12,7 @@ public class FakePlayerEntity extends OtherClientPlayerEntity {
 	public FakePlayerEntity() {
 		super(SongPlayer.MC.world, SongPlayer.MC.player.getGameProfile());
 		
-		copyPositionAndRotation(player);
+		copyStagePosAndPlayerLook();
 		
 		inventory.clone(player.inventory);
 		
@@ -31,5 +31,16 @@ public class FakePlayerEntity extends OtherClientPlayerEntity {
 	
 	public void resetPlayerPosition() {
 		player.refreshPositionAndAngles(getX(), getY(), getZ(), yaw, pitch);
+	}
+	
+	public void copyStagePosAndPlayerLook() {
+		if (SongPlayer.stage != null) {
+			refreshPositionAndAngles(SongPlayer.stage.position.getX()+0.5, SongPlayer.stage.position.getY(), SongPlayer.stage.position.getZ()+0.5, player.yaw, player.pitch);
+			headYaw = player.headYaw;
+			bodyYaw = player.bodyYaw;
+		}
+		else {
+			copyPositionAndRotation(player);
+		}
 	}
 }
