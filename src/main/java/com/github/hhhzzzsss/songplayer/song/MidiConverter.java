@@ -52,28 +52,9 @@ public class MidiConverter {
     public static String fileName = "moskau";
 	public static TreeMap<Long, ArrayList<Integer>> noteMap;
     
-	public static TreeMap<Long, ArrayList<Integer>> getMidi(String url) throws Exception {
+	public static TreeMap<Long, ArrayList<Integer>> getMidi(BufferedInputStream downloadStream) throws Exception {
 		noteMap  = new TreeMap<>();
 		
-		//SocketAddress addr = new InetSocketAddress("34.94.90.93", 3128);
-		//Proxy proxy = new Proxy(Proxy.Type.HTTP, addr);
-		URLConnection conn = (new URL(url)).openConnection();
-		conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0");
-		BufferedInputStream downloadStream = new BufferedInputStream(conn.getInputStream());
-		boolean fileTooLarge = true;
-		byte tempbuf[] = new byte[10240];
-		for (int i=0; i<1024; i++) {
-			if (downloadStream.read(tempbuf, 0, 1024) == -1) {
-				fileTooLarge = false;
-				break;
-			}
-		}
-		if (fileTooLarge) {
-			throw new IOException("File too large");
-		}
-		downloadStream.close();
-		downloadStream = new BufferedInputStream(new URL(url).openStream());
-
 		Sequence sequence = MidiSystem.getSequence(downloadStream);
 		
 		long tpq = sequence.getResolution();

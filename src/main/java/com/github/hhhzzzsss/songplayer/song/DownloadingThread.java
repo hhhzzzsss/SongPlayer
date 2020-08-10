@@ -1,5 +1,9 @@
 package com.github.hhhzzzsss.songplayer.song;
 
+import java.io.BufferedInputStream;
+import java.net.URL;
+import java.net.URLConnection;
+
 import com.github.hhhzzzsss.songplayer.SongPlayer;
 import com.github.hhhzzzsss.songplayer.noteblocks.BuildingThread;
 

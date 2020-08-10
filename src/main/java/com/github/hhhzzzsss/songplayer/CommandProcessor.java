@@ -109,6 +109,11 @@ public class CommandProcessor {
     				SongPlayer.addChatMessage("§cCould not find song §4" + args);
     				return true;
     			}
+    			catch (Exception e) {
+    				SongPlayer.addChatMessage("§cError getting song: " + e.getMessage());
+    				e.printStackTrace();
+    				return true;
+    			}
     			
     			SongPlayer.stage = new Stage();
     			SongPlayer.stage.movePlayerToStagePosition();
