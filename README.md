@@ -9,6 +9,4 @@ You can put midis in the .minecraft/songs folder
 
 # Using the client
 You can get a list of commands with $help
-The most important ones are
-$play \<file name\>
-$stop
+The most important ones are $play \<file name\> and $stop
