@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "songplayer",
-  "version": "1.1.0",
+  "version": "1.1.1",
 
   "name": "Song Player",
   "description": "Builds and plays noteblocks",

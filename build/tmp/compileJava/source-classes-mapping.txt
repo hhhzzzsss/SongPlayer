@@ -22,6 +22,7 @@ com/github/hhhzzzsss/songplayer/Freecam.java
  com.github.hhhzzzsss.songplayer.Freecam
 com/github/hhhzzzsss/songplayer/song/Song.java
  com.github.hhhzzzsss.songplayer.song.Song
+ com.github.hhhzzzsss.songplayer.song.Song$DefaultTrustManager
 com/github/hhhzzzsss/songplayer/CommandProcessor.java
  com.github.hhhzzzsss.songplayer.CommandProcessor
  com.github.hhhzzzsss.songplayer.CommandProcessor$Command
