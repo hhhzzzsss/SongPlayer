@@ -1,8 +1,8 @@
+com/github/hhhzzzsss/songplayer/mixin/ClientPlayerEntityMixin.java
+ com.github.hhhzzzsss.songplayer.mixin.ClientPlayerEntityMixin
 com/github/hhhzzzsss/songplayer/SongPlayer.java
  com.github.hhhzzzsss.songplayer.SongPlayer
  com.github.hhhzzzsss.songplayer.SongPlayer$Mode
-com/github/hhhzzzsss/songplayer/mixin/ClientPlayerEntityMixin.java
- com.github.hhhzzzsss.songplayer.mixin.ClientPlayerEntityMixin
 com/github/hhhzzzsss/songplayer/mixin/KeyboardMixin.java
  com.github.hhhzzzsss.songplayer.mixin.KeyboardMixin
 com/github/hhhzzzsss/songplayer/mixin/MinecraftClientMixin.java
@@ -24,7 +24,6 @@ com/github/hhhzzzsss/songplayer/song/Song.java
  com.github.hhhzzzsss.songplayer.song.Song
 com/github/hhhzzzsss/songplayer/CommandProcessor.java
  com.github.hhhzzzsss.songplayer.CommandProcessor
- com.github.hhhzzzsss.songplayer.CommandProcessor$1
  com.github.hhhzzzsss.songplayer.CommandProcessor$Command
  com.github.hhhzzzsss.songplayer.CommandProcessor$currentCommand
  com.github.hhhzzzsss.songplayer.CommandProcessor$gotoCommand
@@ -37,9 +36,9 @@ com/github/hhhzzzsss/songplayer/CommandProcessor.java
  com.github.hhhzzzsss.songplayer.CommandProcessor$songsCommand
  com.github.hhhzzzsss.songplayer.CommandProcessor$stopCommand
  com.github.hhhzzzsss.songplayer.CommandProcessor$toggleFakePlayerCommand
-com/github/hhhzzzsss/songplayer/mixin/ClientPlayNetworkHandlerMixin.java
- com.github.hhhzzzsss.songplayer.mixin.ClientPlayNetworkHandlerMixin
 com/github/hhhzzzsss/songplayer/noteblocks/PlayingThread.java
  com.github.hhhzzzsss.songplayer.noteblocks.PlayingThread
+com/github/hhhzzzsss/songplayer/mixin/ClientPlayNetworkHandlerMixin.java
+ com.github.hhhzzzsss.songplayer.mixin.ClientPlayNetworkHandlerMixin
 com/github/hhhzzzsss/songplayer/song/DownloadingThread.java
  com.github.hhhzzzsss.songplayer.song.DownloadingThread

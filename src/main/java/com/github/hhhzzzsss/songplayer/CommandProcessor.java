@@ -12,6 +12,8 @@ import com.github.hhhzzzsss.songplayer.noteblocks.Stage;
 import com.github.hhhzzzsss.songplayer.song.DownloadingThread;
 import com.github.hhhzzzsss.songplayer.song.Song;
 
+import net.minecraft.entity.Entity;
+
 public class CommandProcessor {
 	public static ArrayList<Command> commands = new ArrayList<>();
 	
@@ -178,7 +180,7 @@ public class CommandProcessor {
 			}
     		if (args.length() == 0) {
     			if (SongPlayer.fakePlayer != null) {
-    				SongPlayer.fakePlayer.remove();
+    				SongPlayer.fakePlayer.remove(Entity.RemovalReason.DISCARDED);
     				SongPlayer.fakePlayer = null;
     			}
     			SongPlayer.stage.movePlayerToStagePosition();
@@ -382,7 +384,7 @@ public class CommandProcessor {
     			if (SongPlayer.showFakePlayer) {
     				if (SongPlayer.mode == Mode.PLAYING || SongPlayer.mode == Mode.BUILDING) {
 	    				if (SongPlayer.fakePlayer != null) {
-	    					SongPlayer.fakePlayer.remove();
+	    					SongPlayer.fakePlayer.remove(Entity.RemovalReason.DISCARDED);
 	    				}
 	    				SongPlayer.fakePlayer = new FakePlayerEntity();
     				}
@@ -390,7 +392,7 @@ public class CommandProcessor {
     			}
     			else {
     				if (SongPlayer.fakePlayer != null) {
-    					SongPlayer.fakePlayer.remove();
+    					SongPlayer.fakePlayer.remove(Entity.RemovalReason.DISCARDED);
     				}
     				SongPlayer.addChatMessage("§6Disabled fake player");
     			}

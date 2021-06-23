@@ -30,7 +30,7 @@ public class ClientPlayNetworkHandlerMixin {
 			ci.cancel();
 		}*/
 		if (SongPlayer.mode != SongPlayer.Mode.IDLE && packet instanceof PlayerMoveC2SPacket) {
-			connection.send(new PlayerMoveC2SPacket.Both(SongPlayer.stage.position.getX()+0.5, SongPlayer.stage.position.getY(), SongPlayer.stage.position.getZ()+0.5, SongPlayer.MC.player.yaw, SongPlayer.MC.player.pitch, true));
+			connection.send(new PlayerMoveC2SPacket.Full(SongPlayer.stage.position.getX()+0.5, SongPlayer.stage.position.getY(), SongPlayer.stage.position.getZ()+0.5, SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch(), true));
 			if (SongPlayer.fakePlayer != null) {
 				SongPlayer.fakePlayer.copyStagePosAndPlayerLook();
 			}

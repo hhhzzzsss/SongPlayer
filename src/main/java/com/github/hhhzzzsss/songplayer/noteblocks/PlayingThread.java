@@ -4,6 +4,7 @@ import com.github.hhhzzzsss.songplayer.SongPlayer;
 import com.github.hhhzzzsss.songplayer.song.Song;
 
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
 
@@ -25,8 +26,8 @@ public class PlayingThread extends Thread{
 		}
 		stage.rebuild = false;
 		
-		player.abilities.allowFlying = true;
-		player.abilities.flying = true;
+		player.getAbilities().allowFlying = true;
+		player.getAbilities().flying = true;
 		SongPlayer.stage.movePlayerToStagePosition();
 		
 		long songStartTime = System.currentTimeMillis() - song.get(song.position).time;
@@ -82,11 +83,11 @@ public class PlayingThread extends Thread{
 			}
 		}
 
-		player.abilities.allowFlying = true;
-		player.abilities.flying = true;
+		player.getAbilities().allowFlying = true;
+		player.getAbilities().flying = true;
 		SongPlayer.stage.movePlayerToStagePosition();
 		if (SongPlayer.fakePlayer != null) {
-			SongPlayer.fakePlayer.remove();
+			SongPlayer.fakePlayer.remove(Entity.RemovalReason.DISCARDED);
 			SongPlayer.fakePlayer = null;
 		}
 		

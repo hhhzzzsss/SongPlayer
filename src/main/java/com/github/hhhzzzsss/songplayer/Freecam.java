@@ -1,6 +1,7 @@
 package com.github.hhhzzzsss.songplayer;
 
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.Vec3d;
 
@@ -31,7 +32,7 @@ public class Freecam {
 		enabled = false;
 		if (fakePlayer != null) {
 			fakePlayer.resetPlayerPosition();
-			fakePlayer.remove();
+			fakePlayer.remove(Entity.RemovalReason.DISCARDED);
 			fakePlayer = null;
 			player.setVelocity(Vec3d.ZERO);
 		}

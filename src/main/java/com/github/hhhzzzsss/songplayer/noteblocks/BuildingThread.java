@@ -8,11 +8,13 @@ import com.github.hhhzzzsss.songplayer.song.Song;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -22,12 +24,12 @@ import net.minecraft.world.GameMode;
 
 public class BuildingThread extends Thread {
 	private final ClientPlayerEntity player = SongPlayer.MC.player;
-	private final PlayerInventory inventory = SongPlayer.MC.player.inventory;
+	private final PlayerInventory inventory = SongPlayer.MC.player.getInventory();
 	private final ClientWorld world = SongPlayer.MC.world;
 	private final Stage stage = SongPlayer.stage;
 	private final BlockPos stagePos = SongPlayer.stage.position;
 	private final Song song = SongPlayer.song;
-	private final int NOTEBLOCK_BASE_ID = 249;
+	private final int NOTEBLOCK_BASE_ID = Block.getRawIdFromState(Blocks.NOTE_BLOCK.getDefaultState());
 	private final String[] instrumentNames = {"harp", "basedrum", "snare", "hat", "bass", "flute", "bell", "guitar", "chime", "xylophone", "iron_xylophone", "cow_bell", "didgeridoo", "bit", "banjo", "pling"};
 	private boolean[] missingNotes = new boolean[400];
 	
@@ -44,7 +46,7 @@ public class BuildingThread extends Thread {
 					BlockPos pos = new BlockPos(stagePos.getX()+dx, stagePos.getY()+dy, stagePos.getZ()+dz);
 					BlockState bs = world.getBlockState(pos);
 					int blockId = Block.getRawIdFromState(bs);
-					if (blockId >= 249 && blockId <= 1048) {
+					if (blockId >= NOTEBLOCK_BASE_ID && blockId < NOTEBLOCK_BASE_ID+800) {
 						int noteId = (blockId-NOTEBLOCK_BASE_ID)/2;
 						if (missingNotes[noteId]) {
 							stage.tunedNoteblocks[noteId] = pos;
@@ -89,12 +91,12 @@ public class BuildingThread extends Thread {
 				return;
 			}
 		}
-		player.abilities.allowFlying = true;
-		player.abilities.flying = true;
+		player.getAbilities().allowFlying = true;
+		player.getAbilities().flying = true;
 		SongPlayer.stage.movePlayerToStagePosition();
 		if (SongPlayer.showFakePlayer) {
 			if (SongPlayer.fakePlayer != null) {
-				SongPlayer.fakePlayer.remove();
+				SongPlayer.fakePlayer.remove(Entity.RemovalReason.DISCARDED);
 			}
 			SongPlayer.fakePlayer = new FakePlayerEntity();
 		}
@@ -167,16 +169,16 @@ public class BuildingThread extends Thread {
 	private void holdNoteblock(int id) {
 		int instrument = id/25;
     	int note = id%25;
-		CompoundTag nbt = new CompoundTag();
+		NbtCompound nbt = new NbtCompound();
 		nbt.putString("id", "minecraft:note_block");
 		nbt.putByte("Count", (byte) 1);
-		CompoundTag tag = new CompoundTag();
-		CompoundTag bsTag = new CompoundTag();
+		NbtCompound tag = new NbtCompound();
+		NbtCompound bsTag = new NbtCompound();
 		bsTag.putString("instrument", instrumentNames[instrument]);
 		bsTag.putString("note", Integer.toString(note));
 		tag.put("BlockStateTag", bsTag);
 		nbt.put("tag", tag);
-		inventory.main.set(inventory.selectedSlot, ItemStack.fromTag(nbt));
+		inventory.main.set(inventory.selectedSlot, ItemStack.fromNbt(nbt));
 		SongPlayer.MC.interactionManager.clickCreativeStack(player.getStackInHand(Hand.MAIN_HAND), 36 + inventory.selectedSlot);
 	}
 	

@@ -14,7 +14,7 @@ public class FakePlayerEntity extends OtherClientPlayerEntity {
 		
 		copyStagePosAndPlayerLook();
 		
-		inventory.clone(player.inventory);
+		getInventory().clone(player.getInventory());
 		
 		Byte playerModel = player.getDataTracker().get(PlayerEntity.PLAYER_MODEL_PARTS);
 		getDataTracker().set(PlayerEntity.PLAYER_MODEL_PARTS, playerModel);
@@ -26,16 +26,16 @@ public class FakePlayerEntity extends OtherClientPlayerEntity {
 		capeY = getY();
 		capeZ = getZ();
 		
-		world.addEntity(getEntityId(), this);
+		world.addEntity(getId(), this);
 	}
 	
 	public void resetPlayerPosition() {
-		player.refreshPositionAndAngles(getX(), getY(), getZ(), yaw, pitch);
+		player.refreshPositionAndAngles(getX(), getY(), getZ(), getYaw(), getPitch());
 	}
 	
 	public void copyStagePosAndPlayerLook() {
 		if (SongPlayer.stage != null) {
-			refreshPositionAndAngles(SongPlayer.stage.position.getX()+0.5, SongPlayer.stage.position.getY(), SongPlayer.stage.position.getZ()+0.5, player.yaw, player.pitch);
+			refreshPositionAndAngles(SongPlayer.stage.position.getX()+0.5, SongPlayer.stage.position.getY(), SongPlayer.stage.position.getZ()+0.5, player.getYaw(), player.getPitch());
 			headYaw = player.headYaw;
 			bodyYaw = player.bodyYaw;
 		}

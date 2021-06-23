@@ -21,7 +21,7 @@ public class Stage {
 	}
 	
 	public void movePlayerToStagePosition() {
-		player.refreshPositionAndAngles(position.getX() + 0.5, position.getY() + 0.0, position.getZ() + 0.5, player.yaw, player.pitch);
+		player.refreshPositionAndAngles(position.getX() + 0.5, position.getY() + 0.0, position.getZ() + 0.5, player.getYaw(), player.getPitch());
 		player.setVelocity(Vec3d.ZERO);
 	}
 }
