@@ -9,9 +9,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import com.github.hhhzzzsss.songplayer.SongPlayer;
 
@@ -88,8 +96,13 @@ public class Song {
 	}
 	
 	public static Song getSongFromUrl(String url) throws Exception {
-		URLConnection conn = (new URL(url)).openConnection();
-		conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0");
+        SSLContext ctx = SSLContext.getInstance("TLS");
+        ctx.init(new KeyManager[0], new TrustManager[] {new DefaultTrustManager()}, new SecureRandom());
+        SSLContext.setDefault(ctx);
+		URLConnection conn = new URL(url).openConnection();
+		conn.setConnectTimeout(5000);
+		conn.setReadTimeout(5000);
+		conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0");
 		BufferedInputStream downloadStream = new BufferedInputStream(conn.getInputStream());
 		Song song = new Song();
 		song.notes.clear();
@@ -107,6 +120,20 @@ public class Song {
     	
     	return song;
 	}
+	
+	private static class DefaultTrustManager implements X509TrustManager {
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {}
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {}
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+    }
 	
 	private static String getExtension(File file) {
 		   String name = file.getName();
