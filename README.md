@@ -46,7 +46,7 @@ By default, the client uses /gmc to go into creative mode. However, /gmc does no
 By default, the client uses /gms to go into survival mode. However, /gms does not work on all servers. If the survival command is different, set it with this command. For example, if the server uses vanilla commands, do `$setSurvivalCommand /gamemode survival`.
 
 ## $toggleFakePlayer
-Toggles whether a fake player will show up to represent your true position while playing a song. When playing a song, since it automatically enables freecam, your true position will be different from your apparent position. The fake player will show where you actually are. By default this is disabled.
+Toggles whether a fake player will show up to represent your true position while playing a song. When playing a song, since it automatically enables freecam, your true position will be different from your apparent position. The fake player will show where you actually are. By default, this is disabled.
 
 # Mechanism
 SongPlayer places noteblocks with nbt and instrument data already in them, so the noteblocks do not need to be individually tuned. Ayunami2000 had previously done a proof-of-concept of this method.
@@ -56,6 +56,6 @@ My client will automatically detect what noteblocks are needed and place them au
 When playing a song, freecam is enabled. You will be able to move around freely, but in reality you are only moving your camera while your player stays at the center of the noteblocks. This is because noteblocks can only be played if you're within reach distance of them, so you have to stand at the center of the noteblocks to play them, but it's still nice to be able to move around while your song is playing.
 
 # 1.17 Support
-I was pretty late to update my client to 1.17, so Ayunami2000 decided to do it for me, which is pretty neat. You can see their repo here: https://github.com/ayunami2000/SongPlayer-1.17. At the moment of writing this though, they don't seem to have updated the the noteblock base id, which would make the client get all the notes wrong, so I don't reccomend using it.
+I was pretty late to update my client to 1.17, so Ayunami2000 decided to do it for me, which is pretty neat. You can see their repo here: https://github.com/ayunami2000/SongPlayer-1.17. At the moment of writing this however, they don't seem to have updated the noteblock base id, which would make the client get the notes wrong, so I don't recommend using it.
 
-I've now updated SongPlayer to 1.17 myself though so you can get it from here.
+I've updated SongPlayer to 1.17 myself now so you can get it from here.
