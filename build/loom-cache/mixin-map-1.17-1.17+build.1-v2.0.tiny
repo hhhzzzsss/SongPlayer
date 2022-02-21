@@ -1,2 +1,0 @@
-v1	named	intermediary
-FIELD	com/github/hhhzzzsss/songplayer/mixin/ClientPlayNetworkHandlerMixin	Lnet/minecraft/network/ClientConnection;	connection	field_3689

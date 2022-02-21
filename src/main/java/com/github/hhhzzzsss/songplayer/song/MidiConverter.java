@@ -76,7 +76,7 @@ public class MidiConverter {
 		Collections.sort(tempoEvents, new Comparator<MidiEvent>() {
 		    @Override
 		    public int compare(MidiEvent a, MidiEvent b) {
-		        return (new Long(a.getTick())).compareTo(b.getTick());
+		        return Long.compare(a.getTick(), b.getTick());
 		    }
 		});
 		
