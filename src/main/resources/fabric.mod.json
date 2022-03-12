@@ -9,8 +9,7 @@
     "hhhzzzsss"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "sources": "https://github.com/hhhzzzsss/SongPlayer"
   },
 
   "license": "CC0-1.0",
@@ -27,9 +26,9 @@
   ],
 
   "depends": {
-    "fabricloader": ">=0.7.4",
+    "fabricloader": ">=0.13.3",
     "fabric": "*",
-    "minecraft": "1.17.x"
+    "minecraft": "1.18.x"
   },
   "suggests": {
     "flamingo": "*"
