@@ -75,7 +75,7 @@ public class BuildingThread extends Thread {
 			}
 		}
 		
-		player.sendChatMessage(SongPlayer.creativeCommand);
+		player.sendCommand(SongPlayer.creativeCommand);
 		try { //delay in case of block updates
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
