@@ -337,7 +337,10 @@ public class CommandProcessor {
     	public boolean processCommand(String args) {
     		if (args.length() > 0) {
     			SongPlayer.creativeCommand = args;
-    			SongPlayer.addChatMessage("§6Set creative command to " + SongPlayer.creativeCommand);
+				if (SongPlayer.creativeCommand.startsWith("/")) {
+					SongPlayer.creativeCommand = SongPlayer.creativeCommand.substring(1);
+				}
+    			SongPlayer.addChatMessage("§6Set creative command to /" + SongPlayer.creativeCommand);
 				return true;
     		}
     		else {
@@ -359,7 +362,10 @@ public class CommandProcessor {
     	public boolean processCommand(String args) {
     		if (args.length() > 0) {
     			SongPlayer.survivalCommand = args;
-    			SongPlayer.addChatMessage("§6Set survival command to " + SongPlayer.survivalCommand);
+				if (SongPlayer.survivalCommand.startsWith("/")) {
+					SongPlayer.survivalCommand = SongPlayer.survivalCommand.substring(1);
+				}
+    			SongPlayer.addChatMessage("§6Set survival command to /" + SongPlayer.survivalCommand);
 				return true;
     		}
     		else {

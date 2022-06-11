@@ -75,7 +75,7 @@ public class BuildingThread extends Thread {
 			}
 		}
 		
-		player.sendChatMessage(SongPlayer.creativeCommand);
+		player.sendCommand(SongPlayer.creativeCommand);
 		try { //delay in case of block updates
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
@@ -189,6 +189,6 @@ public class BuildingThread extends Thread {
     	fx += p.getX();
     	fy += p.getY();
     	fz += p.getZ();
-    	SongPlayer.MC.interactionManager.interactBlock(player, world, Hand.MAIN_HAND, new BlockHitResult(new Vec3d(fx, fy, fz), Direction.UP, p, false));
+    	SongPlayer.MC.interactionManager.interactBlock(player, Hand.MAIN_HAND, new BlockHitResult(new Vec3d(fx, fy, fz), Direction.UP, p, false));
 	}
 }

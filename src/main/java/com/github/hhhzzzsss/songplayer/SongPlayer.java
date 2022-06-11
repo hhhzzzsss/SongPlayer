@@ -7,7 +7,8 @@ import com.github.hhhzzzsss.songplayer.song.Song;
 
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.Text;
 
 public class SongPlayer implements ModInitializer {
 	
@@ -41,6 +42,6 @@ public class SongPlayer implements ModInitializer {
 	}
 	
 	public static void addChatMessage(String message) {
-		MC.player.sendMessage(new LiteralText(message), false);
+		MC.player.sendMessage(Text.of(message), false);
 	}
 }
