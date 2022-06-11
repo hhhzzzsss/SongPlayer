@@ -14,7 +14,7 @@ public class PlayingThread extends Thread{
 	private final Song song = SongPlayer.song;
 	
 	public void run() {
-		player.sendChatMessage(SongPlayer.survivalCommand);
+		player.sendCommand(SongPlayer.survivalCommand);
 		while (SongPlayer.MC.interactionManager.getCurrentGameMode() != GameMode.SURVIVAL) {
 			if (SongPlayer.mode != SongPlayer.Mode.PLAYING) {return;}
 			try {
