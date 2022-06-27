@@ -1,5 +1,7 @@
 package com.github.hhhzzzsss.songplayer;
 
+import com.github.hhhzzzsss.songplayer.noteblocks.SongHandler;
+import com.github.hhhzzzsss.songplayer.noteblocks.Stage;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -34,8 +36,9 @@ public class FakePlayerEntity extends OtherClientPlayerEntity {
 	}
 	
 	public void copyStagePosAndPlayerLook() {
-		if (SongPlayer.stage != null) {
-			refreshPositionAndAngles(SongPlayer.stage.position.getX()+0.5, SongPlayer.stage.position.getY(), SongPlayer.stage.position.getZ()+0.5, player.getYaw(), player.getPitch());
+		Stage stage = SongHandler.getInstance().stage;
+		if (stage != null) {
+			refreshPositionAndAngles(stage.position.getX()+0.5, stage.position.getY(), stage.position.getZ()+0.5, player.getYaw(), player.getPitch());
 			headYaw = player.headYaw;
 			bodyYaw = player.bodyYaw;
 		}

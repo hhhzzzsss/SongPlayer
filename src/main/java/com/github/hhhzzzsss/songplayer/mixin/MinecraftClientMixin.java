@@ -1,5 +1,6 @@
 package com.github.hhhzzzsss.songplayer.mixin;
 
+import com.github.hhhzzzsss.songplayer.noteblocks.SongHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -14,13 +15,12 @@ import net.minecraft.util.math.BlockPos;
 
 @Mixin(MinecraftClient.class)
 public class MinecraftClientMixin {
-	@Inject(at = @At("HEAD"), method = "doItemUse()V")
-	public void onDoItemUse(CallbackInfo ci) {
-		Type type = SongPlayer.MC.crosshairTarget.getType();
-		if (type == Type.BLOCK) {
-			BlockHitResult blockHitResult = (BlockHitResult) SongPlayer.MC.crosshairTarget;
-			BlockPos pos = blockHitResult.getBlockPos();
-			System.out.println(blockHitResult.getSide() + ": " + pos.getX() + " " + pos.getY() + " " + pos.getZ());
+	@Inject(at = @At("HEAD"), method = "render(Z)V")
+	public void onRender(boolean tick, CallbackInfo ci) {
+		if (SongPlayer.MC.world != null && SongPlayer.MC.player != null && SongPlayer.MC.interactionManager != null) {
+			SongHandler.getInstance().onRenderIngame(tick);
+		} else {
+			SongHandler.getInstance().onNotIngame();
 		}
 	}
 }
