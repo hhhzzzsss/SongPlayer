@@ -1,9 +1,10 @@
 package com.github.hhhzzzsss.songplayer;
 
-import com.github.hhhzzzsss.songplayer.noteblocks.SongHandler;
+import com.github.hhhzzzsss.songplayer.playing.SongHandler;
 import com.github.hhhzzzsss.songplayer.song.Song;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -175,20 +176,15 @@ public class CommandProcessor {
 			}
 			
     		if (args.length() > 0) {
-    			Pattern timestamp_pattern = Pattern.compile("(\\d+):(\\d+)");
-                Matcher timestamp_matcher = timestamp_pattern.matcher(args);
-                
-                if (timestamp_matcher.matches()) {
-                	String minutes = timestamp_matcher.group(1);
-                	String seconds = timestamp_matcher.group(2);
-                    SongHandler.getInstance().currentSong.setTime(Integer.parseInt(minutes)*60*1000 + Integer.parseInt(seconds)*1000);
-					SongPlayer.addChatMessage("§6Set song time to §3" + minutes + ":" + seconds);
-                    return true;
-                }
-                else {
+				try {
+					long time = Util.parseTime(args);
+					SongHandler.getInstance().currentSong.setTime(time);
+					SongPlayer.addChatMessage("§6Set song time to §3" + Util.formatTime(time));
+					return true;
+				} catch (IOException e) {
 					SongPlayer.addChatMessage("§cNot a valid time stamp");
-                	return true;
-                }
+					return false;
+				}
     		}
     		else {
     			return false;
@@ -239,14 +235,10 @@ public class CommandProcessor {
 				return true;
 			}
 			Song currentSong = SongHandler.getInstance().currentSong;
+			long currentTime = Math.min(currentSong.time, currentSong.length);
+			long totalTime = currentSong.length;
     		if (args.length() == 0) {
-    			int currTime = (int) (currentSong.time/1000);
-    			int totTime = (int) (currentSong.length/1000);
-    			int currTimeSeconds = currTime % 60;
-    			int totTimeSeconds = totTime % 60;
-    			int currTimeMinutes = currTime / 60;
-    			int totTimeMinutes = totTime / 60;
-    			SongPlayer.addChatMessage(String.format("§6Currently playing %s §3(%d:%02d/%d:%02d)", currentSong.name, currTimeMinutes, currTimeSeconds, totTimeMinutes, totTimeSeconds));
+    			SongPlayer.addChatMessage(String.format("§6Currently playing %s §3(%s/%s)", Util.formatTime(currentTime), Util.formatTime(totalTime)));
     			return true;
     		}
     		else {

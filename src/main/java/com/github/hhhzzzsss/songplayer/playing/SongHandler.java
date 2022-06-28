@@ -1,18 +1,17 @@
-package com.github.hhhzzzsss.songplayer.noteblocks;
+package com.github.hhhzzzsss.songplayer.playing;
 
 import com.github.hhhzzzsss.songplayer.FakePlayerEntity;
 import com.github.hhhzzzsss.songplayer.SongPlayer;
-import com.github.hhhzzzsss.songplayer.song.Instrument;
-import com.github.hhhzzzsss.songplayer.song.Note;
-import com.github.hhhzzzsss.songplayer.song.Song;
-import com.github.hhhzzzsss.songplayer.song.SongLoaderThread;
+import com.github.hhhzzzsss.songplayer.Util;
+import com.github.hhhzzzsss.songplayer.song.*;
 import net.minecraft.block.Block;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -31,6 +30,7 @@ public class SongHandler {
         }
         return instance;
     }
+    private SongHandler() {}
 
     public SongLoaderThread loaderThread = null;
     public LinkedList<Song> songQueue = new LinkedList<>();
@@ -124,6 +124,7 @@ public class SongHandler {
     private int buildEndDelay = 0;
     private int buildCooldown = 0;
     private void handleBuilding() {
+        setBuildProgressDisplay();
         if (buildStartDelay > 0) {
             buildStartDelay--;
             return;
@@ -133,7 +134,6 @@ public class SongHandler {
             return;
         }
         ClientWorld world = SongPlayer.MC.world;
-        ClientPlayerEntity player = SongPlayer.MC.player;
         if (SongPlayer.MC.interactionManager.getCurrentGameMode() != GameMode.CREATIVE) {
             return;
         }
@@ -177,9 +177,19 @@ public class SongHandler {
             return;
         }
     }
+    private void setBuildProgressDisplay() {
+        MutableText text = Text.empty()
+                .append(Text.literal("Building noteblocks | " ).formatted(Formatting.GOLD))
+                .append(Text.literal((stage.totalMissingNotes - stage.missingNotes.size()) + "/" + stage.totalMissingNotes).formatted(Formatting.DARK_AQUA));
+        ProgressDisplay.getInstance().setText(text);
+    }
 
     // Runs every frame
     private void handlePlaying(boolean tick) {
+        if (tick) {
+            setPlayProgressDisplay();
+        }
+
         if (SongPlayer.MC.interactionManager.getCurrentGameMode() != GameMode.SURVIVAL) {
             currentSong.pause();
             return;
@@ -215,6 +225,20 @@ public class SongHandler {
         if (currentSong.finished()) {
             currentSong = null;
         }
+    }
+
+    public void setPlayProgressDisplay() {
+        long currentTime = Math.min(currentSong.time, currentSong.length);
+        long totalTime = currentSong.length;
+        MutableText text = Text.empty()
+                .append(Text.literal("Now playing " ).formatted(Formatting.GOLD))
+                .append(Text.literal(currentSong.name).formatted(Formatting.BLUE))
+                .append(Text.literal(" | " ).formatted(Formatting.GOLD))
+                .append(Text.literal(String.format("%s/%s", Util.formatTime(currentTime), Util.formatTime(totalTime))).formatted(Formatting.DARK_AQUA));
+        if (currentSong.looping) {
+            text.append(Text.literal(" | Looping enabled" ).formatted(Formatting.GOLD));
+        }
+        ProgressDisplay.getInstance().setText(text);
     }
 
     public void cleanup() {

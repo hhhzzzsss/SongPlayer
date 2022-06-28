@@ -2,9 +2,6 @@ package com.github.hhhzzzsss.songplayer;
 
 import java.io.File;
 
-import com.github.hhhzzzsss.songplayer.noteblocks.Stage;
-import com.github.hhhzzzsss.songplayer.song.Song;
-
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;

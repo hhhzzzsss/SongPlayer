@@ -1,7 +1,7 @@
 package com.github.hhhzzzsss.songplayer;
 
-import com.github.hhhzzzsss.songplayer.noteblocks.SongHandler;
-import com.github.hhhzzzsss.songplayer.noteblocks.Stage;
+import com.github.hhhzzzsss.songplayer.playing.SongHandler;
+import com.github.hhhzzzsss.songplayer.playing.Stage;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
