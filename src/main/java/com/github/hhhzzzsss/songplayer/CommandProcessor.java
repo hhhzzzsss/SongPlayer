@@ -23,6 +23,8 @@ public class CommandProcessor {
 		commands.add(new songsCommand());
 		commands.add(new setCreativeCommandCommand());
 		commands.add(new setSurvivalCommandCommand());
+		commands.add(new useEssentialsCommandsCommand());
+		commands.add(new useVanillaCommandsCommand());
 		commands.add(new toggleFakePlayerCommand());
 	}
 	
@@ -329,6 +331,52 @@ public class CommandProcessor {
     		}
     	}
     }
+
+	private static class useEssentialsCommandsCommand extends Command {
+		public String getName() {
+			return "useEssentialsCommands";
+		}
+		public String getSyntax() {
+			return "$useEssentialsCommands";
+		}
+		public String getDescription() {
+			return "Switches to using essentials gamemode commands";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() == 0) {
+				SongPlayer.creativeCommand = "gmc";
+				SongPlayer.survivalCommand = "gms";
+				SongPlayer.addChatMessage("§6Now using essentials gamemode commands");
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+
+	private static class useVanillaCommandsCommand extends Command {
+		public String getName() {
+			return "useVanillaCommands";
+		}
+		public String getSyntax() {
+			return "$useVanillaCommands";
+		}
+		public String getDescription() {
+			return "Switches to using vanilla gamemode commands";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() == 0) {
+				SongPlayer.creativeCommand = "gamemode creative";
+				SongPlayer.survivalCommand = "gamemode survival";
+				SongPlayer.addChatMessage("§6Now using vanilla gamemode commands");
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
 	
 	private static class toggleFakePlayerCommand extends Command {
 		public String getName() {
