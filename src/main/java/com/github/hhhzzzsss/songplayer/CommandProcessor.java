@@ -6,8 +6,6 @@ import com.github.hhhzzzsss.songplayer.song.Song;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class CommandProcessor {
 	public static ArrayList<Command> commands = new ArrayList<>();
@@ -20,6 +18,7 @@ public class CommandProcessor {
 		commands.add(new gotoCommand());
 		commands.add(new loopCommand());
 		commands.add(new currentCommand());
+		commands.add(new queueCommand());
 		commands.add(new songsCommand());
 		commands.add(new setCreativeCommandCommand());
 		commands.add(new setSurvivalCommandCommand());
@@ -173,7 +172,7 @@ public class CommandProcessor {
     	}
     	public boolean processCommand(String args) {
 			if (SongHandler.getInstance().currentSong == null) {
-				SongPlayer.addChatMessage("§cNo song is currently playing");
+				SongPlayer.addChatMessage("§6No song is currently playing");
 				return true;
 			}
 			
@@ -206,7 +205,7 @@ public class CommandProcessor {
     	}
     	public boolean processCommand(String args) {
     		if (SongHandler.getInstance().currentSong == null) {
-				SongPlayer.addChatMessage("§cNo song is currently playing");
+				SongPlayer.addChatMessage("§6No song is currently playing");
 				return true;
 			}
     		
@@ -232,14 +231,14 @@ public class CommandProcessor {
     		return "Gets the song that is currently playing";
     	}
     	public boolean processCommand(String args) {
-			if (SongHandler.getInstance().currentSong == null) {
-				SongPlayer.addChatMessage("§cNo song is currently playing");
-				return true;
-			}
-			Song currentSong = SongHandler.getInstance().currentSong;
-			long currentTime = Math.min(currentSong.time, currentSong.length);
-			long totalTime = currentSong.length;
     		if (args.length() == 0) {
+				if (SongHandler.getInstance().currentSong == null) {
+					SongPlayer.addChatMessage("§6No song is currently playing");
+					return true;
+				}
+				Song currentSong = SongHandler.getInstance().currentSong;
+				long currentTime = Math.min(currentSong.time, currentSong.length);
+				long totalTime = currentSong.length;
     			SongPlayer.addChatMessage(String.format("§6Currently playing %s §3(%s/%s)", Util.formatTime(currentTime), Util.formatTime(totalTime)));
     			return true;
     		}
@@ -248,6 +247,39 @@ public class CommandProcessor {
     		}
     	}
     }
+
+	private static class queueCommand extends Command {
+		public String getName() {
+			return "queue";
+		}
+		public String getSyntax() {
+			return "$queue";
+		}
+		public String getDescription() {
+			return "Shows the current song queue";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() == 0) {
+				if (SongHandler.getInstance().currentSong == null && SongHandler.getInstance().songQueue.isEmpty()) {
+					SongPlayer.addChatMessage("§6No song is currently playing");
+					return true;
+				}
+
+				if (SongHandler.getInstance().currentSong != null) {
+					SongPlayer.addChatMessage("§6Current song: §3" + SongHandler.getInstance().currentSong.name);
+				}
+				int index = 0;
+				for (Song song : SongHandler.getInstance().songQueue) {
+					index++;
+					SongPlayer.addChatMessage(String.format("§6%d. §3%s", index, song.name));
+				}
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
 	
 	private static class songsCommand extends Command {
     	public String getName() {
