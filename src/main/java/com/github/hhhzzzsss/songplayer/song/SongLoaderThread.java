@@ -58,7 +58,7 @@ public class SongLoaderThread extends Thread{
 			}
 
 			try {
-				song = MidiConverter.getSongFromBytes(bytes, location);
+				song = MidiConverter.getSongFromBytes(bytes, name);
 			}
 			catch (Exception e) {}
 
