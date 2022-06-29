@@ -188,8 +188,6 @@ public class Stage {
 
 		// Set total missing notes
 		totalMissingNotes = missingNotes.size();
-
-		System.out.println(player.getEyeY());
 	}
 
 	boolean withinBreakingDist(int dx, int dy, int dz) {
