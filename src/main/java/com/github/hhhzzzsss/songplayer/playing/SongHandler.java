@@ -104,7 +104,7 @@ public class SongHandler {
         }
     }
 
-    private void setSong(Song song) {
+    public void setSong(Song song) {
         currentSong = song;
         building = true;
         setCreativeIfNeeded();
@@ -158,6 +158,9 @@ public class SongHandler {
         } else if (!stage.missingNotes.isEmpty()) {
             int desiredNoteId = stage.missingNotes.pollFirst();
             BlockPos bp = stage.noteblockPositions.get(desiredNoteId);
+            if (bp == null) {
+                return;
+            }
             int blockId = Block.getRawIdFromState(world.getBlockState(bp));
             int currentNoteId = (blockId-SongPlayer.NOTEBLOCK_BASE_ID)/2;
             if (currentNoteId != desiredNoteId) {
@@ -219,7 +222,10 @@ public class SongHandler {
         currentSong.advanceTime();
         while (currentSong.reachedNextNote()) {
             Note note = currentSong.getNextNote();
-            attackBlock(stage.noteblockPositions.get(note.noteId));
+            BlockPos bp = stage.noteblockPositions.get(note.noteId);
+            if (bp != null) {
+                attackBlock(bp);
+            }
         }
 
         if (currentSong.finished()) {

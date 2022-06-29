@@ -9,6 +9,7 @@ import com.github.hhhzzzsss.songplayer.song.Song;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
@@ -52,7 +53,9 @@ public class Stage {
 			for (int dz = -4; dz <= 4; dz++) {
 				if (Math.abs(dx) == 4 && Math.abs(dz) == 4)  {
 					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + 0, position.getZ() + dz));
+					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + 2, position.getZ() + dz));
 					breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + 1, position.getZ() + dz));
+					breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + 3, position.getZ() + dz));
 				} else {
 					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() - 1, position.getZ() + dz));
 					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + 2, position.getZ() + dz));
@@ -62,13 +65,27 @@ public class Stage {
 				}
 			}
 		}
+		for (int dx = -4; dx <= 4; dx++) {
+			for (int dz = -4; dz <= 4; dz++) {
+				if (withinBreakingDist(dx, -3, dz)) {
+					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() - 3, position.getZ() + dz));
+				}
+				if (withinBreakingDist(dx, 4, dz)) {
+					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + 4, position.getZ() + dz));
+				}
+			}
+		}
 
 		// Sorting noteblock and break locations
 		noteblockLocations.sort((a, b) -> {
 			// First sort by y
-			if (a.getY() < b.getY()) {
+			int a_dy = a.getY() - position.getY();
+			int b_dy = b.getY() - position.getY();
+			if (a_dy == -1) a_dy = 0; // same layer
+			if (b_dy == -1) b_dy = 0; // same layer
+			if (Math.abs(a_dy) < Math.abs(b_dy)) {
 				return -1;
-			} else if (a.getY() > b.getY()) {
+			} else if (Math.abs(a_dy) > Math.abs(b_dy)) {
 				return 1;
 			}
 			// Then sort by horizontal distance
@@ -94,6 +111,46 @@ public class Stage {
 				return 0;
 			}
 		});
+
+		// Remove already-existing notes from missingNotes, adding their positions to noteblockPositions, and create a list of unused noteblock locations
+		ArrayList<BlockPos> unusedNoteblockLocations = new ArrayList<>();
+		for (BlockPos nbPos : noteblockLocations) {
+			BlockState bs = SongPlayer.MC.world.getBlockState(nbPos);
+			int blockId = Block.getRawIdFromState(bs);
+			if (blockId >= SongPlayer.NOTEBLOCK_BASE_ID && blockId < SongPlayer.NOTEBLOCK_BASE_ID+800) {
+				int noteId = (blockId-SongPlayer.NOTEBLOCK_BASE_ID)/2;
+				if (missingNotes.contains(noteId)) {
+					missingNotes.remove(noteId);
+					noteblockPositions.put(noteId, nbPos);
+				}
+				else {
+					unusedNoteblockLocations.add(nbPos);
+				}
+			}
+			else {
+				unusedNoteblockLocations.add(nbPos);
+			}
+		}
+
+		// Cull noteblocks that won't fit in stage
+		if (missingNotes.size() > unusedNoteblockLocations.size()) {
+			while (missingNotes.size() > unusedNoteblockLocations.size()) {
+				missingNotes.pollLast();
+			}
+		}
+
+		// Populate missing noteblocks into the unused noteblock locations
+		int idx = 0;
+		for (int noteId : missingNotes) {
+			BlockPos bp = unusedNoteblockLocations.get(idx++);
+			noteblockPositions.put(noteId, bp);
+			int dy = bp.getY() - position.getY();
+			// Optional break locations
+			if (dy < -1 || dy > 2) {
+				breakLocations.add(bp.up());
+			}
+		}
+
 		requiredBreaks = breakLocations
 				.stream()
 				.filter((bp) -> Block.getRawIdFromState(SongPlayer.MC.world.getBlockState(bp)) != 0)
@@ -129,39 +186,16 @@ public class Stage {
 				})
 				.collect(Collectors.toCollection(LinkedList::new));
 
-		// Remove already-existing notes from missingNotes, adding their positions to noteblockPositions, and create a list of unused noteblock locations
-		ArrayList<BlockPos> unusedNoteblockLocations = new ArrayList<>();
-		for (BlockPos nbPos : noteblockLocations) {
-			BlockState bs = SongPlayer.MC.world.getBlockState(nbPos);
-			int blockId = Block.getRawIdFromState(bs);
-			if (blockId >= SongPlayer.NOTEBLOCK_BASE_ID && blockId < SongPlayer.NOTEBLOCK_BASE_ID+800) {
-				int noteId = (blockId-SongPlayer.NOTEBLOCK_BASE_ID)/2;
-				if (missingNotes.contains(noteId)) {
-//					stage.tunedNoteblocks[noteId] = pos;
-					missingNotes.remove(noteId);
-					noteblockPositions.put(noteId, nbPos);
-				}
-				else {
-					unusedNoteblockLocations.add(nbPos);
-				}
-			}
-			else {
-				unusedNoteblockLocations.add(nbPos);
-			}
-		}
-
-		// Populate missing noteblocks into the unused noteblock locations
-		int idx = 0;
-		for (int noteId : missingNotes) {
-			if (idx >= unusedNoteblockLocations.size()) {
-				System.out.println("Too many noteblocks!");
-				break;
-			}
-			noteblockPositions.put(noteId, unusedNoteblockLocations.get(idx++));
-		}
-
 		// Set total missing notes
 		totalMissingNotes = missingNotes.size();
+
+		System.out.println(player.getEyeY());
+	}
+
+	boolean withinBreakingDist(int dx, int dy, int dz) {
+		double dy1 = dy + 0.5 - 1.62; // Standing eye height
+		double dy2 = dy + 0.5 - 1.27; // Crouching eye height
+		return dx*dx + dy1*dy1 + dz*dz < 5.99*5.99 && dx*dx + dy2*dy2 + dz*dz < 5.99*5.99;
 	}
 
 	public boolean nothingToBuild() {

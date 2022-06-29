@@ -1,6 +1,7 @@
 package com.github.hhhzzzsss.songplayer;
 
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
+import com.github.hhhzzzsss.songplayer.song.Note;
 import com.github.hhhzzzsss.songplayer.song.Song;
 
 import java.io.File;
@@ -25,6 +26,7 @@ public class CommandProcessor {
 		commands.add(new useEssentialsCommandsCommand());
 		commands.add(new useVanillaCommandsCommand());
 		commands.add(new toggleFakePlayerCommand());
+		commands.add(new testSongCommand());
 	}
 	
 	// returns true if it is a command and should be cancelled
@@ -435,5 +437,31 @@ public class CommandProcessor {
     			return false;
     		}
     	}
+	}
+
+	private static class testSongCommand extends Command {
+		public String getName() {
+			return "testSong";
+		}
+		public String getSyntax() {
+			return "$testSong";
+		}
+		public String getDescription() {
+			return "Creates a song for testing";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() == 0) {
+				Song song = new Song("test_song");
+				for (int i=0; i<400; i++) {
+					song.add(new Note(i, i*50));
+				}
+				song.length = 400*50;
+				SongHandler.getInstance().setSong(song);
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
 	}
 }
