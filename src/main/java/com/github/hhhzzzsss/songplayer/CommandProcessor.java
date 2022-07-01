@@ -3,10 +3,17 @@ package com.github.hhhzzzsss.songplayer;
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
 import com.github.hhhzzzsss.songplayer.song.Note;
 import com.github.hhhzzzsss.songplayer.song.Song;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.minecraft.command.CommandSource;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class CommandProcessor {
 	public static ArrayList<Command> commands = new ArrayList<>();
@@ -53,6 +60,9 @@ public class CommandProcessor {
     	public abstract String getSyntax();
     	public abstract String getDescription();
     	public abstract boolean processCommand(String args);
+		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
+			return null;
+		}
     }
 	
 	private static class helpCommand extends Command {
@@ -106,6 +116,13 @@ public class CommandProcessor {
     			return false;
     		}
     	}
+		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
+			List<String> filenames = Arrays.stream(SongPlayer.SONG_DIR.listFiles())
+					.filter(File::isFile)
+					.map(File::getName)
+					.collect(Collectors.toList());
+			return CommandSource.suggestMatching(filenames, suggestionsBuilder);
+		}
     }
 
 	private static class stopCommand extends Command {
@@ -463,5 +480,24 @@ public class CommandProcessor {
 				return false;
 			}
 		}
+	}
+
+	// $ prefix included in command string
+	public static CompletableFuture<Suggestions> handleSuggestions(String text, SuggestionsBuilder suggestionsBuilder) {
+		if (!text.contains(" ")) {
+			List<String> names = commands
+					.stream()
+					.map((command) -> "$"+command.getName())
+					.collect(Collectors.toList());
+			return CommandSource.suggestMatching(names, suggestionsBuilder);
+		} else {
+			String[] split = text.split(" ");
+			for (Command command : commands) {
+				if (split[0].equalsIgnoreCase("$"+command.getName())) {
+					return command.getSuggestions(split.length == 1 ? "" : split[1], suggestionsBuilder);
+				}
+			}
+		}
+		return null;
 	}
 }
