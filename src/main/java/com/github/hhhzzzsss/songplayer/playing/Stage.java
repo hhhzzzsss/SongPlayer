@@ -199,4 +199,31 @@ public class Stage {
 	public boolean nothingToBuild() {
 		return requiredBreaks.isEmpty() && missingNotes.isEmpty();
 	}
+
+	private static final int WRONG_INSTRUMENT_TOLERANCE = 3;
+	public boolean hasBreakingModification() {
+		int wrongInstruments = 0;
+		for (Map.Entry<Integer, BlockPos> entry : noteblockPositions.entrySet()) {
+			BlockState bs = SongPlayer.MC.world.getBlockState(entry.getValue());
+			int blockId = Block.getRawIdFromState(bs);
+			int actualNoteId = (blockId-SongPlayer.NOTEBLOCK_BASE_ID)/2;
+			if (actualNoteId < 0 || actualNoteId >= 400) {
+				return true;
+			}
+			int actualInstrument = actualNoteId / 25;
+			int actualPtich = actualNoteId % 25;
+			int targetInstrument = entry.getKey() / 25;
+			int targetPitch = entry.getKey() % 25;
+			if (targetPitch != actualPtich) {
+				return true;
+			}
+			if (targetInstrument != actualInstrument) {
+				wrongInstruments++;
+				if (wrongInstruments > WRONG_INSTRUMENT_TOLERANCE) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }
