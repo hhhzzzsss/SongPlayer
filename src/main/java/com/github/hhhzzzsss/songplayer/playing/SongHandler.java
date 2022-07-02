@@ -221,13 +221,18 @@ public class SongHandler {
 
         currentSong.play();
 
+        boolean somethingPlayed = false;
         currentSong.advanceTime();
         while (currentSong.reachedNextNote()) {
             Note note = currentSong.getNextNote();
             BlockPos bp = stage.noteblockPositions.get(note.noteId);
             if (bp != null) {
                 attackBlock(bp);
+                somethingPlayed = true;
             }
+        }
+        if (somethingPlayed) {
+            stopAttack();
         }
 
         if (currentSong.finished()) {
@@ -314,5 +319,8 @@ public class SongHandler {
     }
     private void attackBlock(BlockPos bp) {
         SongPlayer.MC.interactionManager.attackBlock(bp, Direction.UP);
+    }
+    private void stopAttack() {
+        SongPlayer.MC.interactionManager.cancelBlockBreaking();
     }
 }
