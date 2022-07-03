@@ -86,7 +86,6 @@ public class NBSConverter {
             loopStartTick = buffer.getShort();
         }
 
-
         ArrayList<NBSNote> nbsNotes = new ArrayList<>();
         short tick = -1;
         while (true) {
@@ -133,6 +132,7 @@ public class NBSConverter {
         if (loop > 0) {
             song.looping = true;
             song.loopPosition = getMilliTime(loopStartTick, tempo);
+            song.loopCount = maxLoopCount;
         }
         for (NBSNote note : nbsNotes) {
             Instrument instrument;

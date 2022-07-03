@@ -244,12 +244,16 @@ public class SongHandler {
         long currentTime = Math.min(currentSong.time, currentSong.length);
         long totalTime = currentSong.length;
         MutableText text = Text.empty()
-                .append(Text.literal("Now playing " ).formatted(Formatting.GOLD))
+                .append(Text.literal("Now playing ").formatted(Formatting.GOLD))
                 .append(Text.literal(currentSong.name).formatted(Formatting.BLUE))
-                .append(Text.literal(" | " ).formatted(Formatting.GOLD))
+                .append(Text.literal(" | ").formatted(Formatting.GOLD))
                 .append(Text.literal(String.format("%s/%s", Util.formatTime(currentTime), Util.formatTime(totalTime))).formatted(Formatting.DARK_AQUA));
         if (currentSong.looping) {
-            text.append(Text.literal(" | Looping enabled" ).formatted(Formatting.GOLD));
+            if (currentSong.loopCount > 0) {
+                text.append(Text.literal(String.format(" | Loop (%d/%d)", currentSong.currentLoop, currentSong.loopCount)).formatted(Formatting.GOLD));
+            } else {
+                text.append(Text.literal(" | Looping enabled").formatted(Formatting.GOLD));
+            }
         }
         ProgressDisplay.getInstance().setText(text);
     }

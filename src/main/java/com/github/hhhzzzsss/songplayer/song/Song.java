@@ -12,8 +12,10 @@ public class Song {
 	public boolean paused = true;
 	public long startTime = 0; // Start time in millis since unix epoch
 	public long length = 0; // Milliseconds in the song
-	public long loopPosition = 0; // Milliseconds into the song to start looping
 	public long time = 0; // Time since start of song
+	public long loopPosition = 0; // Milliseconds into the song to start looping
+	public int loopCount = 0; // Number of times to loop
+	public int currentLoop = 0; // Number of loops so far
 	
 	public Song(String name) {
 		this.name = name;
@@ -48,6 +50,7 @@ public class Song {
 	public void pause() {
 		if (!paused) {
 			paused = true;
+			// Recalculates time so that the song will continue playing after the exact point it was paused
 			advanceTime();
 		}
 	}
@@ -56,8 +59,8 @@ public class Song {
 		time = t;
 		startTime = System.currentTimeMillis() - time;
 		position = 0;
-		while (reachedNextNote()) {
-			getNextNote();
+		while (position < notes.size() && notes.get(position).time < t) {
+			position++;
 		}
 	}
 
@@ -67,10 +70,15 @@ public class Song {
 
 	public boolean reachedNextNote() {
 		if (position < notes.size()) {
-			return notes.get(position).time <= this.time;
+			return notes.get(position).time <= time;
 		} else {
-			if (looping) {
-				return notes.get(0).time + length <= this.time;
+			if (time > length && shouldLoop()) {
+				loop();
+				if (position < notes.size()) {
+					return notes.get(position).time <= time;
+				} else {
+					return false;
+				}
 			} else {
 				return false;
 			}
@@ -79,7 +87,7 @@ public class Song {
 
 	public Note getNextNote() {
 		if (position >= notes.size()) {
-			if (looping) {
+			if (shouldLoop()) {
 				loop();
 			} else {
 				return null;
@@ -89,13 +97,29 @@ public class Song {
 	}
 
 	public boolean finished() {
-		return time > length;
+		return time > length && !shouldLoop();
 	}
 
 	private void loop() {
 		position = 0;
-		startTime += length;
-		time -= length;
+		startTime += length - loopPosition;
+		time -= length - loopPosition;
+		while (position < notes.size() && notes.get(position).time < loopPosition) {
+			position++;
+		}
+		currentLoop++;
+	}
+
+	private boolean shouldLoop() {
+		if (looping) {
+			if (loopCount == 0) {
+				return true;
+			} else {
+				return currentLoop < loopCount;
+			}
+		} else {
+			return false;
+		}
 	}
 
 	public int size() {

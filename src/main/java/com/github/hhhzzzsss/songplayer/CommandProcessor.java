@@ -229,6 +229,7 @@ public class CommandProcessor {
 			}
     		
     		SongHandler.getInstance().currentSong.looping = !SongHandler.getInstance().currentSong.looping;
+			SongHandler.getInstance().currentSong.loopCount = 0;
 			if (SongHandler.getInstance().currentSong.looping) {
 				SongPlayer.addChatMessage("§6Enabled looping");
 			}
