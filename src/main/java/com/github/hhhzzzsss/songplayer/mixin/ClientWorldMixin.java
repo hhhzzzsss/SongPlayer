@@ -28,13 +28,4 @@ public class ClientWorldMixin {
             }
         }
     }
-
-//    public String getBlockString(BlockState state) {
-//        Block block = state.getBlock();
-//        if (block instanceof NoteBlock) {
-//            NoteBlock block = (NoteBlock) block;
-//        } else {
-//            return state.toString();
-//        }
-//    }
 }

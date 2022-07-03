@@ -8,7 +8,6 @@
   "client": [
     "ClientPlayerEntityMixin",
     "ClientPlayNetworkHandlerMixin",
-    "ClientWorldMixin",
     "CommandSuggestorMixin",
     "InGameHudMixin",
     "MinecraftClientMixin"
