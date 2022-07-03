@@ -6,6 +6,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 import javax.sound.midi.*;
 
@@ -120,7 +121,7 @@ public class MidiConverter {
 		
 		return song;
 	}
-	
+
 	public static Note getMidiInstrumentNote(int midiInstrument, int midiPitch, long microTime) {
 		Instrument instrument = null;
 		if ((midiInstrument >= 0 && midiInstrument <= 7) || (midiInstrument >= 24 && midiInstrument <= 31)) { //normal
@@ -182,26 +183,64 @@ public class MidiConverter {
 		return new Note(noteId, time);
 	}
 
+	// 0 4 7 12 16 19 24
+	public static HashMap<Integer, Integer> percussionMap = new HashMap<>();
+	static {
+		percussionMap.put(35, 0  + 25*Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(36, 4  + 25*Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(37, 7  + 25*Instrument.HAT.instrumentId);
+		percussionMap.put(38, 7  + 25*Instrument.SNARE.instrumentId);
+		percussionMap.put(39, 0 + 25*Instrument.SNARE.instrumentId);
+		percussionMap.put(40, 12 + 25*Instrument.SNARE.instrumentId);
+		percussionMap.put(41, 7  + 25*Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(42, 7  + 25*Instrument.HAT.instrumentId);
+		percussionMap.put(43, 12 + 25*Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(44, 7  + 25*Instrument.HAT.instrumentId);
+		percussionMap.put(45, 16 + 25*Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(46, 7  + 25*Instrument.HAT.instrumentId);
+		percussionMap.put(47, 19 + 25*Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(48, 23 + 25*Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(49, 12 + 25*Instrument.HAT.instrumentId);
+		percussionMap.put(50, 24 + 25*Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(51, 13 + 25*Instrument.HAT.instrumentId);
+		percussionMap.put(52, 0  + 25*Instrument.SNARE.instrumentId);
+		percussionMap.put(53, 0  + 25*Instrument.COW_BELL.instrumentId);
+		percussionMap.put(54, 12 + 25*Instrument.SNARE.instrumentId);
+		percussionMap.put(55, 12 + 25*Instrument.HAT.instrumentId);
+		percussionMap.put(56, 13 + 25*Instrument.COW_BELL.instrumentId);
+		percussionMap.put(57, 12 + 25*Instrument.HAT.instrumentId);
+		percussionMap.put(58, 0  + 25*Instrument.BASEDRUM.instrumentId); // ??
+		percussionMap.put(59, 12 + 25*Instrument.HAT.instrumentId);
+		percussionMap.put(60, 24 + 25*Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(61, 19 + 25*Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(62, 24 + 25*Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(63, 24 + 25*Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(64, 20 + 25*Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(65, 24 + 25*Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(66, 20 + 25*Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(67, 24 + 25*Instrument.HAT.instrumentId);
+		percussionMap.put(68, 22 + 25*Instrument.HAT.instrumentId);
+		percussionMap.put(69, 16 + 25*Instrument.SNARE.instrumentId);
+		percussionMap.put(70, 16 + 25*Instrument.SNARE.instrumentId);
+		percussionMap.put(71, 24 + 25*Instrument.HAT.instrumentId);
+		percussionMap.put(72, 24 + 25*Instrument.HAT.instrumentId);
+		percussionMap.put(73, 19 + 25*Instrument.SNARE.instrumentId);
+		percussionMap.put(74, 19 + 25*Instrument.SNARE.instrumentId);
+		percussionMap.put(75, 12 + 25*Instrument.HAT.instrumentId);
+		percussionMap.put(76, 24 + 25*Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(77, 22 + 25*Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(78, 22 + 25*Instrument.HAT.instrumentId);
+		percussionMap.put(79, 19 + 25*Instrument.SNARE.instrumentId);
+		percussionMap.put(80, 16 + 25*Instrument.HAT.instrumentId);
+		percussionMap.put(81, 16 + 25*Instrument.HAT.instrumentId);
+	}
 	private static Note getMidiPercussionNote(int midiPitch, long microTime) {
-		Instrument instrument = null;
-		if (midiPitch == 35 || midiPitch == 36 || midiPitch == 41 || midiPitch == 43 || midiPitch == 45 || midiPitch == 57) {
-			instrument = Instrument.BASEDRUM;
-		}
-		else if (midiPitch == 38 || midiPitch == 39 || midiPitch == 40 || midiPitch == 54 || midiPitch == 69 || midiPitch == 70 || midiPitch == 73 || midiPitch == 74 || midiPitch == 78 || midiPitch == 79) {
-			instrument = Instrument.SNARE;
-		}
-		else if (midiPitch == 37 || midiPitch == 42 || midiPitch == 44 || midiPitch == 46 || midiPitch == 49 || midiPitch == 51 || midiPitch == 52 || midiPitch == 55 || midiPitch == 57 || midiPitch == 59) {
-			instrument = Instrument.HAT;
-		}
+		if (percussionMap.containsKey(midiPitch)) {
+			int noteId = percussionMap.get(midiPitch);
+			long time = microTime / 1000L;
 
-		if (instrument == null) {
-			return null;
+			return new Note(noteId, time);
 		}
-
-		int pitch = 0;
-		int noteId = pitch + instrument.instrumentId*25;
-		long time = microTime / 1000L;
-
-		return new Note(noteId, time);
+		return null;
 	}
 }
