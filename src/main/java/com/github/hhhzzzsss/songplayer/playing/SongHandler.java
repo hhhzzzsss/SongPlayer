@@ -236,6 +236,7 @@ public class SongHandler {
         }
 
         if (currentSong.finished()) {
+            SongPlayer.addChatMessage("§6Done playing §3" + currentSong.name);
             currentSong = null;
         }
     }
