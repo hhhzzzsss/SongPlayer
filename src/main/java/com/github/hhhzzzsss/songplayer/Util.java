@@ -27,7 +27,7 @@ public class Util {
         return sb.toString();
     }
 
-    public static Pattern timePattern = Pattern.compile("(?:(\\d+)?:)(\\d+):(\\d+)");
+    public static Pattern timePattern = Pattern.compile("(?:(\\d+):)?(\\d+):(\\d+)");
     public static long parseTime(String timeStr) throws IOException {
         Matcher matcher = timePattern.matcher(timeStr);
         if (matcher.matches()) {
