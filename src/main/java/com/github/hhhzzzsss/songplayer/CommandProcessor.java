@@ -285,13 +285,14 @@ public class CommandProcessor {
 					return true;
 				}
 
+				SongPlayer.addChatMessage("§6Song queue:");
 				if (SongHandler.getInstance().currentSong != null) {
-					SongPlayer.addChatMessage("§6Current song: §3" + SongHandler.getInstance().currentSong.name);
+					SongPlayer.addChatMessage("§bCurrent song: §3" + SongHandler.getInstance().currentSong.name);
 				}
 				int index = 0;
 				for (Song song : SongHandler.getInstance().songQueue) {
 					index++;
-					SongPlayer.addChatMessage(String.format("§6%d. §3%s", index, song.name));
+					SongPlayer.addChatMessage(String.format("§b%d. §3%s", index, song.name));
 				}
 				return true;
 			}
