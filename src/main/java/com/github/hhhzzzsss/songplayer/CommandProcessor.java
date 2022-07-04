@@ -28,7 +28,7 @@ public class CommandProcessor {
 		commands.add(new skipCommand());
 		commands.add(new gotoCommand());
 		commands.add(new loopCommand());
-		commands.add(new currentCommand());
+		commands.add(new statusCommand());
 		commands.add(new queueCommand());
 		commands.add(new songsCommand());
 		commands.add(new setCreativeCommandCommand());
@@ -265,7 +265,7 @@ public class CommandProcessor {
     	}
     }
 	
-	private static class currentCommand extends Command {
+	private static class statusCommand extends Command {
     	public String getName() {
     		return "status";
     	}
