@@ -66,9 +66,7 @@ public class SongLoaderThread extends Thread{
 				try {
 					song = NBSConverter.getSongFromBytes(bytes, name);
 				}
-				catch (Exception e) {
-					e.printStackTrace();
-				}
+				catch (Exception e) {}
 			}
 
 			if (song == null) {
