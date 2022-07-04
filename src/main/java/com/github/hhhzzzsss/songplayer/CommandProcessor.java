@@ -11,12 +11,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class CommandProcessor {
 	public static ArrayList<Command> commands = new ArrayList<>();
+	public static HashMap<String, Command> commandMap = new HashMap<>();
+	public static ArrayList<String> commandCompletions = new ArrayList<>();
 	
 	public static void initCommands() {
 		commands.add(new helpCommand());
@@ -34,6 +37,15 @@ public class CommandProcessor {
 		commands.add(new useVanillaCommandsCommand());
 		commands.add(new toggleFakePlayerCommand());
 		commands.add(new testSongCommand());
+
+		for (Command command : commands) {
+			commandMap.put(command.getName().toLowerCase(), command);
+			commandCompletions.add(command.getName());
+			for (String alias : command.getAliases()) {
+				commandMap.put(alias.toLowerCase(), command);
+				commandCompletions.add(alias);
+			}
+		}
 	}
 	
 	// returns true if it is a command and should be cancelled
@@ -42,17 +54,19 @@ public class CommandProcessor {
 			String[] parts = message.substring(1).split(" ", 2);
 		    String name = parts.length>0 ? parts[0] : "";
 		    String args = parts.length>1 ? parts[1] : "";
-		    for (Command c : commands) {
-		    	if (c.getName().equalsIgnoreCase(name)) {
-		    		boolean success = c.processCommand(args);
-		    		if (!success) {
-		    			SongPlayer.addChatMessage("§cSyntax - " + c.getSyntax());
-		    		}
-		    		return true;
-		    	}
-		    }
+			Command c = commandMap.get(name.toLowerCase());
+		    if (c == null) {
+				SongPlayer.addChatMessage("§cUnrecognized command");
+			} else {
+				boolean success = c.processCommand(args);
+				if (!success) {
+					SongPlayer.addChatMessage("§cSyntax - " + c.getSyntax());
+				}
+			}
+			return true;
+		} else {
+			return false;
 		}
-		return false;
 	}
 	
 	private static abstract class Command {
@@ -60,6 +74,9 @@ public class CommandProcessor {
     	public abstract String getSyntax();
     	public abstract String getDescription();
     	public abstract boolean processCommand(String args);
+		public String[] getAliases() {
+			return new String[]{};
+		}
 		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
 			return null;
 		}
@@ -82,20 +99,28 @@ public class CommandProcessor {
     				helpMessage.append(" $" + c.getName());
     			}
     			SongPlayer.addChatMessage(helpMessage.toString());
-    			return true;
     		}
     		else {
-    			for (Command c : commands) {
-    				if (c.getName().equalsIgnoreCase(args)) {
-    					SongPlayer.addChatMessage("§6" + c.getName() + ": " + c.getDescription() + " - " + c.getSyntax());
-    					return true;
-    				}
-    			}
-    			SongPlayer.addChatMessage("§cCommand not recognized: " + args);
-    			return true;
+				if (commandMap.containsKey(args.toLowerCase())) {
+					Command c = commandMap.get(args.toLowerCase());
+					SongPlayer.addChatMessage("§6------------------------------");
+					SongPlayer.addChatMessage("§6Help: §3" + c.getName());
+					SongPlayer.addChatMessage("§6Description: §3" + c.getDescription());
+					SongPlayer.addChatMessage("§6Usage: §3" + c.getSyntax());
+					if (c.getAliases().length > 0) {
+						SongPlayer.addChatMessage("§6Aliases: §3" + String.join(", ", c.getAliases()));
+					}
+					SongPlayer.addChatMessage("§6------------------------------");
+    			} else {
+					SongPlayer.addChatMessage("§cCommand not recognized: " + args);
+				}
     		}
+			return true;
     	}
-    }
+		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
+			return CommandSource.suggestMatching(commandCompletions, suggestionsBuilder);
+		}
+	}
 	
 	private static class playCommand extends Command {
     	public String getName() {
@@ -242,13 +267,16 @@ public class CommandProcessor {
 	
 	private static class currentCommand extends Command {
     	public String getName() {
-    		return "current";
+    		return "status";
     	}
+		public String[] getAliases() {
+			return new String[]{"current"};
+		}
     	public String getSyntax() {
-    		return "$current";
+    		return "$status";
     	}
     	public String getDescription() {
-    		return "Gets the song that is currently playing";
+    		return "Gets the status of the song that is currently playing";
     	}
     	public boolean processCommand(String args) {
     		if (args.length() == 0) {
@@ -272,6 +300,9 @@ public class CommandProcessor {
 		public String getName() {
 			return "queue";
 		}
+		public String[] getAliases() {
+			return new String[]{"showQueue"};
+		}
 		public String getSyntax() {
 			return "$queue";
 		}
@@ -285,15 +316,16 @@ public class CommandProcessor {
 					return true;
 				}
 
-				SongPlayer.addChatMessage("§6Song queue:");
+				SongPlayer.addChatMessage("§6------------------------------");
 				if (SongHandler.getInstance().currentSong != null) {
-					SongPlayer.addChatMessage("§bCurrent song: §3" + SongHandler.getInstance().currentSong.name);
+					SongPlayer.addChatMessage("§6Current song: §3" + SongHandler.getInstance().currentSong.name);
 				}
 				int index = 0;
 				for (Song song : SongHandler.getInstance().songQueue) {
 					index++;
-					SongPlayer.addChatMessage(String.format("§b%d. §3%s", index, song.name));
+					SongPlayer.addChatMessage(String.format("§6%d. §3%s", index, song.name));
 				}
+				SongPlayer.addChatMessage("§6------------------------------");
 				return true;
 			}
 			else {
@@ -306,6 +338,9 @@ public class CommandProcessor {
     	public String getName() {
     		return "songs";
     	}
+		public String[] getAliases() {
+			return new String[]{"list"};
+		}
     	public String getSyntax() {
     		return "$songs";
     	}
@@ -339,8 +374,11 @@ public class CommandProcessor {
     	public String getName() {
     		return "setCreativeCommand";
     	}
+		public String[] getAliases() {
+			return new String[]{"sc"};
+		}
     	public String getSyntax() {
-    		return "$setCreativeCommand";
+    		return "$setCreativeCommand <command>";
     	}
     	public String getDescription() {
     		return "Sets the command used to go into creative mode";
@@ -364,8 +402,11 @@ public class CommandProcessor {
     	public String getName() {
     		return "setSurvivalCommand";
     	}
+		public String[] getAliases() {
+			return new String[]{"ss"};
+		}
     	public String getSyntax() {
-    		return "$setSurvivalCommand";
+    		return "$setSurvivalCommand <command>";
     	}
     	public String getDescription() {
     		return "Sets the command used to go into survival mode";
@@ -388,6 +429,9 @@ public class CommandProcessor {
 	private static class useEssentialsCommandsCommand extends Command {
 		public String getName() {
 			return "useEssentialsCommands";
+		}
+		public String[] getAliases() {
+			return new String[]{"essentials", "useEssentials", "essentialsCommands"};
 		}
 		public String getSyntax() {
 			return "$useEssentialsCommands";
@@ -412,6 +456,9 @@ public class CommandProcessor {
 		public String getName() {
 			return "useVanillaCommands";
 		}
+		public String[] getAliases() {
+			return new String[]{"vanilla", "useVanilla", "vanillaCommands"};
+		}
 		public String getSyntax() {
 			return "$useVanillaCommands";
 		}
@@ -435,6 +482,9 @@ public class CommandProcessor {
 		public String getName() {
     		return "toggleFakePlayer";
     	}
+		public String[] getAliases() {
+			return new String[]{"fakePlayer", "fp"};
+		}
     	public String getSyntax() {
     		return "$toggleFakePlayer";
     	}
@@ -487,19 +537,20 @@ public class CommandProcessor {
 	// $ prefix included in command string
 	public static CompletableFuture<Suggestions> handleSuggestions(String text, SuggestionsBuilder suggestionsBuilder) {
 		if (!text.contains(" ")) {
-			List<String> names = commands
+			List<String> names = commandCompletions
 					.stream()
-					.map((command) -> "$"+command.getName())
+					.map((commandName) -> "$"+commandName)
 					.collect(Collectors.toList());
 			return CommandSource.suggestMatching(names, suggestionsBuilder);
 		} else {
 			String[] split = text.split(" ");
-			for (Command command : commands) {
-				if (split[0].equalsIgnoreCase("$"+command.getName())) {
-					return command.getSuggestions(split.length == 1 ? "" : split[1], suggestionsBuilder);
+			if (split[0].startsWith("$")) {
+				String commandName = split[0].substring(1).toLowerCase();
+				if (commandMap.containsKey(commandName)) {
+					return commandMap.get(commandName).getSuggestions(split.length == 1 ? "" : split[1], suggestionsBuilder);
 				}
 			}
+			return null;
 		}
-		return null;
 	}
 }
