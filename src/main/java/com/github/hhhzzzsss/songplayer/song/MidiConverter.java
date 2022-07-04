@@ -125,10 +125,12 @@ public class MidiConverter {
 	public static Note getMidiInstrumentNote(int midiInstrument, int midiPitch, long microTime) {
 		Instrument instrument = null;
 		Instrument[] instrumentList = instrumentMap.get(midiInstrument);
-		for (Instrument candidateInstrument : instrumentList) {
-			if (midiPitch >= candidateInstrument.offset && midiPitch <= candidateInstrument.offset+24) {
-				instrument = candidateInstrument;
-				break;
+		if (instrumentList != null) {
+			for (Instrument candidateInstrument : instrumentList) {
+				if (midiPitch >= candidateInstrument.offset && midiPitch <= candidateInstrument.offset+24) {
+					instrument = candidateInstrument;
+					break;
+				}
 			}
 		}
 
