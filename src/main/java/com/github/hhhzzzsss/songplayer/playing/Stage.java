@@ -153,7 +153,10 @@ public class Stage {
 
 		requiredBreaks = breakLocations
 				.stream()
-				.filter((bp) -> Block.getRawIdFromState(SongPlayer.MC.world.getBlockState(bp)) != 0)
+				.filter((bp) -> {
+					BlockState bs = SongPlayer.MC.world.getBlockState(bp);
+					return !bs.isAir() && !bs.getMaterial().isLiquid();
+				})
 				.sorted((a, b) -> {
 					// First sort by y
 					if (a.getY() < b.getY()) {
@@ -222,6 +225,11 @@ public class Stage {
 				if (wrongInstruments > WRONG_INSTRUMENT_TOLERANCE) {
 					return true;
 				}
+			}
+
+			BlockState aboveBs = SongPlayer.MC.world.getBlockState(entry.getValue().up());
+			if (!aboveBs.isAir() && !aboveBs.getMaterial().isLiquid()) {
+				return true;
 			}
 		}
 		return false;

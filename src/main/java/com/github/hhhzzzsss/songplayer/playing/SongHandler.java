@@ -202,7 +202,7 @@ public class SongHandler {
             if (stage.hasBreakingModification()) {
                 stage.checkBuildStatus(currentSong);
             }
-            if (!stage.missingNotes.isEmpty()) {
+            if (!stage.nothingToBuild()) {
                 building = true;
                 setCreativeIfNeeded();
                 stage.movePlayerToStagePosition();
