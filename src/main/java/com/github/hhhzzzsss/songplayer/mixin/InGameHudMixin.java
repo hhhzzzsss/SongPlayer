@@ -24,10 +24,6 @@ public class InGameHudMixin {
     @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;F)V",
             at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableBlend()V", ordinal = 4))
     private void onRender(MatrixStack matrixStack, float tickDelta, CallbackInfo ci) {
-        if (SongPlayer.MC.options.debugEnabled) {
-            return;
-        }
-
         ProgressDisplay.getInstance().onRenderHUD(matrixStack, scaledWidth, scaledHeight, heldItemTooltipFade);
     }
 }
