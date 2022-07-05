@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "Song Player",
-  "description": "Builds and plays noteblocks",
+  "description": "A plugin for building and playing noteblock songs in Minecraft",
   "authors": [
     "hhhzzzsss"
   ],
@@ -12,7 +12,7 @@
     "sources": "https://github.com/hhhzzzsss/SongPlayer"
   },
 
-  "license": "CC0-1.0",
+  "license": "MIT",
   "icon": "assets/songplayer/icon.png",
 
   "environment": "*",
