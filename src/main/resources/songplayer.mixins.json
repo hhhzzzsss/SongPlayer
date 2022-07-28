@@ -8,7 +8,7 @@
   "client": [
     "ClientPlayerEntityMixin",
     "ClientPlayNetworkHandlerMixin",
-    "CommandSuggestorMixin",
+    "ChatInputSuggestorMixin",
     "InGameHudMixin",
     "MinecraftClientMixin"
   ],

@@ -3,8 +3,7 @@ package com.github.hhhzzzsss.songplayer.mixin;
 import com.github.hhhzzzsss.songplayer.CommandProcessor;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.minecraft.client.gui.screen.CommandSuggestor;
-import net.minecraft.client.gui.screen.CommandSuggestor.SuggestionWindow;
+import net.minecraft.client.gui.screen.ChatInputSuggestor;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -14,8 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.concurrent.CompletableFuture;
 
-@Mixin(CommandSuggestor.class)
-public class CommandSuggestorMixin {
+@Mixin(ChatInputSuggestor.class)
+public class ChatInputSuggestorMixin {
     @Shadow
     CompletableFuture<Suggestions> pendingSuggestions;
 
@@ -25,12 +24,12 @@ public class CommandSuggestorMixin {
     }
 
     @Shadow
-    public void showSuggestions(boolean narrateFirstSuggestion) {}
+    public void show(boolean narrateFirstSuggestion) {}
 
     @Shadow
     final TextFieldWidget textField;
 
-    public CommandSuggestorMixin() {
+    public ChatInputSuggestorMixin() {
         textField = null;
     }
 
@@ -47,7 +46,7 @@ public class CommandSuggestorMixin {
         CompletableFuture<Suggestions> suggestions = CommandProcessor.handleSuggestions(preStr, new SuggestionsBuilder(preStr, wordStart));
         if (suggestions != null) {
             this.pendingSuggestions = suggestions;
-            this.showSuggestions(true);
+            this.show(true);
         }
     }
 }
