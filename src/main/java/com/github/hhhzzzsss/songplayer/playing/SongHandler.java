@@ -278,7 +278,7 @@ public class SongHandler {
     }
     private void checkCommandCache() {
         if (cachedCommand != null && System.currentTimeMillis() >= lastCommandTime + 1500) {
-            SongPlayer.MC.player.sendCommand(cachedCommand);
+            SongPlayer.MC.getNetworkHandler().sendCommand(cachedCommand);
             cachedCommand = null;
             lastCommandTime = System.currentTimeMillis();
         }

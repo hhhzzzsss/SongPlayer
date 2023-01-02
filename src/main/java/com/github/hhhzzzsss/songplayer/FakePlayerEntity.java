@@ -12,7 +12,7 @@ public class FakePlayerEntity extends OtherClientPlayerEntity {
 	ClientWorld world = SongPlayer.MC.world;
 	
 	public FakePlayerEntity() {
-		super(SongPlayer.MC.world, SongPlayer.MC.player.getGameProfile(), SongPlayer.MC.player.getPublicKey());
+		super(SongPlayer.MC.world, SongPlayer.MC.player.getGameProfile());
 		
 		copyStagePosAndPlayerLook();
 		

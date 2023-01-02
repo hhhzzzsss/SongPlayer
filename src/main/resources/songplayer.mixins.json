@@ -6,7 +6,6 @@
   "mixins": [
   ],
   "client": [
-    "ClientPlayerEntityMixin",
     "ClientPlayNetworkHandlerMixin",
     "ChatInputSuggestorMixin",
     "InGameHudMixin",
