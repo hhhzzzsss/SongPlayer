@@ -1,8 +1,10 @@
 package com.github.hhhzzzsss.songplayer.mixin;
 
+import com.github.hhhzzzsss.songplayer.CommandProcessor;
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
 import com.github.hhhzzzsss.songplayer.playing.Stage;
 import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,6 +36,14 @@ public class ClientPlayNetworkHandlerMixin {
 			if (SongPlayer.fakePlayer != null) {
 				SongPlayer.fakePlayer.copyStagePosAndPlayerLook();
 			}
+			ci.cancel();
+		}
+	}
+
+	@Inject(at = @At("HEAD"), method = "sendChatMessage(Ljava/lang/String;)V", cancellable=true)
+	private void onSendChatMessage(String content, CallbackInfo ci) {
+		boolean isCommand = CommandProcessor.processChatMessage(content);
+		if (isCommand) {
 			ci.cancel();
 		}
 	}
