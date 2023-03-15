@@ -38,7 +38,7 @@ public class SongHandler {
     public Stage stage = null;
     public boolean building = false;
 
-    public void onRenderIngame(boolean tick) {
+    public void onUpdate(boolean tick) {
         if (currentSong == null && songQueue.size() > 0) {
             setSong(songQueue.poll());
         }
@@ -85,7 +85,6 @@ public class SongHandler {
                 handleBuilding();
             }
         } else {
-            // Check if stage was broken
             handlePlaying(tick);
         }
     }
@@ -153,7 +152,7 @@ public class SongHandler {
                 BlockPos bp = stage.requiredBreaks.poll();
                 SongPlayer.MC.interactionManager.attackBlock(bp, Direction.UP);
             }
-            buildEndDelay = 40;
+            buildEndDelay = 20;
             return;
         } else if (!stage.missingNotes.isEmpty()) {
             int desiredNoteId = stage.missingNotes.pollFirst();
@@ -170,8 +169,8 @@ public class SongHandler {
                 }
                 placeBlock(bp);
             }
-            buildCooldown = 4;
-            buildEndDelay = 40;
+            buildCooldown = 0; // No cooldown, so it places a block every tick
+            buildEndDelay = 20;
         } else {
             building = false;
             setSurvivalIfNeeded();
