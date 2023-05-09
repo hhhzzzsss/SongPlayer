@@ -21,8 +21,8 @@ public class InGameHudMixin {
     @Shadow
     private int heldItemTooltipFade;
 
-    @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;F)V",
-            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableBlend()V", ordinal = 4))
+    @Inject(method = "render",
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableBlend()V", ordinal = 3))
     private void onRender(MatrixStack matrixStack, float tickDelta, CallbackInfo ci) {
         ProgressDisplay.getInstance().onRenderHUD(matrixStack, scaledWidth, scaledHeight, heldItemTooltipFade);
     }
