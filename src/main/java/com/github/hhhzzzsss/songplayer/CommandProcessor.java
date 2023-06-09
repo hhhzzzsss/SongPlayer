@@ -23,6 +23,7 @@ public class CommandProcessor {
 
 	public static void initCommands() {
 		commands.add(new helpCommand());
+		commands.add(new setPrefixCommand());
 		commands.add(new playCommand());
 		commands.add(new stopCommand());
 		commands.add(new skipCommand());
@@ -50,7 +51,7 @@ public class CommandProcessor {
 
 	// returns true if it is a command and should be cancelled
 	public static boolean processChatMessage(String message) {
-		if (message.startsWith("$")) {
+		if (message.startsWith(Config.getConfig().prefix)) {
 			String[] parts = message.substring(1).split(" ", 2);
 			String name = parts.length>0 ? parts[0] : "";
 			String args = parts.length>1 ? parts[1] : "";
@@ -87,7 +88,7 @@ public class CommandProcessor {
 			return "help";
 		}
 		public String getSyntax() {
-			return "$help [command]";
+			return "help [command]";
 		}
 		public String getDescription() {
 			return "Lists commands or explains command";
@@ -96,7 +97,7 @@ public class CommandProcessor {
 			if (args.length() == 0) {
 				StringBuilder helpMessage = new StringBuilder("§6Commands -");
 				for (Command c : commands) {
-					helpMessage.append(" $" + c.getName());
+					helpMessage.append(" " + Config.getConfig().prefix + c.getName());
 				}
 				SongPlayer.addChatMessage(helpMessage.toString());
 			}
@@ -106,7 +107,7 @@ public class CommandProcessor {
 					SongPlayer.addChatMessage("§6------------------------------");
 					SongPlayer.addChatMessage("§6Help: §3" + c.getName());
 					SongPlayer.addChatMessage("§6Description: §3" + c.getDescription());
-					SongPlayer.addChatMessage("§6Usage: §3" + c.getSyntax());
+					SongPlayer.addChatMessage("§6Usage: §3" + Config.getConfig().prefix + c.getSyntax());
 					if (c.getAliases().length > 0) {
 						SongPlayer.addChatMessage("§6Aliases: §3" + String.join(", ", c.getAliases()));
 					}
@@ -122,12 +123,42 @@ public class CommandProcessor {
 		}
 	}
 
+	private static class setPrefixCommand extends Command {
+		public String getName() {
+			return "setPrefix";
+		}
+		public String[] getAliases() {
+			return new String[]{"prefix"};
+		}
+		public String getSyntax() {
+			return "setPrefix <prefix>";
+		}
+		public String getDescription() {
+			return "Sets the command prefix used by SongPlayer";
+		}
+		public boolean processCommand(String args) {
+			if (args.contains(" ")) {
+				SongPlayer.addChatMessage("§cPrefix cannot contain a space");
+				return true;
+			}
+			else if (args.length() > 0) {
+				Config.getConfig().prefix = args;
+				SongPlayer.addChatMessage("§6Set prefix to " + args);
+				Config.saveConfigWithErrorHandling();
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+
 	private static class playCommand extends Command {
 		public String getName() {
 			return "play";
 		}
 		public String getSyntax() {
-			return "$play <song or url>";
+			return "play <song or url>";
 		}
 		public String getDescription() {
 			return "Plays a song";
@@ -155,7 +186,7 @@ public class CommandProcessor {
 			return "stop";
 		}
 		public String getSyntax() {
-			return "$stop";
+			return "stop";
 		}
 		public String getDescription() {
 			return "Stops playing";
@@ -184,7 +215,7 @@ public class CommandProcessor {
 			return "skip";
 		}
 		public String getSyntax() {
-			return "$skip";
+			return "skip";
 		}
 		public String getDescription() {
 			return "Skips current song";
@@ -209,7 +240,7 @@ public class CommandProcessor {
 			return "goto";
 		}
 		public String getSyntax() {
-			return "$goto <mm:ss>";
+			return "goto <mm:ss>";
 		}
 		public String getDescription() {
 			return "Goes to a specific time in the song";
@@ -242,7 +273,7 @@ public class CommandProcessor {
 			return "loop";
 		}
 		public String getSyntax() {
-			return "$loop";
+			return "loop";
 		}
 		public String getDescription() {
 			return "Toggles song looping";
@@ -273,7 +304,7 @@ public class CommandProcessor {
 			return new String[]{"current"};
 		}
 		public String getSyntax() {
-			return "$status";
+			return "status";
 		}
 		public String getDescription() {
 			return "Gets the status of the song that is currently playing";
@@ -304,7 +335,7 @@ public class CommandProcessor {
 			return new String[]{"showQueue"};
 		}
 		public String getSyntax() {
-			return "$queue";
+			return "queue";
 		}
 		public String getDescription() {
 			return "Shows the current song queue";
@@ -342,7 +373,7 @@ public class CommandProcessor {
 			return new String[]{"list"};
 		}
 		public String getSyntax() {
-			return "$songs";
+			return "songs";
 		}
 		public String getDescription() {
 			return "Lists available songs";
@@ -378,7 +409,7 @@ public class CommandProcessor {
 			return new String[]{"sc"};
 		}
 		public String getSyntax() {
-			return "$setCreativeCommand <command>";
+			return "setCreativeCommand <command>";
 		}
 		public String getDescription() {
 			return "Sets the command used to go into creative mode";
@@ -408,7 +439,7 @@ public class CommandProcessor {
 			return new String[]{"ss"};
 		}
 		public String getSyntax() {
-			return "$setSurvivalCommand <command>";
+			return "setSurvivalCommand <command>";
 		}
 		public String getDescription() {
 			return "Sets the command used to go into survival mode";
@@ -438,7 +469,7 @@ public class CommandProcessor {
 			return new String[]{"essentials", "useEssentials", "essentialsCommands"};
 		}
 		public String getSyntax() {
-			return "$useEssentialsCommands";
+			return "useEssentialsCommands";
 		}
 		public String getDescription() {
 			return "Switches to using essentials gamemode commands";
@@ -465,7 +496,7 @@ public class CommandProcessor {
 			return new String[]{"vanilla", "useVanilla", "vanillaCommands"};
 		}
 		public String getSyntax() {
-			return "$useVanillaCommands";
+			return "useVanillaCommands";
 		}
 		public String getDescription() {
 			return "Switches to using vanilla gamemode commands";
@@ -492,7 +523,7 @@ public class CommandProcessor {
 			return new String[]{"fakePlayer", "fp"};
 		}
 		public String getSyntax() {
-			return "$toggleFakePlayer";
+			return "toggleFakePlayer";
 		}
 		public String getDescription() {
 			return "Shows a fake player representing your true position when playing songs";
@@ -520,7 +551,7 @@ public class CommandProcessor {
 			return "testSong";
 		}
 		public String getSyntax() {
-			return "$testSong";
+			return "testSong";
 		}
 		public String getDescription() {
 			return "Creates a song for testing";
@@ -541,17 +572,16 @@ public class CommandProcessor {
 		}
 	}
 
-	// $ prefix included in command string
 	public static CompletableFuture<Suggestions> handleSuggestions(String text, SuggestionsBuilder suggestionsBuilder) {
 		if (!text.contains(" ")) {
 			List<String> names = commandCompletions
 					.stream()
-					.map((commandName) -> "$"+commandName)
+					.map((commandName) -> Config.getConfig().prefix+commandName)
 					.collect(Collectors.toList());
 			return CommandSource.suggestMatching(names, suggestionsBuilder);
 		} else {
 			String[] split = text.split(" ");
-			if (split[0].startsWith("$")) {
+			if (split[0].startsWith(Config.getConfig().prefix)) {
 				String commandName = split[0].substring(1).toLowerCase();
 				if (commandMap.containsKey(commandName)) {
 					return commandMap.get(commandName).getSuggestions(split.length == 1 ? "" : split[1], suggestionsBuilder);

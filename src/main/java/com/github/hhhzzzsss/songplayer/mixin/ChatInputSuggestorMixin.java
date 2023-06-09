@@ -1,6 +1,7 @@
 package com.github.hhhzzzsss.songplayer.mixin;
 
 import com.github.hhhzzzsss.songplayer.CommandProcessor;
+import com.github.hhhzzzsss.songplayer.Config;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.client.gui.screen.ChatInputSuggestor;
@@ -38,7 +39,7 @@ public class ChatInputSuggestorMixin {
         String textStr = this.textField.getText();
         int cursorPos = this.textField.getCursor();
         String preStr = textStr.substring(0, cursorPos);
-        if (!preStr.startsWith("$")) {
+        if (!preStr.startsWith(Config.getConfig().prefix)) {
             return;
         }
 

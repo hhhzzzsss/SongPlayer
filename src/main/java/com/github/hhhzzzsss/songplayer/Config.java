@@ -11,6 +11,7 @@ public class Config {
     public static final File CONFIG_FILE = new File(SongPlayer.SONGPLAYER_DIR, "config.json");
     private static final Gson gson = new Gson();
 
+    public String prefix = "$";
     public String creativeCommand = "gmc";
     public String survivalCommand = "gms";
     public boolean showFakePlayer = false;
@@ -21,10 +22,12 @@ public class Config {
             try {
                 if (CONFIG_FILE.exists()) {
                     loadConfig();
-                } else {
+                }
+                else {
                     saveConfig();
                 }
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -50,7 +53,8 @@ public class Config {
     public static void saveConfigWithErrorHandling() {
         try {
             Config.saveConfig();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             if (SongPlayer.MC.world != null) {
                 SongPlayer.addChatMessage("§cFailed to save config file");
             }
