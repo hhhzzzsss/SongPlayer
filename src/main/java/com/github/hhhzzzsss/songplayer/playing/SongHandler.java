@@ -1,5 +1,6 @@
 package com.github.hhhzzzsss.songplayer.playing;
 
+import com.github.hhhzzzsss.songplayer.Config;
 import com.github.hhhzzzsss.songplayer.FakePlayerEntity;
 import com.github.hhhzzzsss.songplayer.SongPlayer;
 import com.github.hhhzzzsss.songplayer.Util;
@@ -69,11 +70,11 @@ public class SongHandler {
             stage = new Stage();
             stage.movePlayerToStagePosition();
         }
-        if (SongPlayer.showFakePlayer && SongPlayer.fakePlayer == null) {
+        if (Config.getConfig().showFakePlayer && SongPlayer.fakePlayer == null) {
             SongPlayer.fakePlayer = new FakePlayerEntity();
             SongPlayer.fakePlayer.copyStagePosAndPlayerLook();
         }
-        if (!SongPlayer.showFakePlayer && SongPlayer.fakePlayer != null) {
+        if (!Config.getConfig().showFakePlayer && SongPlayer.fakePlayer != null) {
             SongPlayer.removeFakePlayer();
         }
 
@@ -285,13 +286,13 @@ public class SongHandler {
     private void setCreativeIfNeeded() {
         cachedCommand = null;
         if (SongPlayer.MC.interactionManager.getCurrentGameMode() != GameMode.CREATIVE) {
-            sendGamemodeCommand(SongPlayer.creativeCommand);
+            sendGamemodeCommand(Config.getConfig().creativeCommand);
         }
     }
     private void setSurvivalIfNeeded() {
         cachedCommand = null;
         if (SongPlayer.MC.interactionManager.getCurrentGameMode() != GameMode.SURVIVAL) {
-            sendGamemodeCommand(SongPlayer.survivalCommand);
+            sendGamemodeCommand(Config.getConfig().survivalCommand);
         }
     }
 

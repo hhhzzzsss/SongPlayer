@@ -10,25 +10,26 @@ import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
 
 public class SongPlayer implements ModInitializer {
-	
+
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final int NOTEBLOCK_BASE_ID = Block.getRawIdFromState(Blocks.NOTE_BLOCK.getDefaultState());
 
 	public static final File SONG_DIR = new File("songs");
-	public static boolean showFakePlayer = false;
+	public static final File SONGPLAYER_DIR = new File("SongPlayer");
 	public static FakePlayerEntity fakePlayer;
-	public static String creativeCommand = "gmc";
-	public static String survivalCommand = "gms";
-	
+
 	@Override
 	public void onInitialize() {
 		if (!SONG_DIR.exists()) {
 			SONG_DIR.mkdir();
 		}
+		if (!SONGPLAYER_DIR.exists()) {
+			SONGPLAYER_DIR.mkdir();
+		}
 
 		CommandProcessor.initCommands();
 	}
-	
+
 	public static void addChatMessage(String message) {
 		MC.player.sendMessage(Text.of(message), false);
 	}
