@@ -24,9 +24,6 @@ public class SongLoaderThread extends Thread{
 			isUrl = true;
 			songUrl = new URL(location);
 		}
-		else if (location.contains("/") || location.contains("\\")) {
-			throw new IOException("Invalid characters in song name: " + location);
-		}
 		else if (getSongFile(location).exists()) {
 			songPath = getSongFile(location);
 		}

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CommandProcessor {
 	public static ArrayList<Command> commands = new ArrayList<>();
@@ -173,11 +174,26 @@ public class CommandProcessor {
 			}
 		}
 		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
-			List<String> filenames = Arrays.stream(SongPlayer.SONG_DIR.listFiles())
-					.filter(File::isFile)
-					.map(File::getName)
-					.collect(Collectors.toList());
-			return CommandSource.suggestMatching(filenames, suggestionsBuilder);
+			int lastSlash = args.lastIndexOf("/");
+			String dirString = "";
+			File dir = SongPlayer.SONG_DIR;
+			if (lastSlash >= 0) {
+				dirString = args.substring(0, lastSlash+1);
+				dir = new File(dir, dirString);
+			}
+
+			if (!dir.exists()) return null;
+
+			ArrayList<String> suggestions = new ArrayList<>();
+			for (File file : dir.listFiles()) {
+				if (file.isFile()) {
+					suggestions.add(dirString + file.getName());
+				}
+				else if (file.isDirectory()) {
+					suggestions.add(dirString + file.getName() + "/");
+				}
+			}
+			return CommandSource.suggestMatching(suggestions, suggestionsBuilder);
 		}
 	}
 
