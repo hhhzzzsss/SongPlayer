@@ -15,6 +15,8 @@ public class Config {
     public String creativeCommand = "gmc";
     public String survivalCommand = "gms";
     public boolean showFakePlayer = false;
+    public boolean loopPlaylists;
+    public boolean shufflePlaylists;
 
     public static Config getConfig() {
         if (config == null) {

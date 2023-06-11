@@ -16,15 +16,19 @@ public class SongPlayer implements ModInitializer {
 
 	public static final File SONG_DIR = new File("songs");
 	public static final File SONGPLAYER_DIR = new File("SongPlayer");
+	public static final File PLAYLISTS_DIR = new File("SongPlayer/playlists");
 	public static FakePlayerEntity fakePlayer;
 
 	@Override
 	public void onInitialize() {
 		if (!SONG_DIR.exists()) {
-			SONG_DIR.mkdir();
+			SONG_DIR.mkdirs();
 		}
 		if (!SONGPLAYER_DIR.exists()) {
-			SONGPLAYER_DIR.mkdir();
+			SONGPLAYER_DIR.mkdirs();
+		}
+		if (!PLAYLISTS_DIR.exists()) {
+			PLAYLISTS_DIR.mkdirs();
 		}
 
 		CommandProcessor.initCommands();

@@ -2,6 +2,7 @@ package com.github.hhhzzzsss.songplayer;
 
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
 import com.github.hhhzzzsss.songplayer.song.Note;
+import com.github.hhhzzzsss.songplayer.song.Playlist;
 import com.github.hhhzzzsss.songplayer.song.Song;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
@@ -33,6 +34,7 @@ public class CommandProcessor {
 		commands.add(new statusCommand());
 		commands.add(new queueCommand());
 		commands.add(new songsCommand());
+		commands.add(new playlistCommand());
 		commands.add(new setCreativeCommandCommand());
 		commands.add(new setSurvivalCommandCommand());
 		commands.add(new useEssentialsCommandsCommand());
@@ -62,7 +64,18 @@ public class CommandProcessor {
 			} else {
 				boolean success = c.processCommand(args);
 				if (!success) {
-					SongPlayer.addChatMessage("§cSyntax - " + c.getSyntax());
+					if (c.getSyntax().length == 0) {
+						SongPlayer.addChatMessage("§cSyntax: " + Config.getConfig().prefix + c.getName());
+					}
+					else if (c.getSyntax().length == 1) {
+						SongPlayer.addChatMessage("§cSyntax: " + Config.getConfig().prefix + c.getName() + " " + c.getSyntax()[0]);
+					}
+					else {
+						SongPlayer.addChatMessage("§cSyntax:");
+						for (String syntax : c.getSyntax()) {
+							SongPlayer.addChatMessage("§c    " + Config.getConfig().prefix + c.getName() + " " + syntax);
+						}
+					}
 				}
 			}
 			return true;
@@ -73,7 +86,7 @@ public class CommandProcessor {
 
 	private static abstract class Command {
 		public abstract String getName();
-		public abstract String getSyntax();
+		public abstract String[] getSyntax();
 		public abstract String getDescription();
 		public abstract boolean processCommand(String args);
 		public String[] getAliases() {
@@ -88,8 +101,8 @@ public class CommandProcessor {
 		public String getName() {
 			return "help";
 		}
-		public String getSyntax() {
-			return "help [command]";
+		public String[] getSyntax() {
+			return new String[]{"[command]"};
 		}
 		public String getDescription() {
 			return "Lists commands or explains command";
@@ -108,7 +121,17 @@ public class CommandProcessor {
 					SongPlayer.addChatMessage("§6------------------------------");
 					SongPlayer.addChatMessage("§6Help: §3" + c.getName());
 					SongPlayer.addChatMessage("§6Description: §3" + c.getDescription());
-					SongPlayer.addChatMessage("§6Usage: §3" + Config.getConfig().prefix + c.getSyntax());
+					if (c.getSyntax().length == 0) {
+						SongPlayer.addChatMessage("§6Usage: §3" + Config.getConfig().prefix + c.getName());
+					}
+					else if (c.getSyntax().length == 1) {
+						SongPlayer.addChatMessage("§6Usage: §3" + Config.getConfig().prefix + c.getName() + " " + c.getSyntax()[0]);
+					} else {
+						SongPlayer.addChatMessage("§6Usage:");
+						for (String syntax : c.getSyntax()) {
+							SongPlayer.addChatMessage("    §3" + Config.getConfig().prefix + c.getName() + " " + syntax);
+						}
+					}
 					if (c.getAliases().length > 0) {
 						SongPlayer.addChatMessage("§6Aliases: §3" + String.join(", ", c.getAliases()));
 					}
@@ -131,8 +154,8 @@ public class CommandProcessor {
 		public String[] getAliases() {
 			return new String[]{"prefix"};
 		}
-		public String getSyntax() {
-			return "setPrefix <prefix>";
+		public String[] getSyntax() {
+			return new String[] {"<prefix>"};
 		}
 		public String getDescription() {
 			return "Sets the command prefix used by SongPlayer";
@@ -158,8 +181,8 @@ public class CommandProcessor {
 		public String getName() {
 			return "play";
 		}
-		public String getSyntax() {
-			return "play <song or url>";
+		public String[] getSyntax() {
+			return new String[] {"<song or url>"};
 		}
 		public String getDescription() {
 			return "Plays a song";
@@ -174,26 +197,12 @@ public class CommandProcessor {
 			}
 		}
 		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
-			int lastSlash = args.lastIndexOf("/");
-			String dirString = "";
-			File dir = SongPlayer.SONG_DIR;
-			if (lastSlash >= 0) {
-				dirString = args.substring(0, lastSlash+1);
-				dir = new File(dir, dirString);
+			if (!args.contains(" ")) {
+				return Util.giveSongSuggestions(args, suggestionsBuilder);
 			}
-
-			if (!dir.exists()) return null;
-
-			ArrayList<String> suggestions = new ArrayList<>();
-			for (File file : dir.listFiles()) {
-				if (file.isFile()) {
-					suggestions.add(dirString + file.getName());
-				}
-				else if (file.isDirectory()) {
-					suggestions.add(dirString + file.getName() + "/");
-				}
+			else {
+				return null;
 			}
-			return CommandSource.suggestMatching(suggestions, suggestionsBuilder);
 		}
 	}
 
@@ -201,8 +210,8 @@ public class CommandProcessor {
 		public String getName() {
 			return "stop";
 		}
-		public String getSyntax() {
-			return "stop";
+		public String[] getSyntax() {
+			return new String[0];
 		}
 		public String getDescription() {
 			return "Stops playing";
@@ -230,8 +239,8 @@ public class CommandProcessor {
 		public String getName() {
 			return "skip";
 		}
-		public String getSyntax() {
-			return "skip";
+		public String[] getSyntax() {
+			return new String[0];
 		}
 		public String getDescription() {
 			return "Skips current song";
@@ -255,8 +264,8 @@ public class CommandProcessor {
 		public String getName() {
 			return "goto";
 		}
-		public String getSyntax() {
-			return "goto <mm:ss>";
+		public String[] getSyntax() {
+			return new String[] {"<mm:ss>"};
 		}
 		public String getDescription() {
 			return "Goes to a specific time in the song";
@@ -288,8 +297,8 @@ public class CommandProcessor {
 		public String getName() {
 			return "loop";
 		}
-		public String getSyntax() {
-			return "loop";
+		public String[] getSyntax() {
+			return new String[0];
 		}
 		public String getDescription() {
 			return "Toggles song looping";
@@ -319,8 +328,8 @@ public class CommandProcessor {
 		public String[] getAliases() {
 			return new String[]{"current"};
 		}
-		public String getSyntax() {
-			return "status";
+		public String[] getSyntax() {
+			return new String[0];
 		}
 		public String getDescription() {
 			return "Gets the status of the song that is currently playing";
@@ -350,8 +359,8 @@ public class CommandProcessor {
 		public String[] getAliases() {
 			return new String[]{"showQueue"};
 		}
-		public String getSyntax() {
-			return "queue";
+		public String[] getSyntax() {
+			return new String[0];
 		}
 		public String getDescription() {
 			return "Shows the current song queue";
@@ -388,8 +397,8 @@ public class CommandProcessor {
 		public String[] getAliases() {
 			return new String[]{"list"};
 		}
-		public String getSyntax() {
-			return "songs";
+		public String[] getSyntax() {
+			return new String[0];
 		}
 		public String getDescription() {
 			return "Lists available songs";
@@ -417,6 +426,187 @@ public class CommandProcessor {
 		}
 	}
 
+	private static class playlistCommand extends Command {
+		public String getName() {
+			return "playlist";
+		}
+		public String[] getSyntax() {
+			return new String[] {
+					"play <playlist>",
+					"create <playlist>",
+					"list [playlist]",
+					"delete <playlist> <song>",
+					"addSong <playlist> <song>",
+					"removeSong <playlist> <song>",
+					"renameSong <playlist> <old name> <new name>",
+					"loop",
+					"shuffle",
+			};
+		}
+		public String getDescription() {
+			return "Configures playlists";
+		}
+		public boolean processCommand(String args) {
+			String[] split = args.split(" ");
+
+			if (split.length < 1) return false;
+
+			try {
+				File playlistDir = null;
+				if (split.length >= 2) {
+					playlistDir = new File(SongPlayer.PLAYLISTS_DIR, split[1]);
+				}
+				switch (split[0].toLowerCase()) {
+					case "play":
+						if (split.length != 2) return false;
+						if (!playlistDir.exists()) {
+							SongPlayer.addChatMessage("§cPlaylist does not exist");
+							return true;
+						}
+						SongHandler.getInstance().setPlaylist(playlistDir);
+						return true;
+					case "create":
+						if (split.length > 2) {
+							SongPlayer.addChatMessage("§cCannot have spaces in playlist name");
+							return true;
+						}
+						if (split.length != 2) return false;
+						Playlist.createPlaylist(split[1]);
+						SongPlayer.addChatMessage(String.format("§6Created playlist §3%s", split[1]));
+						return true;
+					case "delete":
+						if (split.length != 2) return false;
+						Playlist.deletePlaylist(playlistDir);
+						SongPlayer.addChatMessage(String.format("§6Deleted playlist §3%s", split[1]));
+						return true;
+					case "list":
+						if (split.length == 1) {
+							if (!SongPlayer.PLAYLISTS_DIR.exists()) return true;
+							List<String> playlists = Arrays.stream(SongPlayer.PLAYLISTS_DIR.listFiles())
+									.filter(File::isDirectory)
+									.map(File::getName)
+									.collect(Collectors.toList());
+							if (playlists.size() == 0) {
+								SongPlayer.addChatMessage("§6No playlists found");
+							} else {
+								SongPlayer.addChatMessage("§6Playlists: §3" + String.join(", ", playlists));
+							}
+							return true;
+						}
+						List<String> playlistIndex = Playlist.listSongs(playlistDir);
+						SongPlayer.addChatMessage("§6------------------------------");
+						int index = 0;
+						for (String songName : playlistIndex) {
+							index++;
+							SongPlayer.addChatMessage(String.format("§6%d. §3%s", index, songName));
+						}
+						SongPlayer.addChatMessage("§6------------------------------");
+						return true;
+					case "addsong":
+						if (split.length != 3) return false;
+						Playlist.addSong(playlistDir, new File(SongPlayer.SONG_DIR, split[2]));
+						SongPlayer.addChatMessage(String.format("§6Added §3%s §6to §3%s", split[2], split[1]));
+						return true;
+					case "removesong":
+						if (split.length != 3) return false;
+						Playlist.removeSong(playlistDir, split[2]);
+						SongPlayer.addChatMessage(String.format("§6Removed §3%s §6from §3%s", split[2], split[1]));
+						return true;
+					case "renamesong":
+						if (split.length != 4) return false;
+						Playlist.renameSong(playlistDir, split[2], split[3]);
+						SongPlayer.addChatMessage(String.format("§6Renamed song from §3%s §6from to §3%s", split[2], split[3]));
+						return true;
+					case "loop":
+						if (split.length != 1) return false;
+						Config.getConfig().loopPlaylists = !Config.getConfig().loopPlaylists;
+						SongHandler.getInstance().setPlaylistLoop(Config.getConfig().loopPlaylists);
+						if (Config.getConfig().loopPlaylists) {
+							SongPlayer.addChatMessage("§6Enabled playlist looping");
+						}
+						else {
+							SongPlayer.addChatMessage("§6Disabled playlist looping");
+						}
+						Config.saveConfigWithErrorHandling();
+						return true;
+					case "shuffle":
+						if (split.length != 1) return false;
+						Config.getConfig().shufflePlaylists = !Config.getConfig().shufflePlaylists;
+						SongHandler.getInstance().setPlaylistShuffle(Config.getConfig().shufflePlaylists);
+						if (Config.getConfig().loopPlaylists) {
+							SongPlayer.addChatMessage("§6Enabled playlist shuffling");
+						}
+						else {
+							SongPlayer.addChatMessage("§6Disabled playlist shuffling");
+						}
+						Config.saveConfigWithErrorHandling();
+						return true;
+					default:
+						return false;
+				}
+			}
+			catch (IOException e) {
+				SongPlayer.addChatMessage("§c" + e.getMessage());
+				return true;
+			}
+		}
+		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
+			String[] split = args.split(" ", -1);
+			if (split.length <= 1) {
+				return CommandSource.suggestMatching(new String[] {
+						"play",
+						"create",
+						"delete",
+						"list",
+						"addSong",
+						"removeSong",
+						"renameSong",
+						"loop",
+						"shuffle",
+				}, suggestionsBuilder);
+			}
+			switch (split[0].toLowerCase()) {
+				case "create":
+				case "loop":
+				case "shuffle":
+				default:
+					return null;
+				case "play":
+				case "list":
+				case "delete":
+					if (split.length == 2) {
+						return Util.givePlaylistSuggestions(suggestionsBuilder);
+					}
+					return null;
+				case "addsong":
+					if (split.length == 2) {
+						return Util.givePlaylistSuggestions(suggestionsBuilder);
+					}
+					else if (split.length == 3) {
+						return Util.giveSongSuggestions(split[2], suggestionsBuilder);
+					}
+					return null;
+				case "removesong":
+				case "renamesong":
+					if (split.length == 2) {
+						return Util.givePlaylistSuggestions(suggestionsBuilder);
+					}
+					else if (split.length == 3) {
+						File playlistDir = new File(SongPlayer.PLAYLISTS_DIR, split[1]);
+						List<File> playlistFiles = Playlist.getSongFiles(playlistDir);
+						if (playlistFiles == null) {
+							return null;
+						}
+						return CommandSource.suggestMatching(
+								playlistFiles.stream()
+										.map(File::getName),
+								suggestionsBuilder);
+					}
+					return null;
+			}
+		}
+	}
+
 	private static class setCreativeCommandCommand extends Command {
 		public String getName() {
 			return "setCreativeCommand";
@@ -424,8 +614,8 @@ public class CommandProcessor {
 		public String[] getAliases() {
 			return new String[]{"sc"};
 		}
-		public String getSyntax() {
-			return "setCreativeCommand <command>";
+		public String[] getSyntax() {
+			return new String[] {"<command>"};
 		}
 		public String getDescription() {
 			return "Sets the command used to go into creative mode";
@@ -454,8 +644,8 @@ public class CommandProcessor {
 		public String[] getAliases() {
 			return new String[]{"ss"};
 		}
-		public String getSyntax() {
-			return "setSurvivalCommand <command>";
+		public String[] getSyntax() {
+			return new String[] {"<command>"};
 		}
 		public String getDescription() {
 			return "Sets the command used to go into survival mode";
@@ -484,8 +674,8 @@ public class CommandProcessor {
 		public String[] getAliases() {
 			return new String[]{"essentials", "useEssentials", "essentialsCommands"};
 		}
-		public String getSyntax() {
-			return "useEssentialsCommands";
+		public String[] getSyntax() {
+			return new String[0];
 		}
 		public String getDescription() {
 			return "Switches to using essentials gamemode commands";
@@ -511,8 +701,8 @@ public class CommandProcessor {
 		public String[] getAliases() {
 			return new String[]{"vanilla", "useVanilla", "vanillaCommands"};
 		}
-		public String getSyntax() {
-			return "useVanillaCommands";
+		public String[] getSyntax() {
+			return new String[0];
 		}
 		public String getDescription() {
 			return "Switches to using vanilla gamemode commands";
@@ -538,8 +728,8 @@ public class CommandProcessor {
 		public String[] getAliases() {
 			return new String[]{"fakePlayer", "fp"};
 		}
-		public String getSyntax() {
-			return "toggleFakePlayer";
+		public String[] getSyntax() {
+			return new String[0];
 		}
 		public String getDescription() {
 			return "Shows a fake player representing your true position when playing songs";
@@ -566,8 +756,8 @@ public class CommandProcessor {
 		public String getName() {
 			return "testSong";
 		}
-		public String getSyntax() {
-			return "testSong";
+		public String[] getSyntax() {
+			return new String[0];
 		}
 		public String getDescription() {
 			return "Creates a song for testing";
@@ -596,7 +786,7 @@ public class CommandProcessor {
 					.collect(Collectors.toList());
 			return CommandSource.suggestMatching(names, suggestionsBuilder);
 		} else {
-			String[] split = text.split(" ");
+			String[] split = text.split(" ", 2);
 			if (split[0].startsWith(Config.getConfig().prefix)) {
 				String commandName = split[0].substring(1).toLowerCase();
 				if (commandMap.containsKey(commandName)) {

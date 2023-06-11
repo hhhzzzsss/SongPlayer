@@ -18,11 +18,13 @@ public class ProgressDisplay {
     }
     private ProgressDisplay() {}
 
-    public MutableText displayText = Text.empty();
+    public MutableText topText = Text.empty();
+    public MutableText bottomText = Text.empty();
     public int fade = 0;
 
-    public void setText(MutableText text) {
-        displayText = text;
+    public void setText(MutableText bottomText, MutableText topText) {
+        this.bottomText = bottomText;
+        this.topText = topText;
         fade = 100;
     }
 
@@ -31,15 +33,18 @@ public class ProgressDisplay {
             return;
         }
 
-        int textWidth = SongPlayer.MC.textRenderer.getWidth(displayText);
-        int textX = (scaledWidth - textWidth) / 2;
-        int textY = scaledHeight - 59;
+        int bottomTextWidth = SongPlayer.MC.textRenderer.getWidth(bottomText);
+        int topTextWidth = SongPlayer.MC.textRenderer.getWidth(topText);
+        int bottomTextX = (scaledWidth - bottomTextWidth) / 2;
+        int topTextX = (scaledWidth - topTextWidth) / 2;
+        int bottomTextY = scaledHeight - 59;
         if (!SongPlayer.MC.interactionManager.hasStatusBars()) {
-            textY += 14;
+            bottomTextY += 14;
         }
         if (heldItemTooltipFade > 0) {
-            textY -= 12;
+            bottomTextY -= 12;
         }
+        int topTextY = bottomTextY - 12;
 
         int opacity = (int)((float)this.fade * 256.0F / 10.0F);
         if (opacity > 255) {
@@ -49,7 +54,8 @@ public class ProgressDisplay {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         Objects.requireNonNull(SongPlayer.MC.textRenderer);
-        SongPlayer.MC.textRenderer.drawWithShadow(matrixStack, displayText, (float)textX, (float)textY, 16777215 + (opacity << 24));
+        SongPlayer.MC.textRenderer.drawWithShadow(matrixStack, bottomText, (float)bottomTextX, (float)bottomTextY, 16777215 + (opacity << 24));
+        SongPlayer.MC.textRenderer.drawWithShadow(matrixStack, topText, (float)topTextX, (float)topTextY, 16777215 + (opacity << 24));
         RenderSystem.disableBlend();
     }
 

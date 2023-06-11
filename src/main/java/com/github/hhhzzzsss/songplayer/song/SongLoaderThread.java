@@ -40,6 +40,10 @@ public class SongLoaderThread extends Thread{
 			throw new IOException("Could not find song: " + location);
 		}
 	}
+
+	public SongLoaderThread(File file) {
+		this.songPath = file;
+	}
 	
 	public void run() {
 		try {

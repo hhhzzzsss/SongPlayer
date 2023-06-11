@@ -20,6 +20,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 
@@ -36,13 +37,42 @@ public class SongHandler {
     public SongLoaderThread loaderThread = null;
     public LinkedList<Song> songQueue = new LinkedList<>();
     public Song currentSong = null;
+    public Playlist currentPlaylist = null;
     public Stage stage = null;
     public boolean building = false;
 
+    boolean playlistChecked = false;
+
     public void onUpdate(boolean tick) {
-        if (currentSong == null && songQueue.size() > 0) {
+        // Check current playlist and load song from it if necessary
+        if (currentSong == null && currentPlaylist != null && currentPlaylist.loaded) {
+            if (!playlistChecked) {
+                playlistChecked = true;
+                if (currentPlaylist.songsFailedToLoad.size() > 0) {
+                    SongPlayer.addChatMessage("§cFailed to load the following songs from the playlist: §4" + String.join(" ", currentPlaylist.songsFailedToLoad));
+                }
+            }
+            Song nextSong = currentPlaylist.getNext();
+            if (currentPlaylist.songs.size() == 0) {
+                SongPlayer.addChatMessage("§cPlaylist has no playable songs");
+                currentPlaylist = null;
+            }
+            else if (nextSong == null) {
+                SongPlayer.addChatMessage("§6Playlist has finished playing");
+                currentPlaylist = null;
+            }
+            else {
+                nextSong.reset();
+                setSong(nextSong);
+            }
+        }
+
+        // Check queue and load song from it if necessary
+        if (currentSong == null && currentPlaylist == null && songQueue.size() > 0) {
             setSong(songQueue.poll());
         }
+
+        // Check if loader thread is finished and handle accordingly
         if (loaderThread != null && !loaderThread.isAlive()) {
             if (loaderThread.exception != null) {
                 SongPlayer.addChatMessage("§cFailed to load song: §4" + loaderThread.exception.getMessage());
@@ -56,6 +86,7 @@ public class SongHandler {
             loaderThread = null;
         }
 
+        // Check if no song is playing and, if necessary, handle cleanup
         if (currentSong == null) {
             if (stage != null || SongPlayer.fakePlayer != null) {
                 if (stage != null) {
@@ -63,37 +94,42 @@ public class SongHandler {
                 }
                 cleanup();
             }
-            return;
         }
-
-        if (stage == null) {
-            stage = new Stage();
-            stage.movePlayerToStagePosition();
-        }
-        if (Config.getConfig().showFakePlayer && SongPlayer.fakePlayer == null) {
-            SongPlayer.fakePlayer = new FakePlayerEntity();
-            SongPlayer.fakePlayer.copyStagePosAndPlayerLook();
-        }
-        if (!Config.getConfig().showFakePlayer && SongPlayer.fakePlayer != null) {
-            SongPlayer.removeFakePlayer();
-        }
-
-        checkCommandCache();
-
-        SongPlayer.MC.player.getAbilities().allowFlying = true;
-        if (building) {
-            if (tick) {
-                handleBuilding();
+        // Otherwise, handle song playing
+        else {
+            if (stage == null) {
+                stage = new Stage();
+                stage.movePlayerToStagePosition();
             }
-        } else {
-            handlePlaying(tick);
+            if (Config.getConfig().showFakePlayer && SongPlayer.fakePlayer == null) {
+                SongPlayer.fakePlayer = new FakePlayerEntity();
+                SongPlayer.fakePlayer.copyStagePosAndPlayerLook();
+            }
+            if (!Config.getConfig().showFakePlayer && SongPlayer.fakePlayer != null) {
+                SongPlayer.removeFakePlayer();
+            }
+
+            checkCommandCache();
+
+            SongPlayer.MC.player.getAbilities().allowFlying = true;
+            if (building) {
+                if (tick) {
+                    handleBuilding();
+                }
+            } else {
+                handlePlaying(tick);
+            }
         }
     }
 
     public void loadSong(String location) {
         if (loaderThread != null) {
             SongPlayer.addChatMessage("§cAlready loading a song, cannot load another");
-        } else {
+        }
+        else if (currentPlaylist != null) {
+            SongPlayer.addChatMessage("§cCannot load a song while a playlist is playing");
+        }
+        else {
             try {
                 loaderThread = new SongLoaderThread(location);
                 SongPlayer.addChatMessage("§6Loading §3" + location + "");
@@ -117,6 +153,28 @@ public class SongHandler {
     private void queueSong(Song song) {
         songQueue.add(song);
         SongPlayer.addChatMessage("§6Added song to queue: §3" + song.name);
+    }
+
+    public void setPlaylist(File playlist) {
+        if (loaderThread != null || currentSong != null || !songQueue.isEmpty()) {
+            SongPlayer.addChatMessage("§cCannot start playing a playlist while something else is playing");
+        }
+        else {
+            currentPlaylist = new Playlist(playlist, Config.getConfig().loopPlaylists, Config.getConfig().shufflePlaylists);
+            playlistChecked = false;
+        }
+    }
+
+    public void setPlaylistLoop(boolean loop) {
+        if (currentPlaylist != null) {
+            currentPlaylist.setLoop(loop);
+        }
+    }
+
+    public void setPlaylistShuffle(boolean shuffle) {
+        if (currentPlaylist != null) {
+            currentPlaylist.setShuffle(shuffle);
+        }
     }
 
     // Runs every tick
@@ -181,10 +239,23 @@ public class SongHandler {
         }
     }
     private void setBuildProgressDisplay() {
-        MutableText text = Text.empty()
+        MutableText buildText = Text.empty()
                 .append(Text.literal("Building noteblocks | " ).formatted(Formatting.GOLD))
                 .append(Text.literal((stage.totalMissingNotes - stage.missingNotes.size()) + "/" + stage.totalMissingNotes).formatted(Formatting.DARK_AQUA));
-        ProgressDisplay.getInstance().setText(text);
+        MutableText playlistText = Text.empty();
+        if (currentPlaylist != null && currentPlaylist.loaded) {
+            playlistText = playlistText.append(Text.literal("Playlist: ").formatted(Formatting.GOLD))
+                    .append(Text.literal(currentPlaylist.name).formatted(Formatting.BLUE))
+                    .append(Text.literal(" | ").formatted(Formatting.GOLD))
+                    .append(Text.literal(String.format(" (%s/%s)", currentPlaylist.songNumber, currentPlaylist.songs.size())).formatted(Formatting.DARK_AQUA));
+            if (currentPlaylist.loop) {
+                playlistText.append(Text.literal(" | Looping").formatted(Formatting.GOLD));
+            }
+            if (currentPlaylist.shuffle) {
+                playlistText.append(Text.literal(" | Shuffled").formatted(Formatting.GOLD));
+            }
+        }
+        ProgressDisplay.getInstance().setText(buildText, playlistText);
     }
 
     // Runs every frame
@@ -244,23 +315,37 @@ public class SongHandler {
     public void setPlayProgressDisplay() {
         long currentTime = Math.min(currentSong.time, currentSong.length);
         long totalTime = currentSong.length;
-        MutableText text = Text.empty()
-                .append(Text.literal("Now playing ").formatted(Formatting.GOLD))
+        MutableText songText = Text.empty()
+                .append(Text.literal("Now playing: ").formatted(Formatting.GOLD))
                 .append(Text.literal(currentSong.name).formatted(Formatting.BLUE))
                 .append(Text.literal(" | ").formatted(Formatting.GOLD))
                 .append(Text.literal(String.format("%s/%s", Util.formatTime(currentTime), Util.formatTime(totalTime))).formatted(Formatting.DARK_AQUA));
         if (currentSong.looping) {
             if (currentSong.loopCount > 0) {
-                text.append(Text.literal(String.format(" | Loop (%d/%d)", currentSong.currentLoop, currentSong.loopCount)).formatted(Formatting.GOLD));
+                songText.append(Text.literal(String.format(" | Loop (%d/%d)", currentSong.currentLoop, currentSong.loopCount)).formatted(Formatting.GOLD));
             } else {
-                text.append(Text.literal(" | Looping enabled").formatted(Formatting.GOLD));
+                songText.append(Text.literal(" | Looping enabled").formatted(Formatting.GOLD));
             }
         }
-        ProgressDisplay.getInstance().setText(text);
+        MutableText playlistText = Text.empty();
+        if (currentPlaylist != null && currentPlaylist.loaded) {
+            playlistText = playlistText.append(Text.literal("Playlist: ").formatted(Formatting.GOLD))
+                    .append(Text.literal(currentPlaylist.name).formatted(Formatting.BLUE))
+                    .append(Text.literal(" | ").formatted(Formatting.GOLD))
+                    .append(Text.literal(String.format(" (%s/%s)", currentPlaylist.songNumber, currentPlaylist.songs.size())).formatted(Formatting.DARK_AQUA));
+            if (currentPlaylist.loop) {
+                playlistText.append(Text.literal(" | Looping").formatted(Formatting.GOLD));
+            }
+            if (currentPlaylist.shuffle) {
+                playlistText.append(Text.literal(" | Shuffled").formatted(Formatting.GOLD));
+            }
+        }
+        ProgressDisplay.getInstance().setText(songText, playlistText);
     }
 
     public void cleanup() {
         currentSong = null;
+        currentPlaylist = null;
         songQueue.clear();
         stage = null;
         SongPlayer.removeFakePlayer();
@@ -268,6 +353,7 @@ public class SongHandler {
 
     public void onNotIngame() {
         currentSong = null;
+        currentPlaylist = null;
         songQueue.clear();
     }
 
