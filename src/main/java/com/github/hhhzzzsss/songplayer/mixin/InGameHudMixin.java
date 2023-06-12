@@ -1,6 +1,5 @@
 package com.github.hhhzzzsss.songplayer.mixin;
 
-import com.github.hhhzzzsss.songplayer.SongPlayer;
 import com.github.hhhzzzsss.songplayer.playing.ProgressDisplay;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;

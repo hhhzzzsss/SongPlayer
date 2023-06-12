@@ -1,6 +1,10 @@
 package com.github.hhhzzzsss.songplayer.song;
-import java.io.*;
-import java.net.*;
+
+import javax.sound.midi.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyManagementException;
@@ -8,8 +12,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-
-import javax.sound.midi.*;
 
 public class MidiConverter {
 	public static final int SET_INSTRUMENT = 0xC0;

@@ -1,17 +1,14 @@
 package com.github.hhhzzzsss.songplayer;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class SongPlayer implements ModInitializer {
 

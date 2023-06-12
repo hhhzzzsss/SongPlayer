@@ -1,17 +1,15 @@
 package com.github.hhhzzzsss.songplayer.playing;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import com.github.hhhzzzsss.songplayer.SongPlayer;
-
 import com.github.hhhzzzsss.songplayer.song.Song;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.EntityPose;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Stage {
 	private final ClientPlayerEntity player = SongPlayer.MC.player;
