@@ -1,6 +1,7 @@
 package com.github.hhhzzzsss.songplayer.song;
 import java.io.*;
 import java.net.*;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -21,9 +22,9 @@ public class MidiConverter {
 		return getSong(sequence, Paths.get(url.toURI().getPath()).getFileName().toString());
 	}
 
-	public static Song getSongFromFile(File file) throws InvalidMidiDataException, IOException {
-		Sequence sequence = MidiSystem.getSequence(file);
-		return getSong(sequence, file.getName());
+	public static Song getSongFromFile(Path file) throws InvalidMidiDataException, IOException {
+		Sequence sequence = MidiSystem.getSequence(file.toFile());
+		return getSong(sequence, file.getFileName().toString());
 	}
 
 	public static Song getSongFromBytes(byte[] bytes, String name) throws InvalidMidiDataException, IOException {

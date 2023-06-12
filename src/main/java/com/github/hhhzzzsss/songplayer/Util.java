@@ -1,18 +1,39 @@
 package com.github.hhhzzzsss.songplayer;
 
+import com.github.hhhzzzsss.songplayer.song.Song;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Util {
+    public static void createDirectoriesSilently(Path path) {
+        try {
+            Files.createDirectories(path);
+        }
+        catch (IOException e) {}
+    }
+
+    public static Stream<Path> listFilesSilently(Path path) {
+        try {
+            return Files.list(path);
+        }
+        catch (IOException e) {
+            return null;
+        }
+    }
+
     public static String formatTime(long milliseconds) {
         long temp = Math.abs(milliseconds);
         temp /= 1000;
@@ -57,32 +78,34 @@ public class Util {
     public static CompletableFuture<Suggestions> giveSongSuggestions(String arg, SuggestionsBuilder suggestionsBuilder) {
         int lastSlash = arg.lastIndexOf("/");
         String dirString = "";
-        File dir = SongPlayer.SONG_DIR;
+        Path dir = SongPlayer.SONG_DIR;
         if (lastSlash >= 0) {
             dirString = arg.substring(0, lastSlash+1);
-            dir = new File(dir, dirString);
+            dir = dir.resolve(dirString);
         }
 
-        if (!dir.exists()) return null;
+        Stream<Path> songFiles = listFilesSilently(dir);
+        if (songFiles == null) return null;
 
         ArrayList<String> suggestions = new ArrayList<>();
-        for (File file : dir.listFiles()) {
-            if (file.isFile()) {
-                suggestions.add(dirString + file.getName());
+        for (Path path : songFiles.collect(Collectors.toList())) {
+            if (Files.isRegularFile(path)) {
+                suggestions.add(dirString + path.getFileName().toString());
             }
-            else if (file.isDirectory()) {
-                suggestions.add(dirString + file.getName() + "/");
+            else if (Files.isDirectory(path)) {
+                suggestions.add(dirString + path.getFileName().toString() + "/");
             }
         }
         return CommandSource.suggestMatching(suggestions, suggestionsBuilder);
     }
 
     public static CompletableFuture<Suggestions> givePlaylistSuggestions(SuggestionsBuilder suggestionsBuilder) {
-        if (!SongPlayer.PLAYLISTS_DIR.exists()) return null;
+        if (!Files.exists(SongPlayer.PLAYLISTS_DIR)) return null;
         return CommandSource.suggestMatching(
-                Arrays.stream(SongPlayer.PLAYLISTS_DIR.listFiles())
-                        .filter(File::isDirectory)
-                        .map(File::getName),
+                listFilesSilently(SongPlayer.PLAYLISTS_DIR)
+                        .filter(Files::isDirectory)
+                        .map(Path::getFileName)
+                        .map(Path::toString),
                 suggestionsBuilder);
     }
 }

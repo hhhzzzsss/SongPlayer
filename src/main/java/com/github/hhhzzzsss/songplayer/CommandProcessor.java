@@ -10,6 +10,8 @@ import net.minecraft.command.CommandSource;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -62,20 +64,26 @@ public class CommandProcessor {
 			if (c == null) {
 				SongPlayer.addChatMessage("§cUnrecognized command");
 			} else {
-				boolean success = c.processCommand(args);
-				if (!success) {
-					if (c.getSyntax().length == 0) {
-						SongPlayer.addChatMessage("§cSyntax: " + Config.getConfig().prefix + c.getName());
-					}
-					else if (c.getSyntax().length == 1) {
-						SongPlayer.addChatMessage("§cSyntax: " + Config.getConfig().prefix + c.getName() + " " + c.getSyntax()[0]);
-					}
-					else {
-						SongPlayer.addChatMessage("§cSyntax:");
-						for (String syntax : c.getSyntax()) {
-							SongPlayer.addChatMessage("§c    " + Config.getConfig().prefix + c.getName() + " " + syntax);
+				try {
+					boolean success = c.processCommand(args);
+					if (!success) {
+						if (c.getSyntax().length == 0) {
+							SongPlayer.addChatMessage("§cSyntax: " + Config.getConfig().prefix + c.getName());
+						}
+						else if (c.getSyntax().length == 1) {
+							SongPlayer.addChatMessage("§cSyntax: " + Config.getConfig().prefix + c.getName() + " " + c.getSyntax()[0]);
+						}
+						else {
+							SongPlayer.addChatMessage("§cSyntax:");
+							for (String syntax : c.getSyntax()) {
+								SongPlayer.addChatMessage("§c    " + Config.getConfig().prefix + c.getName() + " " + syntax);
+							}
 						}
 					}
+				}
+				catch (Throwable e) {
+					e.printStackTrace();
+					SongPlayer.addChatMessage("§cAn error occurred while running this command: §4" + e.getMessage());
 				}
 			}
 			return true;
@@ -405,19 +413,14 @@ public class CommandProcessor {
 		}
 		public boolean processCommand(String args) {
 			if (args.length() == 0) {
-				StringBuilder sb = new StringBuilder("§6");
-				boolean firstItem = true;
-				for (File songFile : SongPlayer.SONG_DIR.listFiles()) {
-					String fileName = songFile.getName();
-					if (firstItem) {
-						firstItem = false;
-					}
-					else {
-						sb.append(", ");
-					}
-					sb.append(fileName);
-				}
-				SongPlayer.addChatMessage(sb.toString());
+				String message = "§6" + String.join(
+						", ",
+						Util.listFilesSilently(SongPlayer.SONG_DIR)
+								.map(Path::getFileName)
+								.map(Path::toString)
+								.collect(Collectors.toList())
+				);
+				SongPlayer.addChatMessage(message);
 				return true;
 			}
 			else {
@@ -452,14 +455,14 @@ public class CommandProcessor {
 			if (split.length < 1) return false;
 
 			try {
-				File playlistDir = null;
+				Path playlistDir = null;
 				if (split.length >= 2) {
-					playlistDir = new File(SongPlayer.PLAYLISTS_DIR, split[1]);
+					playlistDir = SongPlayer.PLAYLISTS_DIR.resolve(split[1]);
 				}
 				switch (split[0].toLowerCase()) {
 					case "play":
 						if (split.length != 2) return false;
-						if (!playlistDir.exists()) {
+						if (!Files.exists(playlistDir)) {
 							SongPlayer.addChatMessage("§cPlaylist does not exist");
 							return true;
 						}
@@ -481,10 +484,11 @@ public class CommandProcessor {
 						return true;
 					case "list":
 						if (split.length == 1) {
-							if (!SongPlayer.PLAYLISTS_DIR.exists()) return true;
-							List<String> playlists = Arrays.stream(SongPlayer.PLAYLISTS_DIR.listFiles())
-									.filter(File::isDirectory)
-									.map(File::getName)
+							if (!Files.exists(SongPlayer.PLAYLISTS_DIR)) return true;
+							List<String> playlists = Util.listFilesSilently(SongPlayer.PLAYLISTS_DIR)
+									.filter(Files::isDirectory)
+									.map(Path::getFileName)
+									.map(Path::toString)
 									.collect(Collectors.toList());
 							if (playlists.size() == 0) {
 								SongPlayer.addChatMessage("§6No playlists found");
@@ -504,7 +508,7 @@ public class CommandProcessor {
 						return true;
 					case "addsong":
 						if (split.length != 3) return false;
-						Playlist.addSong(playlistDir, new File(SongPlayer.SONG_DIR, split[2]));
+						Playlist.addSong(playlistDir, SongPlayer.SONG_DIR.resolve(split[2]));
 						SongPlayer.addChatMessage(String.format("§6Added §3%s §6to §3%s", split[2], split[1]));
 						return true;
 					case "removesong":
@@ -592,14 +596,14 @@ public class CommandProcessor {
 						return Util.givePlaylistSuggestions(suggestionsBuilder);
 					}
 					else if (split.length == 3) {
-						File playlistDir = new File(SongPlayer.PLAYLISTS_DIR, split[1]);
-						List<File> playlistFiles = Playlist.getSongFiles(playlistDir);
+						Path playlistDir = SongPlayer.PLAYLISTS_DIR.resolve(split[1]);
+						Stream<Path> playlistFiles = Playlist.getSongFiles(playlistDir);
 						if (playlistFiles == null) {
 							return null;
 						}
 						return CommandSource.suggestMatching(
-								playlistFiles.stream()
-										.map(File::getName),
+								playlistFiles.map(Path::getFileName)
+										.map(Path::toString),
 								suggestionsBuilder);
 					}
 					return null;

@@ -1,6 +1,7 @@
 package com.github.hhhzzzsss.songplayer.song;
 
 import com.github.hhhzzzsss.songplayer.SongPlayer;
+import com.github.hhhzzzsss.songplayer.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -11,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Playlist {
     public static final String INDEX_FILE_NAME = "index.json";
@@ -21,22 +23,22 @@ public class Playlist {
     public boolean shuffle = false;
 
     public List<String> index;
-    public List<File> songFiles;
+    public List<Path> songFiles;
     public List<Song> songs = new ArrayList<>();
     public List<Integer> ordering = null;
     public int songNumber = 0;
     public boolean loaded = false;
     public ArrayList<String> songsFailedToLoad = new ArrayList<>();
 
-    public Playlist(File directory, boolean loop, boolean shuffle) {
-        this.name = directory.getName();
+    public Playlist(Path directory, boolean loop, boolean shuffle) {
+        this.name = directory.getFileName().toString();
         this.loop = loop;
         this.shuffle = shuffle;
         this.setShuffle(this.shuffle);
-        if (directory.isDirectory()) {
+        if (Files.isDirectory(directory)) {
             index = validateAndLoadIndex(directory);
             songFiles = index.stream()
-                    .map(name -> new File(directory, name))
+                    .map(name -> directory.resolve(name))
                     .collect(Collectors.toList());
             (new PlaylistLoaderThread()).start();
         } else {
@@ -48,11 +50,11 @@ public class Playlist {
     private class PlaylistLoaderThread extends Thread {
         @Override
         public void run() {
-            for (File file : songFiles) {
+            for (Path file : songFiles) {
                 SongLoaderThread slt = new SongLoaderThread(file);
                 slt.run();
                 if (slt.exception != null) {
-                    songsFailedToLoad.add(file.getName());
+                    songsFailedToLoad.add(file.getFileName().toString());
                 } else {
                     songs.add(slt.song);
                 }
@@ -101,11 +103,12 @@ public class Playlist {
         return songs.get(ordering.get(songNumber++));
     }
 
-    private static List<String> validateAndLoadIndex(File directory) {
-        List<String> songNames = getSongFiles(directory).stream()
-                .map(File::getName)
+    private static List<String> validateAndLoadIndex(Path directory) {
+        List<String> songNames = getSongFiles(directory)
+                .map(Path::getFileName)
+                .map(Path::toString)
                 .collect(Collectors.toList());
-        if (!getIndexFile(directory).exists()) {
+        if (!Files.exists(getIndexFile(directory))) {
             saveIndexSilently(directory, songNames);
             return songNames;
         }
@@ -146,41 +149,35 @@ public class Playlist {
         }
     }
 
-    public static File getIndexFile(File directory) {
-        return new File(directory, INDEX_FILE_NAME);
+    public static Path getIndexFile(Path directory) {
+        return directory.resolve(INDEX_FILE_NAME);
     }
 
-    public static List<File> getSongFiles(File directory) {
-        File[] files = directory.listFiles();
+    public static Stream<Path> getSongFiles(Path directory) {
+        Stream<Path> files = Util.listFilesSilently(directory);
         if (files == null) {
             return null;
         }
-        return Arrays.stream(files)
-                .filter(file -> !file.getName().equals(INDEX_FILE_NAME))
-                .collect(Collectors.toList());
+        return files.filter(file -> !file.getFileName().toString().equals(INDEX_FILE_NAME));
     }
 
-    private static List<String> loadIndex(File directory) throws IOException {
-        File indexFile = getIndexFile(directory);
-        FileInputStream fis = new FileInputStream(indexFile);
-        InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-        BufferedReader reader = new BufferedReader(isr);
+    private static List<String> loadIndex(Path directory) throws IOException {
+        Path indexFile = getIndexFile(directory);
+        BufferedReader reader = Files.newBufferedReader(indexFile);
         Type type = new TypeToken<ArrayList<String>>(){}.getType();
         List<String> index = gson.fromJson(reader, type);
         reader.close();
         return index;
     }
 
-    private static void saveIndex(File directory, List<String> index) throws IOException {
-        File indexFile = getIndexFile(directory);
-        FileOutputStream fos = new FileOutputStream(indexFile);
-        OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
-        BufferedWriter writer = new BufferedWriter(osw);
+    private static void saveIndex(Path directory, List<String> index) throws IOException {
+        Path indexFile = getIndexFile(directory);
+        BufferedWriter writer = Files.newBufferedWriter(indexFile);
         writer.write(gson.toJson(index));
         writer.close();
     }
 
-    private static void saveIndexSilently(File directory, List<String> index) {
+    private static void saveIndexSilently(Path directory, List<String> index) {
         try {
             saveIndex(directory, index);
         }
@@ -189,67 +186,67 @@ public class Playlist {
         }
     }
 
-    public static List<String> listSongs(File directory) throws IOException {
-        if (!directory.exists()) {
+    public static List<String> listSongs(Path directory) throws IOException {
+        if (!Files.exists(directory)) {
             throw new IOException("Playlist does not exist");
         }
         return validateAndLoadIndex(directory);
     }
 
     public static void createPlaylist(String playlist) {
-        File playlistDir = new File(SongPlayer.PLAYLISTS_DIR, playlist);
-        playlistDir.mkdir();
+        Path playlistDir = SongPlayer.PLAYLISTS_DIR.resolve(playlist);
+        Util.createDirectoriesSilently(playlistDir);
     }
 
-    public static void addSong(File directory, File songFile) throws IOException {
-        if (!directory.exists()) {
+    public static void addSong(Path directory, Path songFile) throws IOException {
+        if (!Files.exists(directory)) {
             throw new IOException("Playlist does not exist");
         }
-        if (!songFile.exists()) {
+        if (!Files.exists(songFile)) {
             throw new IOException("Could not find specified song");
         }
 
         List<String> index = validateAndLoadIndex(directory);
-        if (index.contains(songFile.getName())) {
+        if (index.contains(songFile.getFileName().toString())) {
             throw new IOException("Playlist already contains a song by this name");
         }
-        Files.copy( songFile.toPath(), (new File(directory,songFile.getName())).toPath() );
-        index.add(songFile.getName());
+        Files.copy(songFile, directory.resolve(songFile.getFileName().toString()));
+        index.add(songFile.getFileName().toString());
         saveIndex(directory, index);
     }
 
-    public static void removeSong(File directory, String songName) throws IOException {
-        if (!directory.exists()) {
+    public static void removeSong(Path directory, String songName) throws IOException {
+        if (!Files.exists(directory)) {
             throw new IOException("Playlist does not exist");
         }
-        File songFile = new File(directory, songName);
-        if (!songFile.exists()) {
+        Path songFile = directory.resolve(songName);
+        if (!Files.exists(songFile)) {
             throw new IOException("Playlist does not contain a song by this name");
         }
 
         List<String> index = validateAndLoadIndex(directory);
-        songFile.delete();
+        Files.delete(songFile);
         index.remove(songName);
         saveIndex(directory, index);
     }
 
-    public static void deletePlaylist(File directory) throws IOException {
-        if (!directory.exists()) {
+    public static void deletePlaylist(Path directory) throws IOException {
+        if (!Files.exists(directory)) {
             throw new IOException("Playlist does not exist");
         }
-        Files.walk(directory.toPath())
+        Files.walk(directory)
                 .map(Path::toFile)
                 .sorted(Comparator.reverseOrder())
                 .forEach(File::delete);
     }
 
-    public static void renameSong(File directory, String oldName, String newName) throws IOException {
+    public static void renameSong(Path directory, String oldName, String newName) throws IOException {
         List<String> index = validateAndLoadIndex(directory);
         int pos = index.indexOf(oldName);
         if (pos < 0) {
             throw new IOException("Song not found in playlist");
         }
-        (new File(directory, oldName)).renameTo(new File(directory, newName));
+        Files.move(directory.resolve(oldName), directory.resolve(newName));
         index.set(pos, newName);
         saveIndex(directory, index);
     }

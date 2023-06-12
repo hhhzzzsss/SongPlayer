@@ -22,6 +22,7 @@ import net.minecraft.world.GameMode;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.LinkedList;
 
 public class SongHandler {
@@ -155,7 +156,7 @@ public class SongHandler {
         SongPlayer.addChatMessage("§6Added song to queue: §3" + song.name);
     }
 
-    public void setPlaylist(File playlist) {
+    public void setPlaylist(Path playlist) {
         if (loaderThread != null || currentSong != null || !songQueue.isEmpty()) {
             SongPlayer.addChatMessage("§cCannot start playing a playlist while something else is playing");
         }

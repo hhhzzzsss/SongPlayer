@@ -6,12 +6,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class SongLoaderThread extends Thread{
 	
 	private String location;
-	private File songPath;
+	private Path songPath;
 	private URL songUrl;
 	public Exception exception;
 	public Song song;
@@ -24,16 +25,16 @@ public class SongLoaderThread extends Thread{
 			isUrl = true;
 			songUrl = new URL(location);
 		}
-		else if (getSongFile(location).exists()) {
+		else if (Files.exists(getSongFile(location))) {
 			songPath = getSongFile(location);
 		}
-		else if (getSongFile(location+".mid").exists()) {
+		else if (Files.exists(getSongFile(location+".mid"))) {
 			songPath = getSongFile(location+".mid");
 		}
-		else if (getSongFile(location+".midi").exists()) {
+		else if (Files.exists(getSongFile(location+".midi"))) {
 			songPath = getSongFile(location+".midi");
 		}
-		else if (getSongFile(location+".nbs").exists()) {
+		else if (Files.exists(getSongFile(location+".nbs"))) {
 			songPath = getSongFile(location+".nbs");
 		}
 		else {
@@ -41,7 +42,7 @@ public class SongLoaderThread extends Thread{
 		}
 	}
 
-	public SongLoaderThread(File file) {
+	public SongLoaderThread(Path file) {
 		this.songPath = file;
 	}
 	
@@ -54,8 +55,8 @@ public class SongLoaderThread extends Thread{
 				name = Paths.get(songUrl.toURI().getPath()).getFileName().toString();
 			}
 			else {
-				bytes = Files.readAllBytes(songPath.toPath());
-				name = songPath.getName();
+				bytes = Files.readAllBytes(songPath);
+				name = songPath.getFileName().toString();
 			}
 
 			try {
@@ -80,7 +81,9 @@ public class SongLoaderThread extends Thread{
 		}
 	}
 
-	private File getSongFile(String name) {
-		return new File(SongPlayer.SONG_DIR, name);
+	private Path getSongFile(String name) {
+		System.out.println(SongPlayer.SONG_DIR.resolve(name));
+		System.out.println(Files.exists(SongPlayer.SONG_DIR.resolve(name)));
+		return SongPlayer.SONG_DIR.resolve(name);
 	}
 }

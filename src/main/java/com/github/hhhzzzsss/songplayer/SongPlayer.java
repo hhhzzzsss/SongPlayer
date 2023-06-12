@@ -1,6 +1,10 @@
 package com.github.hhhzzzsss.songplayer;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.block.Block;
@@ -14,21 +18,21 @@ public class SongPlayer implements ModInitializer {
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final int NOTEBLOCK_BASE_ID = Block.getRawIdFromState(Blocks.NOTE_BLOCK.getDefaultState());
 
-	public static final File SONG_DIR = new File("songs");
-	public static final File SONGPLAYER_DIR = new File("SongPlayer");
-	public static final File PLAYLISTS_DIR = new File("SongPlayer/playlists");
+	public static final Path SONG_DIR = Path.of("songs");
+	public static final Path SONGPLAYER_DIR = Path.of("SongPlayer");
+	public static final Path PLAYLISTS_DIR = Path.of("SongPlayer/playlists");
 	public static FakePlayerEntity fakePlayer;
 
 	@Override
 	public void onInitialize() {
-		if (!SONG_DIR.exists()) {
-			SONG_DIR.mkdirs();
+		if (!Files.exists(SONG_DIR)) {
+			Util.createDirectoriesSilently(SONG_DIR);
 		}
-		if (!SONGPLAYER_DIR.exists()) {
-			SONGPLAYER_DIR.mkdirs();
+		if (!Files.exists(SONGPLAYER_DIR)) {
+			Util.createDirectoriesSilently(SONGPLAYER_DIR);
 		}
-		if (!PLAYLISTS_DIR.exists()) {
-			PLAYLISTS_DIR.mkdirs();
+		if (!Files.exists(PLAYLISTS_DIR)) {
+			Util.createDirectoriesSilently(PLAYLISTS_DIR);
 		}
 
 		CommandProcessor.initCommands();
