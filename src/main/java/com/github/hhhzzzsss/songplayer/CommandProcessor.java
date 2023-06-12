@@ -404,21 +404,37 @@ public class CommandProcessor {
 			return new String[]{"list"};
 		}
 		public String[] getSyntax() {
-			return new String[0];
+			return new String[] {
+					"",
+					"<subdirectory>"};
 		}
 		public String getDescription() {
-			return "Lists available songs";
+			return "Lists available songs. If an argument is provided, lists all songs in the subdirectory.";
 		}
 		public boolean processCommand(String args) {
 			if (args.length() == 0) {
-				String message = "§6" + String.join(
-						", ",
-						Util.listFilesSilently(SongPlayer.SONG_DIR)
-								.map(Path::getFileName)
-								.map(Path::toString)
-								.collect(Collectors.toList())
-				);
-				SongPlayer.addChatMessage(message);
+				List<String> subdirectories = Util.listFilesSilently(SongPlayer.SONG_DIR)
+						.filter(Files::isDirectory)
+						.map(Path::getFileName)
+						.map(Path::toString)
+						.map(str -> str + "/")
+						.collect(Collectors.toList());
+				List<String> songs = Util.listFilesSilently(SongPlayer.SONG_DIR)
+						.filter(Files::isRegularFile)
+						.map(Path::getFileName)
+						.map(Path::toString)
+						.collect(Collectors.toList());
+				if (subdirectories.size() == 0 && songs.size() == 0) {
+					SongPlayer.addChatMessage("§6No songs found. You can put midi or nbs files in the §3.minecraft/songs §6folder.");
+				}
+				else {
+					if (subdirectories.size() > 0) {
+						SongPlayer.addChatMessage("§6Subdirectories: §3" + String.join(" ", subdirectories));
+					}
+					if (songs.size() > 0) {
+						SongPlayer.addChatMessage("§6Songs: §7" + String.join(", ", songs));
+					}
+				}
 				return true;
 			}
 			else {
@@ -435,7 +451,7 @@ public class CommandProcessor {
 			return new String[] {
 					"play <playlist>",
 					"create <playlist>",
-					"list [playlist]",
+					"list [<playlist>]",
 					"delete <playlist> <song>",
 					"addSong <playlist> <song>",
 					"removeSong <playlist> <song>",
