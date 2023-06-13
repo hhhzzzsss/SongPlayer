@@ -1,5 +1,6 @@
 package com.github.hhhzzzsss.songplayer;
 
+import com.github.hhhzzzsss.songplayer.playing.Stage;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
@@ -18,8 +19,9 @@ public class Config {
     public String creativeCommand = "gmc";
     public String survivalCommand = "gms";
     public boolean showFakePlayer = false;
-    public boolean loopPlaylists;
-    public boolean shufflePlaylists;
+    public boolean loopPlaylists = false;
+    public boolean shufflePlaylists = false;
+    public Stage.StageType stageType = Stage.StageType.DEFAULT;
 
     public static Config getConfig() {
         if (config == null) {

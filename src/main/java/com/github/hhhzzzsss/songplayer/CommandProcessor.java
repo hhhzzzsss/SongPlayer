@@ -1,6 +1,7 @@
 package com.github.hhhzzzsss.songplayer;
 
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
+import com.github.hhhzzzsss.songplayer.playing.Stage;
 import com.github.hhhzzzsss.songplayer.song.Note;
 import com.github.hhhzzzsss.songplayer.song.Playlist;
 import com.github.hhhzzzsss.songplayer.song.Song;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -40,6 +42,7 @@ public class CommandProcessor {
 		commands.add(new useEssentialsCommandsCommand());
 		commands.add(new useVanillaCommandsCommand());
 		commands.add(new toggleFakePlayerCommand());
+		commands.add(new setStageTypeCommand());
 		commands.add(new testSongCommand());
 
 		for (Command command : commands) {
@@ -766,6 +769,46 @@ public class CommandProcessor {
 			}
 			else {
 				return false;
+			}
+		}
+	}
+
+	private static class setStageTypeCommand extends Command {
+		public String getName() {
+			return "setStageType";
+		}
+		public String[] getAliases() {
+			return new String[]{"setStage", "stageType"};
+		}
+		public String[] getSyntax() {
+			return new String[] {"<DEFAULT | WIDE | SPHERICAL>"};
+		}
+		public String getDescription() {
+			return "Sets the type of noteblock stage to build";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() > 0) {
+				try {
+					Stage.StageType stageType = Stage.StageType.valueOf(args.toUpperCase());
+					Config.getConfig().stageType = stageType;
+					SongPlayer.addChatMessage("§6Set stage type to §3" + stageType.name());
+					Config.saveConfigWithErrorHandling();
+				}
+				catch (IllegalArgumentException e) {
+					SongPlayer.addChatMessage("§cInvalid stage type");
+				}
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
+			if (!args.contains(" ")) {
+				return CommandSource.suggestMatching(Arrays.stream(Stage.StageType.values()).map(Stage.StageType::name), suggestionsBuilder);
+			}
+			else {
+				return null;
 			}
 		}
 	}

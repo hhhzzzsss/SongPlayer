@@ -1,5 +1,6 @@
 package com.github.hhhzzzsss.songplayer.playing;
 
+import com.github.hhhzzzsss.songplayer.Config;
 import com.github.hhhzzzsss.songplayer.SongPlayer;
 import com.github.hhhzzzsss.songplayer.song.Song;
 import net.minecraft.block.Block;
@@ -13,11 +14,15 @@ import java.util.stream.Collectors;
 
 public class Stage {
 	private final ClientPlayerEntity player = SongPlayer.MC.player;
+
+	public static enum StageType {
+		DEFAULT,
+		WIDE,
+		SPHERICAL,
+	}
 	
 	public BlockPos position;
-//	public BlockPos[] tunedNoteblocks = new BlockPos[400];
 	public HashMap<Integer, BlockPos> noteblockPositions = new HashMap<>();
-	public boolean rebuild = false;
 
 	public LinkedList<BlockPos> requiredBreaks = new LinkedList<>();
 	public TreeSet<Integer> missingNotes = new TreeSet<>();
@@ -46,32 +51,11 @@ public class Stage {
 		}
 
 		ArrayList<BlockPos> noteblockLocations = new ArrayList<>();
-		ArrayList<BlockPos> breakLocations = new ArrayList<>();
-		for (int dx = -4; dx <= 4; dx++) {
-			for (int dz = -4; dz <= 4; dz++) {
-				if (Math.abs(dx) == 4 && Math.abs(dz) == 4)  {
-					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + 0, position.getZ() + dz));
-					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + 2, position.getZ() + dz));
-					breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + 1, position.getZ() + dz));
-					breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + 3, position.getZ() + dz));
-				} else {
-					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() - 1, position.getZ() + dz));
-					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + 2, position.getZ() + dz));
-					breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + 0, position.getZ() + dz));
-					breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + 1, position.getZ() + dz));
-					breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + 3, position.getZ() + dz));
-				}
-			}
-		}
-		for (int dx = -4; dx <= 4; dx++) {
-			for (int dz = -4; dz <= 4; dz++) {
-				if (withinBreakingDist(dx, -3, dz)) {
-					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() - 3, position.getZ() + dz));
-				}
-				if (withinBreakingDist(dx, 4, dz)) {
-					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + 4, position.getZ() + dz));
-				}
-			}
+		HashSet<BlockPos> breakLocations = new HashSet<>();
+		switch (Config.getConfig().stageType) {
+			case DEFAULT -> loadDefaultBlocks(noteblockLocations, breakLocations);
+			case WIDE -> loadWideBlocks(noteblockLocations, breakLocations);
+			case SPHERICAL -> loadSphericalBlocks(noteblockLocations, breakLocations);
 		}
 
 		// Sorting noteblock and break locations
@@ -191,10 +175,242 @@ public class Stage {
 		totalMissingNotes = missingNotes.size();
 	}
 
+	void loadDefaultBlocks(Collection<BlockPos> noteblockLocations, Collection<BlockPos> breakLocations) {
+		for (int dx = -4; dx <= 4; dx++) {
+			for (int dz = -4; dz <= 4; dz++) {
+				if (Math.abs(dx) == 4 && Math.abs(dz) == 4)  {
+					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + 0, position.getZ() + dz));
+					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + 2, position.getZ() + dz));
+					breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + 1, position.getZ() + dz));
+				}
+				else {
+					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() - 1, position.getZ() + dz));
+					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + 2, position.getZ() + dz));
+					breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + 0, position.getZ() + dz));
+					breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + 1, position.getZ() + dz));
+				}
+			}
+		}
+		for (int dx = -4; dx <= 4; dx++) {
+			for (int dz = -4; dz <= 4; dz++) {
+				if (withinBreakingDist(dx, -3, dz)) {
+					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() - 3, position.getZ() + dz));
+				}
+				if (withinBreakingDist(dx, 4, dz)) {
+					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + 4, position.getZ() + dz));
+				}
+			}
+		}
+	}
+
+	void loadWideBlocks(Collection<BlockPos> noteblockLocations, Collection<BlockPos> breakLocations) {
+		for (int dx = -5; dx <= 5; dx++) {
+			for (int dz = -5; dz <= 5; dz++) {
+				if (withinBreakingDist(dx, 2, dz)) {
+					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + 2, position.getZ() + dz));
+					if (withinBreakingDist(dx, -1, dz)) {
+						noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() - 1, position.getZ() + dz));
+						breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + 0, position.getZ() + dz));
+						breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + 1, position.getZ() + dz));
+					}
+					else if (withinBreakingDist(dx, 0, dz)) {
+						noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + 0, position.getZ() + dz));
+						breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + 1, position.getZ() + dz));
+					}
+				}
+				if (withinBreakingDist(dx, -3, dz)) {
+					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() - 3, position.getZ() + dz));
+				}
+				if (withinBreakingDist(dx, 4, dz)) {
+					noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + 4, position.getZ() + dz));
+				}
+			}
+		}
+	}
+
+	// This code was taken from Sk8kman fork of SongPlayer
+	// Thanks Sk8kman and Lizard16 for this spherical stage design!
+	void loadSphericalBlocks(Collection<BlockPos> noteblockLocations, Collection<BlockPos> breakLocations) {
+		int[] yLayers = {-4, -2, -1, 0, 1, 2, 3, 4, 5, 6};
+
+		for (int dx = -5; dx <= 5; dx++) {
+			for (int dz = -5; dz <= 5; dz++) {
+				for (int dy : yLayers) {
+					int adx = Math.abs(dx);
+					int adz = Math.abs(dz);
+					switch(dy) {
+						case -4: {
+							if (adx < 3 && adz < 3) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							if ((adx == 3 ^ adz == 3) && (adx == 0 ^ adz == 0)) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							break;
+						}
+						case -2: { // also takes care of -3
+							if (adz == 0 && adx == 0) { // prevents placing int the center
+								break;
+							}
+							if (adz * adx > 9) { // prevents building out too far
+								break;
+							}
+							if (adz + adx == 5 && adx != 0 && adz != 0) {
+								// add noteblocks above and below here
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy + 1, position.getZ() + dz));
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy - 1, position.getZ() + dz));
+								break;
+							}
+							if (adz * adx == 3) {
+								// add noteblocks above and below here
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy + 1, position.getZ() + dz));
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy - 1, position.getZ() + dz));
+								break;
+							}
+							if (adx < 3 && adz < 3 && adx + adz > 0) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy + 2, position.getZ() + dz));
+								break;
+							}
+							if (adz == 0 ^ adx == 0) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy + 2, position.getZ() + dz));
+								break;
+							}
+							if (adz * adx == 10) { // expecting one to be 2, and one to be 5.
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy + 2, position.getZ() + dz));
+								break;
+							}
+							if (adz + adx == 6) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								if (adx == 5 ^ adz == 5) {
+									breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy + 2, position.getZ() + dz));
+								}
+								break;
+							}
+							break;
+						}
+						case -1: {
+							if (adx + adz == 7 || adx + adz == 0) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							break;
+						}
+						case 0: {
+							int check = adx + adz;
+							if ((check == 8 || check == 6) && adx * adz > 5) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							break;
+						}
+						case 1: {
+							int addl1 = adx + adz;
+							if (addl1 == 7 || addl1 == 3 || addl1 == 2) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							if (adx == 5 ^ adz == 5 && addl1 < 7) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							if (addl1 == 4 && adx * adz != 0) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							if (adx + adz < 7) {
+								breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							break;
+						}
+						case 2: {
+							int addl2 = adx + adz;
+							if (adx == 5 || adz == 5) {
+								break;
+							}
+							if (addl2 == 8 || addl2 == 6 || addl2 == 5 || addl2 == 1) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							if ((addl2 == 4) && (adx == 0 ^ adz == 0)) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							if (addl2 == 0) {
+								breakLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							break;
+						}
+						case 3: {
+							if (adx * adz == 12 || adx + adz == 0) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							if ((adx == 5 ^ adz == 5) && (adx < 2 ^ adz < 2)) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							if (adx > 3 || adz > 3) { // don't allow any more checks past 3 blocks out
+								break;
+							}
+							if (adx + adz > 1 && adx + adz < 5) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							break;
+						}
+						case 4: {
+							if (adx == 5 || adz == 5) {
+								break;
+							}
+							if (adx + adz == 4 && adx * adz == 0) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							int addl4 = adx + adz;
+							if (addl4 == 1 || addl4 == 5 || addl4 == 6) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							break;
+						}
+						case 5: {
+							if (adx > 3 || adz > 3) {
+								break;
+							}
+							int addl5 = adx + adz;
+							if (addl5 > 1 && addl5 < 5) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							break;
+						}
+						case 6: {
+							if (adx + adz < 2) {
+								noteblockLocations.add(new BlockPos(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+								break;
+							}
+							break;
+						}
+					}
+					//all breaks lead here
+				}
+			}
+		}
+	}
+
+	// This doesn't check for whether the block above the noteblock position is also reachable
+	// Usually there is sky above you though so hopefully this doesn't cause a problem most of the time
 	boolean withinBreakingDist(int dx, int dy, int dz) {
 		double dy1 = dy + 0.5 - 1.62; // Standing eye height
 		double dy2 = dy + 0.5 - 1.27; // Crouching eye height
-		return dx*dx + dy1*dy1 + dz*dz < 5.99*5.99 && dx*dx + dy2*dy2 + dz*dz < 5.99*5.99;
+		return dx*dx + dy1*dy1 + dz*dz < 5.99999*5.99999 && dx*dx + dy2*dy2 + dz*dz < 5.99999*5.99999;
 	}
 
 	public boolean nothingToBuild() {
