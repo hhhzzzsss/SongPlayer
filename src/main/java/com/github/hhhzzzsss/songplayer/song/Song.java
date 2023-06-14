@@ -58,7 +58,7 @@ public class Song {
 	public void reset() {
 		paused = true;
 		setTime(0);
-		loopCount = 0;
+		currentLoop = 0;
 	}
 
 	public void setTime(long t) {
