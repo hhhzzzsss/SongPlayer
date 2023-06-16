@@ -1,5 +1,7 @@
 package com.github.hhhzzzsss.songplayer;
 
+import com.github.hhhzzzsss.songplayer.item.SongItemCreatorThread;
+import com.github.hhhzzzsss.songplayer.item.SongItemUtils;
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
 import com.github.hhhzzzsss.songplayer.playing.Stage;
 import com.github.hhhzzzsss.songplayer.song.Note;
@@ -8,17 +10,21 @@ import com.github.hhhzzzsss.songplayer.song.Song;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Hand;
+import net.minecraft.world.GameMode;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.github.hhhzzzsss.songplayer.SongPlayer.MC;
 
 public class CommandProcessor {
 	public static ArrayList<Command> commands = new ArrayList<>();
@@ -43,6 +49,7 @@ public class CommandProcessor {
 		commands.add(new useVanillaCommandsCommand());
 		commands.add(new toggleFakePlayerCommand());
 		commands.add(new setStageTypeCommand());
+		commands.add(new songItemCommand());
 		commands.add(new testSongCommand());
 
 		for (Command command : commands) {
@@ -809,6 +816,80 @@ public class CommandProcessor {
 			}
 			else {
 				return null;
+			}
+		}
+	}
+
+	private static class songItemCommand extends Command {
+		public String getName() {
+			return "songItem";
+		}
+		public String[] getAliases() {
+			return new String[]{"item"};
+		}
+		public String[] getSyntax() {
+			return new String[] {
+					"create <song or url>",
+					"setSongName <name>",
+			};
+		}
+		public String getDescription() {
+			return "Assigns/edits song data for the item in your hand";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() == 0) {
+				return false;
+			}
+
+			if (MC.interactionManager.getCurrentGameMode() != GameMode.CREATIVE) {
+				SongPlayer.addChatMessage("§cYou must be in creative mode to use this command");
+				return true;
+			}
+
+			ItemStack stack = MC.player.getMainHandStack().copy();
+			NbtCompound songPlayerNBT = stack.getSubNbt("SongPlayerData");
+
+			String[] split = args.split(" ");
+			switch (split[0].toLowerCase()) {
+				case "create":
+					if (split.length != 2) return false;
+					try {
+						(new SongItemCreatorThread(split[1])).start();
+					} catch (IOException e) {
+						SongPlayer.addChatMessage("§cError creating song item: §4" + e.getMessage());
+					}
+					return true;
+				case "setsongname":
+					if (split.length < 2) return false;
+					if (songPlayerNBT == null) {
+						SongPlayer.addChatMessage("§cYou must be holding a song item");
+						return true;
+					}
+					String name = String.join(" ", Arrays.copyOfRange(split, 1, split.length));
+					songPlayerNBT.putString(SongItemUtils.DISPLAY_NAME_KEY, name);
+					MC.interactionManager.clickCreativeStack(MC.player.getStackInHand(Hand.MAIN_HAND), 36 + MC.player.getInventory().selectedSlot);
+					SongPlayer.addChatMessage("§6Set song's display name to §3" + name);
+					return true;
+				default:
+					return false;
+			}
+		}
+		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
+			String[] split = args.split(" ", -1);
+			if (split.length <= 1) {
+				return CommandSource.suggestMatching(new String[] {
+						"create",
+						"setSongName",
+				}, suggestionsBuilder);
+			}
+			switch (split[0].toLowerCase()) {
+				case "create":
+					if (split.length == 2) {
+						return Util.giveSongSuggestions(split[1], suggestionsBuilder);
+					}
+				case "setsongname":
+				default:
+					return null;
 			}
 		}
 	}

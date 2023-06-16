@@ -1,4 +1,8 @@
-package com.github.hhhzzzsss.songplayer.song;
+package com.github.hhhzzzsss.songplayer.conversion;
+
+import com.github.hhhzzzsss.songplayer.song.Instrument;
+import com.github.hhhzzzsss.songplayer.song.Note;
+import com.github.hhhzzzsss.songplayer.song.Song;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

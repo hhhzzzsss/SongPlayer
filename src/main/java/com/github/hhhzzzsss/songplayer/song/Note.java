@@ -16,6 +16,12 @@ public class Note implements Comparable<Note> {
 		else if (time > other.time) {
 			return 1;
 		}
+		else if (noteId < other.noteId) {
+			return -1;
+		}
+		else if (noteId > other.noteId) {
+			return 1;
+		}
 		else {
 			return 0;
 		}

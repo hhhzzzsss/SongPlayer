@@ -1,6 +1,8 @@
 package com.github.hhhzzzsss.songplayer.song;
 
 import com.github.hhhzzzsss.songplayer.SongPlayer;
+import com.github.hhhzzzsss.songplayer.conversion.MidiConverter;
+import com.github.hhhzzzsss.songplayer.conversion.NBSConverter;
 
 import java.io.IOException;
 import java.net.URL;
@@ -15,8 +17,11 @@ public class SongLoaderThread extends Thread{
 	private URL songUrl;
 	public Exception exception;
 	public Song song;
+	public String filename;
 
 	private boolean isUrl = false;
+
+	protected SongLoaderThread() {}
 
 	public SongLoaderThread(String location) throws IOException {
 		this.location = location;
@@ -48,24 +53,23 @@ public class SongLoaderThread extends Thread{
 	public void run() {
 		try {
 			byte[] bytes;
-			String name;
 			if (isUrl) {
 				bytes = DownloadUtils.DownloadToByteArray(songUrl, 10*1024*1024);
-				name = Paths.get(songUrl.toURI().getPath()).getFileName().toString();
+				filename = Paths.get(songUrl.toURI().getPath()).getFileName().toString();
 			}
 			else {
 				bytes = Files.readAllBytes(songPath);
-				name = songPath.getFileName().toString();
+				filename = songPath.getFileName().toString();
 			}
 
 			try {
-				song = MidiConverter.getSongFromBytes(bytes, name);
+				song = MidiConverter.getSongFromBytes(bytes, filename);
 			}
 			catch (Exception e) {}
 
 			if (song == null) {
 				try {
-					song = NBSConverter.getSongFromBytes(bytes, name);
+					song = NBSConverter.getSongFromBytes(bytes, filename);
 				}
 				catch (Exception e) {}
 			}
@@ -73,7 +77,6 @@ public class SongLoaderThread extends Thread{
 			if (song == null) {
 				throw new IOException("Invalid song format");
 			}
-
 		}
 		catch (Exception e) {
 			exception = e;
@@ -81,8 +84,6 @@ public class SongLoaderThread extends Thread{
 	}
 
 	private Path getSongFile(String name) {
-		System.out.println(SongPlayer.SONG_DIR.resolve(name));
-		System.out.println(Files.exists(SongPlayer.SONG_DIR.resolve(name)));
 		return SongPlayer.SONG_DIR.resolve(name);
 	}
 }

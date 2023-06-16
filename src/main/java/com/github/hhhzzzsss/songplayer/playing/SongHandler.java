@@ -140,6 +140,18 @@ public class SongHandler {
         }
     }
 
+    public void loadSong(SongLoaderThread thread) {
+        if (loaderThread != null) {
+            SongPlayer.addChatMessage("§cAlready loading a song, cannot load another");
+        }
+        else if (currentPlaylist != null) {
+            SongPlayer.addChatMessage("§cCannot load a song while a playlist is playing");
+        }
+        else {
+            loaderThread = thread;
+        }
+    }
+
     public void setSong(Song song) {
         currentSong = song;
         building = true;

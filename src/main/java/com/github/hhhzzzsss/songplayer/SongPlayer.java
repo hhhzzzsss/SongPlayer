@@ -39,6 +39,10 @@ public class SongPlayer implements ModInitializer {
 		MC.player.sendMessage(Text.of(message), false);
 	}
 
+	public static void addChatMessage(Text text) {
+		MC.player.sendMessage(text, false);
+	}
+
 	public static void removeFakePlayer() {
 		if (fakePlayer != null) {
 			fakePlayer.remove(Entity.RemovalReason.DISCARDED);
