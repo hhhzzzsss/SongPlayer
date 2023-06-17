@@ -4,6 +4,7 @@ import com.github.hhhzzzsss.songplayer.Config;
 import com.github.hhhzzzsss.songplayer.FakePlayerEntity;
 import com.github.hhhzzzsss.songplayer.SongPlayer;
 import com.github.hhhzzzsss.songplayer.Util;
+import com.github.hhhzzzsss.songplayer.mixin.ClientPlayerInteractionManagerAccessor;
 import com.github.hhhzzzsss.songplayer.song.*;
 import net.minecraft.block.Block;
 import net.minecraft.client.world.ClientWorld;
@@ -159,6 +160,7 @@ public class SongHandler {
         if (stage != null) {
             stage.movePlayerToStagePosition();
         }
+        getAndSaveBuildSlot();
         SongPlayer.addChatMessage("§6Building noteblocks");
     }
 
@@ -193,6 +195,8 @@ public class SongHandler {
     private int buildStartDelay = 0;
     private int buildEndDelay = 0;
     private int buildCooldown = 0;
+    private int buildSlot = 0;
+    private ItemStack prevHeldItem = null;
     private void handleBuilding() {
         setBuildProgressDisplay();
         if (buildStartDelay > 0) {
@@ -224,7 +228,6 @@ public class SongHandler {
                 SongPlayer.MC.interactionManager.attackBlock(bp, Direction.UP);
             }
             buildEndDelay = 20;
-            return;
         } else if (!stage.missingNotes.isEmpty()) {
             int desiredNoteId = stage.missingNotes.pollFirst();
             BlockPos bp = stage.noteblockPositions.get(desiredNoteId);
@@ -234,7 +237,7 @@ public class SongHandler {
             int blockId = Block.getRawIdFromState(world.getBlockState(bp));
             int currentNoteId = (blockId-SongPlayer.NOTEBLOCK_BASE_ID)/2;
             if (currentNoteId != desiredNoteId) {
-                holdNoteblock(desiredNoteId);
+                holdNoteblock(desiredNoteId, buildSlot);
                 if (blockId != 0) {
                     attackBlock(bp);
                 }
@@ -242,12 +245,12 @@ public class SongHandler {
             }
             buildCooldown = 0; // No cooldown, so it places a block every tick
             buildEndDelay = 20;
-        } else {
+        } else { // Switch to playing
+            restoreBuildSlot();
             building = false;
             setSurvivalIfNeeded();
             stage.movePlayerToStagePosition();
             SongPlayer.addChatMessage("§6Now playing §3" + currentSong.name);
-            return;
         }
     }
     private void setBuildProgressDisplay() {
@@ -285,7 +288,7 @@ public class SongHandler {
             if (stage.hasBreakingModification()) {
                 stage.checkBuildStatus(currentSong);
             }
-            if (!stage.nothingToBuild()) {
+            if (!stage.nothingToBuild()) { // Switch to building
                 building = true;
                 setCreativeIfNeeded();
                 stage.movePlayerToStagePosition();
@@ -297,6 +300,7 @@ public class SongHandler {
                     int instrumentId = note / 25;
                     System.out.println("Missing note: " + Instrument.getInstrumentFromId(instrumentId).name() + ":" + pitch);
                 }
+                getAndSaveBuildSlot();
                 SongPlayer.addChatMessage("§6Stage was altered. Rebuilding!");
                 return;
             }
@@ -395,8 +399,10 @@ public class SongHandler {
     }
 
     private final String[] instrumentNames = {"harp", "basedrum", "snare", "hat", "bass", "flute", "bell", "guitar", "chime", "xylophone", "iron_xylophone", "cow_bell", "didgeridoo", "bit", "banjo", "pling"};
-    private void holdNoteblock(int id) {
+    private void holdNoteblock(int id, int slot) {
         PlayerInventory inventory = SongPlayer.MC.player.getInventory();
+        inventory.selectedSlot = slot;
+        ((ClientPlayerInteractionManagerAccessor) SongPlayer.MC.interactionManager).invokeSyncSelectedSlot();
         int instrument = id/25;
         int note = id%25;
         NbtCompound nbt = new NbtCompound();
@@ -408,8 +414,9 @@ public class SongHandler {
         bsTag.putString("note", Integer.toString(note));
         tag.put("BlockStateTag", bsTag);
         nbt.put("tag", tag);
-        inventory.main.set(inventory.selectedSlot, ItemStack.fromNbt(nbt));
-        SongPlayer.MC.interactionManager.clickCreativeStack(SongPlayer.MC.player.getStackInHand(Hand.MAIN_HAND), 36 + inventory.selectedSlot);
+        ItemStack noteblockStack = ItemStack.fromNbt(nbt);
+        inventory.main.set(slot, noteblockStack);
+        SongPlayer.MC.interactionManager.clickCreativeStack(noteblockStack, 36 + slot);
     }
     private void placeBlock(BlockPos bp) {
         double fx = Math.max(0.0, Math.min(1.0, (stage.position.getX() + 0.5 - bp.getX())));
@@ -425,5 +432,16 @@ public class SongHandler {
     }
     private void stopAttack() {
         SongPlayer.MC.interactionManager.cancelBlockBreaking();
+    }
+
+    private void getAndSaveBuildSlot() {
+        buildSlot = SongPlayer.MC.player.getInventory().getSwappableHotbarSlot();
+        prevHeldItem = SongPlayer.MC.player.getInventory().getStack(buildSlot);
+        System.out.println(buildSlot);
+        System.out.println(prevHeldItem.toString());
+    }
+    private void restoreBuildSlot() {
+        SongPlayer.MC.player.getInventory().setStack(buildSlot, prevHeldItem);
+        SongPlayer.MC.interactionManager.clickCreativeStack(prevHeldItem, 36 + buildSlot);
     }
 }

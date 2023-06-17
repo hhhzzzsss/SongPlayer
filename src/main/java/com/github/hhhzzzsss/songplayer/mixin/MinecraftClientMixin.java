@@ -43,6 +43,7 @@ public class MinecraftClientMixin {
 			} catch (IOException e) {
 				SongPlayer.addChatMessage("§cFailed to load song item: §4" + e.getMessage());
 			}
+			ci.cancel();
 		}
 	}
 }
