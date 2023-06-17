@@ -846,8 +846,8 @@ public class CommandProcessor {
 				return true;
 			}
 
-			ItemStack stack = MC.player.getMainHandStack().copy();
-			NbtCompound songPlayerNBT = stack.getSubNbt("SongPlayerData");
+			ItemStack stack = MC.player.getMainHandStack();
+			NbtCompound songPlayerNBT = SongItemUtils.getSongItemTag(stack);
 
 			String[] split = args.split(" ");
 			switch (split[0].toLowerCase()) {
@@ -867,6 +867,7 @@ public class CommandProcessor {
 					}
 					String name = String.join(" ", Arrays.copyOfRange(split, 1, split.length));
 					songPlayerNBT.putString(SongItemUtils.DISPLAY_NAME_KEY, name);
+					MC.player.setStackInHand(Hand.MAIN_HAND, stack);
 					MC.interactionManager.clickCreativeStack(MC.player.getStackInHand(Hand.MAIN_HAND), 36 + MC.player.getInventory().selectedSlot);
 					SongPlayer.addChatMessage("§6Set song's display name to §3" + name);
 					return true;
