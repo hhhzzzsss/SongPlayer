@@ -421,33 +421,55 @@ public class CommandProcessor {
 			return "Lists available songs. If an argument is provided, lists all songs in the subdirectory.";
 		}
 		public boolean processCommand(String args) {
-			if (args.length() == 0) {
-				List<String> subdirectories = Util.listFilesSilently(SongPlayer.SONG_DIR)
+			if (!args.contains(" ")) {
+				Path dir;
+				if (args.length() == 0) {
+					dir = SongPlayer.SONG_DIR;
+				}
+				else {
+					dir = SongPlayer.SONG_DIR.resolve(args);
+					if (!Files.isDirectory(dir)) {
+						SongPlayer.addChatMessage("§cDirectory not found");
+						return true;
+					}
+				}
+				List<String> subdirectories = Util.listFilesSilently(dir)
 						.filter(Files::isDirectory)
 						.map(Path::getFileName)
 						.map(Path::toString)
 						.map(str -> str + "/")
 						.collect(Collectors.toList());
-				List<String> songs = Util.listFilesSilently(SongPlayer.SONG_DIR)
+				List<String> songs = Util.listFilesSilently(dir)
 						.filter(Files::isRegularFile)
 						.map(Path::getFileName)
 						.map(Path::toString)
 						.collect(Collectors.toList());
 				if (subdirectories.size() == 0 && songs.size() == 0) {
-					SongPlayer.addChatMessage("§6No songs found. You can put midi or nbs files in the §3.minecraft/songs §6folder.");
+					SongPlayer.addChatMessage("§bNo songs found. You can put midi or nbs files in the §3.minecraft/songs §6folder.");
 				}
 				else {
+					SongPlayer.addChatMessage("§6----------------------------------------");
+					SongPlayer.addChatMessage("§eContents of .minecraft/songs/" + args);
 					if (subdirectories.size() > 0) {
 						SongPlayer.addChatMessage("§6Subdirectories: §3" + String.join(" ", subdirectories));
 					}
 					if (songs.size() > 0) {
 						SongPlayer.addChatMessage("§6Songs: §7" + String.join(", ", songs));
 					}
+					SongPlayer.addChatMessage("§6----------------------------------------");
 				}
 				return true;
 			}
 			else {
 				return false;
+			}
+		}
+		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
+			if (!args.contains(" ")) {
+				return Util.giveSongDirectorySuggestions(args, suggestionsBuilder);
+			}
+			else {
+				return null;
 			}
 		}
 	}

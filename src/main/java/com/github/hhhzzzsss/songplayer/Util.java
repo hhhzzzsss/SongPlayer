@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -111,6 +112,28 @@ public class Util {
                         .map(Path::getFileName)
                         .map(Path::toString),
                 suggestionsBuilder);
+    }
+
+    public static CompletableFuture<Suggestions> giveSongDirectorySuggestions(String arg, SuggestionsBuilder suggestionsBuilder) {
+        int lastSlash = arg.lastIndexOf("/");
+        String dirString;
+        Path dir = SongPlayer.SONG_DIR;
+        if (lastSlash >= 0) {
+            dirString = arg.substring(0, lastSlash+1);
+            dir = dir.resolve(dirString);
+        }
+        else {
+            dirString = "";
+        }
+
+        Stream<Path> songFiles = listFilesSilently(dir);
+        if (songFiles == null) return null;
+
+        List<String> suggestions = songFiles
+                .filter(Files::isDirectory)
+                .map(path -> dirString + path.getFileName().toString() + "/")
+                .collect(Collectors.toList());
+        return CommandSource.suggestMatching(suggestions, suggestionsBuilder);
     }
 
     public static MutableText getStyledText(String str, Style style) {
