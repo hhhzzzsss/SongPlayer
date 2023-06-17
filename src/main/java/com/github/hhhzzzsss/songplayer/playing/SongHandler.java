@@ -293,7 +293,7 @@ public class SongHandler {
                 setCreativeIfNeeded();
                 stage.movePlayerToStagePosition();
                 currentSong.pause();
-                buildStartDelay = 40;
+                buildStartDelay = 20;
                 System.out.println("Total missing notes: " + stage.missingNotes.size());
                 for (int note : stage.missingNotes) {
                     int pitch = note % 25;
