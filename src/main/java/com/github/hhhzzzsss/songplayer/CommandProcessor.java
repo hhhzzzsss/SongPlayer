@@ -11,7 +11,6 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Hand;
 import net.minecraft.world.GameMode;
@@ -867,6 +866,7 @@ public class CommandProcessor {
 					}
 					String name = String.join(" ", Arrays.copyOfRange(split, 1, split.length));
 					songPlayerNBT.putString(SongItemUtils.DISPLAY_NAME_KEY, name);
+					SongItemUtils.addSongItemDisplay(stack);
 					MC.player.setStackInHand(Hand.MAIN_HAND, stack);
 					MC.interactionManager.clickCreativeStack(MC.player.getStackInHand(Hand.MAIN_HAND), 36 + MC.player.getInventory().selectedSlot);
 					SongPlayer.addChatMessage("§6Set song's display name to §3" + name);

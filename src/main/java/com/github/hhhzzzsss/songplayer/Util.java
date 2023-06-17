@@ -3,6 +3,13 @@ package com.github.hhhzzzsss.songplayer;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
+import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -104,5 +111,23 @@ public class Util {
                         .map(Path::getFileName)
                         .map(Path::toString),
                 suggestionsBuilder);
+    }
+
+    public static MutableText getStyledText(String str, Style style) {
+        MutableText text = MutableText.of(new LiteralTextContent(str));
+        text.setStyle(style);
+        return text;
+    }
+
+    public static void setItemName(ItemStack stack, Text text) {
+        stack.getOrCreateSubNbt(ItemStack.DISPLAY_KEY).putString(ItemStack.NAME_KEY, Text.Serializer.toJson(text));
+    }
+
+    public static void setItemLore(ItemStack stack, Text... loreLines) {
+        NbtList lore = new NbtList();
+        for (Text line : loreLines) {
+            lore.add(NbtString.of(Text.Serializer.toJson(line)));
+        }
+        stack.getOrCreateSubNbt(ItemStack.DISPLAY_KEY).put(ItemStack.LORE_KEY, lore);
     }
 }
