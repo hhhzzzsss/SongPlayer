@@ -52,10 +52,10 @@ public class CommandProcessor {
 		commands.add(new testSongCommand());
 
 		for (Command command : commands) {
-			commandMap.put(command.getName().toLowerCase(), command);
+			commandMap.put(command.getName().toLowerCase(Locale.ROOT), command);
 			commandCompletions.add(command.getName());
 			for (String alias : command.getAliases()) {
-				commandMap.put(alias.toLowerCase(), command);
+				commandMap.put(alias.toLowerCase(Locale.ROOT), command);
 				commandCompletions.add(alias);
 			}
 		}
@@ -67,7 +67,7 @@ public class CommandProcessor {
 			String[] parts = message.substring(1).split(" ", 2);
 			String name = parts.length>0 ? parts[0] : "";
 			String args = parts.length>1 ? parts[1] : "";
-			Command c = commandMap.get(name.toLowerCase());
+			Command c = commandMap.get(name.toLowerCase(Locale.ROOT));
 			if (c == null) {
 				SongPlayer.addChatMessage("§cUnrecognized command");
 			} else {
@@ -131,8 +131,8 @@ public class CommandProcessor {
 				SongPlayer.addChatMessage(helpMessage.toString());
 			}
 			else {
-				if (commandMap.containsKey(args.toLowerCase())) {
-					Command c = commandMap.get(args.toLowerCase());
+				if (commandMap.containsKey(args.toLowerCase(Locale.ROOT))) {
+					Command c = commandMap.get(args.toLowerCase(Locale.ROOT));
 					SongPlayer.addChatMessage("§6------------------------------");
 					SongPlayer.addChatMessage("§6Help: §3" + c.getName());
 					SongPlayer.addChatMessage("§6Description: §3" + c.getDescription());
@@ -482,7 +482,7 @@ public class CommandProcessor {
 				if (split.length >= 2) {
 					playlistDir = SongPlayer.PLAYLISTS_DIR.resolve(split[1]);
 				}
-				switch (split[0].toLowerCase()) {
+				switch (split[0].toLowerCase(Locale.ROOT)) {
 					case "play":
 						if (split.length != 2) return false;
 						if (!Files.exists(playlistDir)) {
@@ -592,7 +592,7 @@ public class CommandProcessor {
 						"shuffle",
 				}, suggestionsBuilder);
 			}
-			switch (split[0].toLowerCase()) {
+			switch (split[0].toLowerCase(Locale.ROOT)) {
 				case "create":
 				case "loop":
 				case "shuffle":
@@ -795,7 +795,7 @@ public class CommandProcessor {
 		public boolean processCommand(String args) {
 			if (args.length() > 0) {
 				try {
-					Stage.StageType stageType = Stage.StageType.valueOf(args.toUpperCase());
+					Stage.StageType stageType = Stage.StageType.valueOf(args.toUpperCase(Locale.ROOT));
 					Config.getConfig().stageType = stageType;
 					SongPlayer.addChatMessage("§6Set stage type to §3" + stageType.name());
 					Config.saveConfigWithErrorHandling();
@@ -849,7 +849,7 @@ public class CommandProcessor {
 			NbtCompound songPlayerNBT = SongItemUtils.getSongItemTag(stack);
 
 			String[] split = args.split(" ");
-			switch (split[0].toLowerCase()) {
+			switch (split[0].toLowerCase(Locale.ROOT)) {
 				case "create":
 					if (split.length != 2) return false;
 					try {
@@ -883,7 +883,7 @@ public class CommandProcessor {
 						"setSongName",
 				}, suggestionsBuilder);
 			}
-			switch (split[0].toLowerCase()) {
+			switch (split[0].toLowerCase(Locale.ROOT)) {
 				case "create":
 					if (split.length == 2) {
 						return Util.giveSongSuggestions(split[1], suggestionsBuilder);
@@ -931,7 +931,7 @@ public class CommandProcessor {
 		} else {
 			String[] split = text.split(" ", 2);
 			if (split[0].startsWith(Config.getConfig().prefix)) {
-				String commandName = split[0].substring(1).toLowerCase();
+				String commandName = split[0].substring(1).toLowerCase(Locale.ROOT);
 				if (commandMap.containsKey(commandName)) {
 					return commandMap.get(commandName).getSuggestions(split.length == 1 ? "" : split[1], suggestionsBuilder);
 				}
