@@ -48,6 +48,7 @@ public class CommandProcessor {
 		commands.add(new useVanillaCommandsCommand());
 		commands.add(new toggleFakePlayerCommand());
 		commands.add(new setStageTypeCommand());
+		commands.add(new toggleMovementCommand());
 		commands.add(new songItemCommand());
 		commands.add(new testSongCommand());
 
@@ -834,6 +835,55 @@ public class CommandProcessor {
 		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
 			if (!args.contains(" ")) {
 				return CommandSource.suggestMatching(Arrays.stream(Stage.StageType.values()).map(Stage.StageType::name), suggestionsBuilder);
+			}
+			else {
+				return null;
+			}
+		}
+	}
+
+	private static class toggleMovementCommand extends Command {
+		public String getName() {
+			return "toggleMovement";
+		}
+		public String[] getAliases() {
+			return new String[]{"movement"};
+		}
+		public String[] getSyntax() {
+			return new String[] {"<swing | rotate>"};
+		}
+		public String getDescription() {
+			return "Toggles different types of movements";
+		}
+		public boolean processCommand(String args) {
+			switch (args.toLowerCase(Locale.ROOT)) {
+				case "swing":
+					Config.getConfig().swing = !Config.getConfig().swing;
+					if (Config.getConfig().swing) {
+						SongPlayer.addChatMessage("§6Enabled arm swinging");
+					}
+					else {
+						SongPlayer.addChatMessage("§6Disabled arm swinging");
+					}
+					Config.saveConfigWithErrorHandling();
+					return true;
+				case "rotate":
+					Config.getConfig().rotate = !Config.getConfig().rotate;
+					if (Config.getConfig().rotate) {
+						SongPlayer.addChatMessage("§6Enabled player rotation");
+					}
+					else {
+						SongPlayer.addChatMessage("§6Disabled player rotation");
+					}
+					Config.saveConfigWithErrorHandling();
+					return true;
+				default:
+					return false;
+			}
+		}
+		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
+			if (!args.contains(" ")) {
+				return CommandSource.suggestMatching(new String[]{"swing", "rotate"}, suggestionsBuilder);
 			}
 			else {
 				return null;

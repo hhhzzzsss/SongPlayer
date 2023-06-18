@@ -1,6 +1,7 @@
 package com.github.hhhzzzsss.songplayer.mixin;
 
 import com.github.hhhzzzsss.songplayer.CommandProcessor;
+import com.github.hhhzzzsss.songplayer.Config;
 import com.github.hhhzzzsss.songplayer.SongPlayer;
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
 import com.github.hhhzzzsss.songplayer.playing.Stage;
@@ -31,10 +32,15 @@ public class ClientPlayNetworkHandlerMixin {
 	@Inject(at = @At("HEAD"), method = "sendPacket(Lnet/minecraft/network/packet/Packet;)V", cancellable = true)
 	private void onSendPacket(Packet<?> packet, CallbackInfo ci) {
 		Stage stage = SongHandler.getInstance().stage;
+
 		if (stage != null && packet instanceof PlayerMoveC2SPacket) {
-			connection.send(new PlayerMoveC2SPacket.Full(stage.position.getX()+0.5, stage.position.getY(), stage.position.getZ()+0.5, SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch(), true));
-			if (SongPlayer.fakePlayer != null) {
-				SongPlayer.fakePlayer.copyStagePosAndPlayerLook();
+			if (Config.getConfig().rotate) {
+				connection.send(new PlayerMoveC2SPacket.PositionAndOnGround(stage.position.getX()+0.5, stage.position.getY(), stage.position.getZ()+0.5, true));
+			} else {
+				connection.send(new PlayerMoveC2SPacket.Full(stage.position.getX() + 0.5, stage.position.getY(), stage.position.getZ() + 0.5, SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch(), true));
+				if (SongPlayer.fakePlayer != null) {
+					SongPlayer.fakePlayer.copyStagePosAndPlayerLook();
+				}
 			}
 			ci.cancel();
 		}

@@ -11,6 +11,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -18,6 +19,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 
@@ -426,12 +428,37 @@ public class SongHandler {
         fy += bp.getY();
         fz += bp.getZ();
         SongPlayer.MC.interactionManager.interactBlock(SongPlayer.MC.player, Hand.MAIN_HAND, new BlockHitResult(new Vec3d(fx, fy, fz), Direction.UP, bp, false));
+        doMovements(fx, fy, fz);
     }
     private void attackBlock(BlockPos bp) {
         SongPlayer.MC.interactionManager.attackBlock(bp, Direction.UP);
+        doMovements(bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5);
     }
     private void stopAttack() {
         SongPlayer.MC.interactionManager.cancelBlockBreaking();
+    }
+
+    private void doMovements(double lookX, double lookY, double lookZ) {
+        if (Config.getConfig().swing) {
+            SongPlayer.MC.player.swingHand(Hand.MAIN_HAND);
+            if (SongPlayer.fakePlayer != null) {
+                SongPlayer.fakePlayer.swingHand(Hand.MAIN_HAND);
+            }
+        }
+        if (Config.getConfig().rotate) {
+            double d = lookX - (stage.position.getX() + 0.5);
+            double e = lookY - (stage.position.getY() + SongPlayer.MC.player.getStandingEyeHeight());
+            double f = lookZ - (stage.position.getZ() + 0.5);
+            double g = Math.sqrt(d * d + f * f);
+            float pitch = MathHelper.wrapDegrees((float) (-(MathHelper.atan2(e, g) * 57.2957763671875)));
+            float yaw = MathHelper.wrapDegrees((float) (MathHelper.atan2(f, d) * 57.2957763671875) - 90.0f);
+            if (SongPlayer.fakePlayer != null) {
+                SongPlayer.fakePlayer.setPitch(pitch);
+                SongPlayer.fakePlayer.setYaw(yaw);
+                SongPlayer.fakePlayer.setHeadYaw(yaw);
+            }
+            SongPlayer.MC.player.networkHandler.getConnection().send(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, true));
+        }
     }
 
     private void getAndSaveBuildSlot() {

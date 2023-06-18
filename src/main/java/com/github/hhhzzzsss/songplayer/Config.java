@@ -22,6 +22,8 @@ public class Config {
     public boolean loopPlaylists = false;
     public boolean shufflePlaylists = false;
     public Stage.StageType stageType = Stage.StageType.DEFAULT;
+    public boolean swing = false;
+    public boolean rotate = false;
 
     public static Config getConfig() {
         if (config == null) {
