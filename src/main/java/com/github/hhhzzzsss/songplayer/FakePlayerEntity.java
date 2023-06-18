@@ -3,13 +3,11 @@ package com.github.hhhzzzsss.songplayer;
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
 import com.github.hhhzzzsss.songplayer.playing.Stage;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.client.RunArgs;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Uuids;
 
 import java.util.UUID;
 

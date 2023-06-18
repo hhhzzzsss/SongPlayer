@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class Stage {
 	private final ClientPlayerEntity player = SongPlayer.MC.player;
 
-	public static enum StageType {
+	public enum StageType {
 		DEFAULT,
 		WIDE,
 		SPHERICAL,

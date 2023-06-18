@@ -359,7 +359,7 @@ public class CommandProcessor {
 				Song currentSong = SongHandler.getInstance().currentSong;
 				long currentTime = Math.min(currentSong.time, currentSong.length);
 				long totalTime = currentSong.length;
-				SongPlayer.addChatMessage(String.format("§6Currently playing %s §3(%s/%s)", Util.formatTime(currentTime), Util.formatTime(totalTime)));
+				SongPlayer.addChatMessage(String.format("§6Currently playing %s §3(%s/%s)", currentSong.name, Util.formatTime(currentTime), Util.formatTime(totalTime)));
 				return true;
 			}
 			else {

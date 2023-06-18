@@ -96,7 +96,7 @@ public class SPConverter {
         if (length > maxSize) {
             throw new IOException("String is too large");
         }
-        byte arr[] = new byte[length];
+        byte[] arr = new byte[length];
         buffer.get(arr, 0, length);
         System.out.println(new String(arr, StandardCharsets.UTF_8));
         return new String(arr, StandardCharsets.UTF_8);

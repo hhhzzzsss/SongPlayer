@@ -171,7 +171,7 @@ public class NBSConverter {
         if (length > maxSize) {
             throw new IOException("String is too large");
         }
-        byte arr[] = new byte[length];
+        byte[] arr = new byte[length];
         buffer.get(arr, 0, length);
         return new String(arr);
     }

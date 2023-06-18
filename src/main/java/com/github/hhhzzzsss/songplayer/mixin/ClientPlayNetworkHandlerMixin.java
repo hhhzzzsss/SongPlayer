@@ -10,7 +10,6 @@ import net.minecraft.entity.EntityPose;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerAbilitiesS2CPacket;

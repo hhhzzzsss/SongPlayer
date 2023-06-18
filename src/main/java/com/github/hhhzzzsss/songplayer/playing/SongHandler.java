@@ -7,7 +7,6 @@ import com.github.hhhzzzsss.songplayer.Util;
 import com.github.hhhzzzsss.songplayer.mixin.ClientPlayerInteractionManagerAccessor;
 import com.github.hhhzzzsss.songplayer.song.*;
 import net.minecraft.block.Block;
-import net.minecraft.client.RunArgs;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -141,7 +140,7 @@ public class SongHandler {
         else {
             try {
                 loaderThread = new SongLoaderThread(location);
-                SongPlayer.addChatMessage("§6Loading §3" + location + "");
+                SongPlayer.addChatMessage("§6Loading §3" + location);
                 loaderThread.start();
             } catch (IOException e) {
                 SongPlayer.addChatMessage("§cFailed to load song: §4" + e.getMessage());
@@ -489,8 +488,6 @@ public class SongHandler {
     private void getAndSaveBuildSlot() {
         buildSlot = SongPlayer.MC.player.getInventory().getSwappableHotbarSlot();
         prevHeldItem = SongPlayer.MC.player.getInventory().getStack(buildSlot);
-        System.out.println(buildSlot);
-        System.out.println(prevHeldItem.toString());
     }
     private void restoreBuildSlot() {
         SongPlayer.MC.player.getInventory().setStack(buildSlot, prevHeldItem);
