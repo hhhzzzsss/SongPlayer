@@ -143,7 +143,7 @@ public class Stage {
 				.stream()
 				.filter((bp) -> {
 					BlockState bs = SongPlayer.MC.world.getBlockState(bp);
-					return !bs.isAir() && !bs.getMaterial().isLiquid();
+					return !bs.isAir() && !bs.isLiquid();
 				})
 				.sorted((a, b) -> {
 					// First sort by y
@@ -448,7 +448,7 @@ public class Stage {
 			}
 
 			BlockState aboveBs = SongPlayer.MC.world.getBlockState(entry.getValue().up());
-			if (!aboveBs.isAir() && !aboveBs.getMaterial().isLiquid()) {
+			if (!aboveBs.isAir() && !aboveBs.isLiquid()) {
 				return true;
 			}
 		}

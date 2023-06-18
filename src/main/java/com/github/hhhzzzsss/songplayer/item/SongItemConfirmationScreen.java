@@ -3,6 +3,7 @@ package com.github.hhhzzzsss.songplayer.item;
 import com.github.hhhzzzsss.songplayer.SongPlayer;
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
 import net.minecraft.client.font.MultilineText;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -52,10 +53,10 @@ public class SongItemConfirmationScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        this.renderBackground(matrices);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        this.renderBackground(context);
 
-        drawCenteredTextWithShadow(matrices, this.textRenderer, this.title, this.width / 2, 40, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(textRenderer, this.title, this.width / 2, 40, 0xFFFFFF);
 
         if (!loaderThread.isAlive()) {
             if (loaderThread.exception != null) {
@@ -80,13 +81,13 @@ public class SongItemConfirmationScreen extends Screen {
         }
 
         if (loaded) {
-            loadedText.drawCenterWithShadow(matrices, this.width / 2, 60);
+            loadedText.drawCenterWithShadow(context, this.width / 2, 60);
         }
         else {
-            unloadedText.drawCenterWithShadow(matrices, this.width / 2, 60);
+            unloadedText.drawCenterWithShadow(context, this.width / 2, 60);
         }
 
-        super.render(matrices, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
     }
 
     public String getNumberColor(double number) {

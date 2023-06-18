@@ -2,6 +2,7 @@ package com.github.hhhzzzsss.songplayer.playing;
 
 import com.github.hhhzzzsss.songplayer.SongPlayer;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -28,7 +29,7 @@ public class ProgressDisplay {
         fade = 100;
     }
 
-    public void onRenderHUD(MatrixStack matrixStack, int scaledWidth, int scaledHeight, int heldItemTooltipFade) {
+    public void onRenderHUD(DrawContext context, int scaledWidth, int scaledHeight, int heldItemTooltipFade) {
         if (fade <= 0) {
             return;
         }
@@ -54,8 +55,8 @@ public class ProgressDisplay {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         Objects.requireNonNull(SongPlayer.MC.textRenderer);
-        SongPlayer.MC.textRenderer.drawWithShadow(matrixStack, bottomText, (float)bottomTextX, (float)bottomTextY, 16777215 + (opacity << 24));
-        SongPlayer.MC.textRenderer.drawWithShadow(matrixStack, topText, (float)topTextX, (float)topTextY, 16777215 + (opacity << 24));
+        context.drawTextWithShadow(SongPlayer.MC.textRenderer, bottomText, bottomTextX, bottomTextY, 16777215 + (opacity << 24));
+        context.drawTextWithShadow(SongPlayer.MC.textRenderer, topText, topTextX, topTextY, 16777215 + (opacity << 24));
         RenderSystem.disableBlend();
     }
 
