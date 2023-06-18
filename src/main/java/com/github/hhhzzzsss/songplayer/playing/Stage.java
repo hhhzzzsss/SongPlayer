@@ -6,6 +6,7 @@ import com.github.hhhzzzsss.songplayer.song.Song;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
@@ -37,6 +38,7 @@ public class Stage {
 		player.getAbilities().flying = true;
 		player.refreshPositionAndAngles(position.getX() + 0.5, position.getY() + 0.0, position.getZ() + 0.5, player.getYaw(), player.getPitch());
 		player.setVelocity(Vec3d.ZERO);
+		SongPlayer.MC.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(position.getX()+0.5, position.getY(), position.getZ()+0.5, SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch(), true));
 	}
 
 	public void checkBuildStatus(Song song) {

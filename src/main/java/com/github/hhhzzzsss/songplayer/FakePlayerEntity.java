@@ -2,17 +2,23 @@ package com.github.hhhzzzsss.songplayer;
 
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
 import com.github.hhhzzzsss.songplayer.playing.Stage;
+import com.mojang.authlib.GameProfile;
+import net.minecraft.client.RunArgs;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Uuids;
+
+import java.util.UUID;
 
 public class FakePlayerEntity extends OtherClientPlayerEntity {
 	ClientPlayerEntity player = SongPlayer.MC.player;
 	ClientWorld world = SongPlayer.MC.world;
 	
 	public FakePlayerEntity() {
-		super(SongPlayer.MC.world, SongPlayer.MC.player.getGameProfile());
+		super(SongPlayer.MC.world, new GameProfile(UUID.randomUUID(), SongPlayer.MC.player.getGameProfile().getName()));
 		
 		copyStagePosAndPlayerLook();
 		
@@ -23,6 +29,11 @@ public class FakePlayerEntity extends OtherClientPlayerEntity {
 		
 		headYaw = player.headYaw;
 		bodyYaw = player.bodyYaw;
+
+		if (player.isSneaking()) {
+			setSneaking(true);
+			setPose(EntityPose.CROUCHING);
+		}
 
 		capeX = getX();
 		capeY = getY();
@@ -40,7 +51,6 @@ public class FakePlayerEntity extends OtherClientPlayerEntity {
 		if (stage != null) {
 			refreshPositionAndAngles(stage.position.getX()+0.5, stage.position.getY(), stage.position.getZ()+0.5, player.getYaw(), player.getPitch());
 			headYaw = player.headYaw;
-			bodyYaw = player.bodyYaw;
 		}
 		else {
 			copyPositionAndRotation(player);
