@@ -241,7 +241,7 @@ public class CommandProcessor {
 				if (SongHandler.getInstance().stage != null) {
 					SongHandler.getInstance().stage.movePlayerToStagePosition();
 				}
-				SongHandler.getInstance().cleanup();
+				SongHandler.getInstance().restoreStateAndCleanUp();
 				SongPlayer.addChatMessage("§6Stopped playing");
 				return true;
 			}

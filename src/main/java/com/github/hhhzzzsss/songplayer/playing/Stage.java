@@ -38,7 +38,11 @@ public class Stage {
 		player.getAbilities().flying = true;
 		player.refreshPositionAndAngles(position.getX() + 0.5, position.getY() + 0.0, position.getZ() + 0.5, player.getYaw(), player.getPitch());
 		player.setVelocity(Vec3d.ZERO);
-		SongPlayer.MC.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(position.getX()+0.5, position.getY(), position.getZ()+0.5, SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch(), true));
+		sendMovementPacketToStagePosition();
+	}
+
+	public void sendMovementPacketToStagePosition() {
+		SongPlayer.MC.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(position.getX()+0.5, position.getY(), position.getZ()+0.5, true));
 	}
 
 	public void checkBuildStatus(Song song) {

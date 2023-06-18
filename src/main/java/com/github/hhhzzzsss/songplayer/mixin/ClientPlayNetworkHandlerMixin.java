@@ -13,6 +13,7 @@ import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerAbilitiesS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,9 +35,7 @@ public class ClientPlayNetworkHandlerMixin {
 		Stage stage = SongHandler.getInstance().stage;
 
 		if (stage != null && packet instanceof PlayerMoveC2SPacket) {
-			if (Config.getConfig().rotate) {
-				connection.send(new PlayerMoveC2SPacket.PositionAndOnGround(stage.position.getX()+0.5, stage.position.getY(), stage.position.getZ()+0.5, true));
-			} else {
+			if (!Config.getConfig().rotate) {
 				connection.send(new PlayerMoveC2SPacket.Full(stage.position.getX() + 0.5, stage.position.getY(), stage.position.getZ() + 0.5, SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch(), true));
 				if (SongPlayer.fakePlayer != null) {
 					SongPlayer.fakePlayer.copyStagePosAndPlayerLook();
@@ -75,5 +74,13 @@ public class ClientPlayNetworkHandlerMixin {
 	@Inject(at = @At("TAIL"), method = "onPlayerRespawn(Lnet/minecraft/network/packet/s2c/play/PlayerRespawnS2CPacket;)V")
 	public void onOnPlayerRespawn(PlayerRespawnS2CPacket packet, CallbackInfo ci) {
 		SongHandler.getInstance().cleanup();
+	}
+
+	@Inject(at = @At("TAIL"), method = "onPlayerAbilities(Lnet/minecraft/network/packet/s2c/play/PlayerAbilitiesS2CPacket;)V")
+	public void onOnPlayerAbilities(PlayerAbilitiesS2CPacket packet, CallbackInfo ci) {
+		SongHandler handler = SongHandler.getInstance();
+		if (handler.currentSong != null || handler.currentPlaylist != null || handler.songQueue.size() > 0) {
+			SongPlayer.MC.player.getAbilities().flying = handler.wasFlying;
+		}
 	}
 }

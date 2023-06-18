@@ -7,6 +7,7 @@ import com.github.hhhzzzsss.songplayer.Util;
 import com.github.hhhzzzsss.songplayer.mixin.ClientPlayerInteractionManagerAccessor;
 import com.github.hhhzzzsss.songplayer.song.*;
 import net.minecraft.block.Block;
+import net.minecraft.client.RunArgs;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -43,6 +44,9 @@ public class SongHandler {
     public Playlist currentPlaylist = null;
     public Stage stage = null;
     public boolean building = false;
+
+    public boolean wasFlying = false;
+    public GameMode originalGamemode = GameMode.CREATIVE;
 
     boolean playlistChecked = false;
 
@@ -89,13 +93,15 @@ public class SongHandler {
             loaderThread = null;
         }
 
+        checkCommandCache();
+
         // Check if no song is playing and, if necessary, handle cleanup
         if (currentSong == null) {
             if (stage != null || SongPlayer.fakePlayer != null) {
-                if (stage != null) {
-                    stage.movePlayerToStagePosition();
-                }
-                cleanup();
+                restoreStateAndCleanUp();
+            }
+            else {
+                originalGamemode = SongPlayer.MC.interactionManager.getCurrentGameMode();
             }
         }
         // Otherwise, handle song playing
@@ -112,9 +118,9 @@ public class SongHandler {
                 SongPlayer.removeFakePlayer();
             }
 
-            checkCommandCache();
-
             SongPlayer.MC.player.getAbilities().allowFlying = true;
+            wasFlying = SongPlayer.MC.player.getAbilities().flying;
+
             if (building) {
                 if (tick) {
                     handleBuilding();
@@ -159,8 +165,12 @@ public class SongHandler {
         currentSong = song;
         building = true;
         setCreativeIfNeeded();
-        if (stage != null) {
+        if (stage == null) {
+            stage = new Stage();
             stage.movePlayerToStagePosition();
+        }
+        else {
+            stage.sendMovementPacketToStagePosition();
         }
         getAndSaveBuildSlot();
         SongPlayer.addChatMessage("§6Building noteblocks");
@@ -251,7 +261,7 @@ public class SongHandler {
             restoreBuildSlot();
             building = false;
             setSurvivalIfNeeded();
-            stage.movePlayerToStagePosition();
+            stage.sendMovementPacketToStagePosition();
             SongPlayer.addChatMessage("§6Now playing §3" + currentSong.name);
         }
     }
@@ -293,7 +303,7 @@ public class SongHandler {
             if (!stage.nothingToBuild()) { // Switch to building
                 building = true;
                 setCreativeIfNeeded();
-                stage.movePlayerToStagePosition();
+                stage.sendMovementPacketToStagePosition();
                 currentSong.pause();
                 buildStartDelay = 20;
                 System.out.println("Total missing notes: " + stage.missingNotes.size());
@@ -367,6 +377,21 @@ public class SongHandler {
         songQueue.clear();
         stage = null;
         SongPlayer.removeFakePlayer();
+    }
+
+    public void restoreStateAndCleanUp() {
+        if (stage != null) {
+            stage.movePlayerToStagePosition();
+        }
+        if (originalGamemode != SongPlayer.MC.interactionManager.getCurrentGameMode()) {
+            if (originalGamemode == GameMode.CREATIVE) {
+                sendGamemodeCommand(Config.getConfig().creativeCommand);
+            }
+            else if (originalGamemode == GameMode.SURVIVAL) {
+                sendGamemodeCommand(Config.getConfig().survivalCommand);
+            }
+        }
+        cleanup();
     }
 
     public void onNotIngame() {

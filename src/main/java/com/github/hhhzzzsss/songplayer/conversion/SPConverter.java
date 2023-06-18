@@ -106,7 +106,6 @@ public class SPConverter {
         byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
         writeInt(os, bytes.length);
         os.write(bytes);
-        System.out.println(string);
     }
 
     private static long getVarLong(ByteBuffer buffer) {
