@@ -12,7 +12,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 17
-    - name: Cache/Uncache Sodium
+    - name: Cache/Uncache SongPlayer
       uses: actions/cache@v2
       with:
         path: |
