@@ -127,7 +127,7 @@ Encodes song data into an item. When you right click on such an item, SongPlayer
 It will automatically generate custom item names and lore, but these can be modified or deleted without affecting the song data, so feel free to edit the items as you wish. SongPlayer only looks at the `SongItemData` tag.
 
 ### $testSong
-A command I used used for testing during development.
+A command I used for testing during development.
 It plays all 400 possible noteblock sounds in order.
 
 # Mechanism
