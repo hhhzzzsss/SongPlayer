@@ -6,9 +6,10 @@
   "mixins": [
   ],
   "client": [
-    "ClientPlayNetworkHandlerMixin",
-    "ClientPlayerInteractionManagerAccessor",
     "ChatInputSuggestorMixin",
+    "ClientPlayerInteractionManagerAccessor",
+    "ClientPlayNetworkHandlerAccessor",
+    "ClientPlayNetworkHandlerMixin",
     "InGameHudMixin",
     "MinecraftClientMixin"
   ],
