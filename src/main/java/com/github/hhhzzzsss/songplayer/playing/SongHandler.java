@@ -206,7 +206,7 @@ public class SongHandler {
     private int buildStartDelay = 0;
     private int buildEndDelay = 0;
     private int buildCooldown = 0;
-    private int buildSlot = 0;
+    private int buildSlot = -1;
     private ItemStack prevHeldItem = null;
     private void handleBuilding() {
         setBuildProgressDisplay();
@@ -237,7 +237,7 @@ public class SongHandler {
             for (int i=0; i<5; i++) {
                 if (stage.requiredBreaks.isEmpty()) break;
                 BlockPos bp = stage.requiredBreaks.poll();
-                SongPlayer.MC.interactionManager.attackBlock(bp, Direction.UP);
+                attackBlock(bp);
             }
             buildEndDelay = 20;
         } else if (!stage.missingNotes.isEmpty()) {
@@ -376,6 +376,7 @@ public class SongHandler {
         currentPlaylist = null;
         songQueue.clear();
         stage = null;
+        buildSlot = -1;
         SongPlayer.removeFakePlayer();
     }
 
@@ -391,6 +392,7 @@ public class SongHandler {
                 sendGamemodeCommand(Config.getConfig().survivalCommand);
             }
         }
+        restoreBuildSlot();
         cleanup();
     }
 
@@ -494,7 +496,10 @@ public class SongHandler {
         prevHeldItem = SongPlayer.MC.player.getInventory().getStack(buildSlot);
     }
     private void restoreBuildSlot() {
-        SongPlayer.MC.player.getInventory().setStack(buildSlot, prevHeldItem);
-        SongPlayer.MC.interactionManager.clickCreativeStack(prevHeldItem, 36 + buildSlot);
+        if (buildSlot != -1) {
+            SongPlayer.MC.player.getInventory().setStack(buildSlot, prevHeldItem);
+            SongPlayer.MC.interactionManager.clickCreativeStack(prevHeldItem, 36 + buildSlot);
+            buildSlot = -1;
+        }
     }
 }
