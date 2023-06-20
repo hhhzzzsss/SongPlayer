@@ -23,7 +23,7 @@ public class SongItemUtils {
         songPlayerNbt.putString(SONG_DATA_KEY, Base64.getEncoder().encodeToString(songData));
         songPlayerNbt.putString(FILE_NAME_KEY, filename);
         songPlayerNbt.putString(DISPLAY_NAME_KEY, displayName);
-        songPlayerNbt.putString(MODEL_KEY, new Integer(751642938));
+        songPlayerNbt.putInt(MODEL_KEY, new Integer("751642938"));
         addSongItemDisplay(stack);
         return stack;
     }
