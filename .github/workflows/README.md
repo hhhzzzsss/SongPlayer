@@ -1,1 +1,0 @@
-Only for testing. This action will be removed when PR is completed.
