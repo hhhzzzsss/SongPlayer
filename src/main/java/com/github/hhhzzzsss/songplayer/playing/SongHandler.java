@@ -92,6 +92,7 @@ public class SongHandler {
             loaderThread = null;
         }
 
+        // Run cached command if timeout reached
         checkCommandCache();
 
         // Check if no song is playing and, if necessary, handle cleanup
@@ -115,6 +116,9 @@ public class SongHandler {
             }
             if (!Config.getConfig().showFakePlayer && SongPlayer.fakePlayer != null) {
                 SongPlayer.removeFakePlayer();
+            }
+            if (SongPlayer.fakePlayer != null) {
+                SongPlayer.fakePlayer.getInventory().clone(SongPlayer.MC.player.getInventory());
             }
 
             SongPlayer.MC.player.getAbilities().allowFlying = true;
