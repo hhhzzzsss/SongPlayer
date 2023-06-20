@@ -19,7 +19,7 @@ public class SongItemUtils {
 
     public static ItemStack createSongItem(ItemStack stack, byte[] songData, String filename, String displayName) {
         NbtCompound songPlayerNbt = new NbtCompound();
-        stack.setNbt(MODEL_KEY, new Integer("751642938"));
+        stack.setSubNbt(MODEL_KEY, new Integer("751642938"));
         stack.setSubNbt(SONG_ITEM_KEY, songPlayerNbt);
         songPlayerNbt.putString(SONG_DATA_KEY, Base64.getEncoder().encodeToString(songData));
         songPlayerNbt.putString(FILE_NAME_KEY, filename);
