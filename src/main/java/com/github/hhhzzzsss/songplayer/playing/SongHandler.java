@@ -229,6 +229,7 @@ public class SongHandler {
                 return;
             } else {
                 stage.checkBuildStatus(currentSong);
+                stage.sendMovementPacketToStagePosition();
             }
         }
 
@@ -481,7 +482,10 @@ public class SongHandler {
                 SongPlayer.fakePlayer.setYaw(yaw);
                 SongPlayer.fakePlayer.setHeadYaw(yaw);
             }
-            SongPlayer.MC.player.networkHandler.getConnection().send(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, true));
+            SongPlayer.MC.player.networkHandler.getConnection().send(new PlayerMoveC2SPacket.Full(
+                    stage.position.getX() + 0.5, stage.position.getY(), stage.position.getZ() + 0.5,
+                    yaw, pitch,
+                    true));
         }
     }
 
