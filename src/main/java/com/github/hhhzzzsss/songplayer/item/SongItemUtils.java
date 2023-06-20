@@ -15,8 +15,12 @@ public class SongItemUtils {
     public static final String SONG_DATA_KEY = "SongData";
     public static final String FILE_NAME_KEY = "FileName";
     public static final String DISPLAY_NAME_KEY = "DisplayName";
+    public static final String MODEL_KEY = "CustomModelData";
 
     public static ItemStack createSongItem(ItemStack stack, byte[] songData, String filename, String displayName) {
+        NbtCompound songPlayerInitNbt = new NbtCompound();
+        songPlayerInitNbt.putInt(MODEL_KEY, new Integer("751642938"));
+        stack.setNbt(songPlayerInitNbt);
         NbtCompound songPlayerNbt = new NbtCompound();
         stack.setSubNbt(SONG_ITEM_KEY, songPlayerNbt);
         songPlayerNbt.putString(SONG_DATA_KEY, Base64.getEncoder().encodeToString(songData));

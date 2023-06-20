@@ -1,0 +1,13 @@
+{
+	"parent": "minecraft:item/generated",
+	"textures": {
+		"layer0": "minecraft:item/paper"
+	},
+	"overrides": [{
+			"predicate": {
+				"custom_model_data": 751642938
+			},
+			"model": "songplayer:item/song_item"
+		}
+	]
+}
