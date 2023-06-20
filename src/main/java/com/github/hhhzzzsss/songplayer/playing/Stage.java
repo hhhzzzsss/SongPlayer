@@ -42,7 +42,18 @@ public class Stage {
 	}
 
 	public void sendMovementPacketToStagePosition() {
-		SongPlayer.MC.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(position.getX()+0.5, position.getY(), position.getZ()+0.5, true));
+		if (SongPlayer.fakePlayer != null) {
+			SongPlayer.MC.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(
+					position.getX() + 0.5, position.getY(), position.getZ() + 0.5,
+					SongPlayer.fakePlayer.getYaw(), SongPlayer.fakePlayer.getPitch(),
+					true));
+		}
+		else {
+			SongPlayer.MC.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(
+					position.getX() + 0.5, position.getY(), position.getZ() + 0.5,
+					SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch(),
+					true));
+		}
 	}
 
 	public void checkBuildStatus(Song song) {
@@ -132,11 +143,10 @@ public class Stage {
 		for (int noteId : missingNotes) {
 			BlockPos bp = unusedNoteblockLocations.get(idx++);
 			noteblockPositions.put(noteId, bp);
-			int dy = bp.getY() - position.getY();
-			// Optional break locations
-			if (dy < -1 || dy > 2) {
-				breakLocations.add(bp.up());
-			}
+		}
+
+		for (BlockPos bp : noteblockPositions.values()) { // Optional break locations
+			breakLocations.add(bp.up());
 		}
 
 		requiredBreaks = breakLocations
@@ -176,6 +186,10 @@ public class Stage {
 					}
 				})
 				.collect(Collectors.toCollection(LinkedList::new));
+
+		if (requiredBreaks.stream().allMatch(bp -> !withinBreakingDist(bp.getX()-position.getX(), bp.getY()-position.getY(), bp.getZ()-position.getZ()))) {
+			requiredBreaks.clear();
+		}
 
 		// Set total missing notes
 		totalMissingNotes = missingNotes.size();
