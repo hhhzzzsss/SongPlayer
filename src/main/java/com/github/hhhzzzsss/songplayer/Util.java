@@ -30,15 +30,6 @@ public class Util {
         catch (IOException e) {}
     }
 
-    public static Stream<Path> listFilesSilently(Path path) {
-        try {
-            return Files.list(path);
-        }
-        catch (IOException e) {
-            return null;
-        }
-    }
-
     public static String formatTime(long milliseconds) {
         long temp = Math.abs(milliseconds);
         temp /= 1000;
@@ -89,29 +80,48 @@ public class Util {
             dir = dir.resolve(dirString);
         }
 
-        Stream<Path> songFiles = listFilesSilently(dir);
-        if (songFiles == null) return null;
+        Stream<Path> songFiles;
+        try {
+            songFiles = Files.list(dir);
+        } catch (IOException e) {
+            return null;
+        }
 
-        ArrayList<String> suggestions = new ArrayList<>();
+        int clipStart;
+        if (arg.contains(" ")) {
+            clipStart = arg.lastIndexOf(" ") + 1;
+        }
+        else {
+            clipStart = 0;
+        }
+
+        ArrayList<String> suggestionsList = new ArrayList<>();
         for (Path path : songFiles.collect(Collectors.toList())) {
             if (Files.isRegularFile(path)) {
-                suggestions.add(dirString + path.getFileName().toString());
+                suggestionsList.add(dirString + path.getFileName().toString());
             }
             else if (Files.isDirectory(path)) {
-                suggestions.add(dirString + path.getFileName().toString() + "/");
+                suggestionsList.add(dirString + path.getFileName().toString() + "/");
             }
         }
+        Stream<String> suggestions = suggestionsList.stream()
+                .filter(str -> str.startsWith(arg))
+                .map(str -> str.substring(clipStart));
         return CommandSource.suggestMatching(suggestions, suggestionsBuilder);
     }
 
     public static CompletableFuture<Suggestions> givePlaylistSuggestions(SuggestionsBuilder suggestionsBuilder) {
         if (!Files.exists(SongPlayer.PLAYLISTS_DIR)) return null;
-        return CommandSource.suggestMatching(
-                listFilesSilently(SongPlayer.PLAYLISTS_DIR)
-                        .filter(Files::isDirectory)
-                        .map(Path::getFileName)
-                        .map(Path::toString),
-                suggestionsBuilder);
+        try {
+            return CommandSource.suggestMatching(
+                    Files.list(SongPlayer.PLAYLISTS_DIR)
+                            .filter(Files::isDirectory)
+                            .map(Path::getFileName)
+                            .map(Path::toString),
+                    suggestionsBuilder);
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     public static CompletableFuture<Suggestions> giveSongDirectorySuggestions(String arg, SuggestionsBuilder suggestionsBuilder) {
@@ -126,13 +136,26 @@ public class Util {
             dirString = "";
         }
 
-        Stream<Path> songFiles = listFilesSilently(dir);
-        if (songFiles == null) return null;
+        Stream<Path> songFiles;
+        try {
+            songFiles = Files.list(dir);
+        } catch (IOException e) {
+            return null;
+        }
 
-        List<String> suggestions = songFiles
+        int clipStart;
+        if (arg.contains(" ")) {
+            clipStart = arg.lastIndexOf(" ") + 1;
+        }
+        else {
+            clipStart = 0;
+        }
+
+        Stream<String> suggestions = songFiles
                 .filter(Files::isDirectory)
                 .map(path -> dirString + path.getFileName().toString() + "/")
-                .collect(Collectors.toList());
+                .filter(str -> str.startsWith(arg))
+                .map(str -> str.substring(clipStart));
         return CommandSource.suggestMatching(suggestions, suggestionsBuilder);
     }
 

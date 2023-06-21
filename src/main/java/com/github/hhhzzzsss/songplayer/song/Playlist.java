@@ -156,11 +156,13 @@ public class Playlist {
     }
 
     public static Stream<Path> getSongFiles(Path directory) {
-        Stream<Path> files = Util.listFilesSilently(directory);
-        if (files == null) {
+        try {
+            Stream<Path> files = Files.list(directory);
+            return files.filter(file -> !file.getFileName().toString().equals(INDEX_FILE_NAME));
+        }
+        catch (IOException e) {
             return null;
         }
-        return files.filter(file -> !file.getFileName().toString().equals(INDEX_FILE_NAME));
     }
 
     private static List<String> loadIndex(Path directory) throws IOException {
@@ -242,14 +244,16 @@ public class Playlist {
                 .forEach(File::delete);
     }
 
-    public static void renameSong(Path directory, String oldName, String newName) throws IOException {
+    // Returns old name
+    public static String renameSong(Path directory, int pos, String newName) throws IOException {
         List<String> index = validateAndLoadIndex(directory);
-        int pos = index.indexOf(oldName);
-        if (pos < 0) {
-            throw new IOException("Song not found in playlist");
+        if (pos < 0 || pos >= index.size()) {
+            throw new IOException("Index out of bounds");
         }
-        Files.move(directory.resolve(oldName), directory.resolve(newName));
+        Path oldPath = directory.resolve(index.get(pos));
+        Files.move(oldPath, directory.resolve(newName));
         index.set(pos, newName);
         saveIndex(directory, index);
+        return oldPath.getFileName().toString();
     }
 }

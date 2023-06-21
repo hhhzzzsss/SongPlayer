@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.github.hhhzzzsss.songplayer.SongPlayer.MC;
@@ -213,12 +214,7 @@ public class CommandProcessor {
 			}
 		}
 		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
-			if (!args.contains(" ")) {
-				return Util.giveSongSuggestions(args, suggestionsBuilder);
-			}
-			else {
-				return null;
-			}
+			return Util.giveSongSuggestions(args, suggestionsBuilder);
 		}
 	}
 
@@ -434,17 +430,27 @@ public class CommandProcessor {
 						return true;
 					}
 				}
-				List<String> subdirectories = Util.listFilesSilently(dir)
-						.filter(Files::isDirectory)
-						.map(Path::getFileName)
-						.map(Path::toString)
-						.map(str -> str + "/")
-						.collect(Collectors.toList());
-				List<String> songs = Util.listFilesSilently(dir)
-						.filter(Files::isRegularFile)
-						.map(Path::getFileName)
-						.map(Path::toString)
-						.collect(Collectors.toList());
+
+				List<String> subdirectories = null;
+				List<String> songs = null;
+				try {
+					subdirectories = Files.list(dir)
+							.filter(Files::isDirectory)
+							.map(Path::getFileName)
+							.map(Path::toString)
+							.map(str -> str + "/")
+							.collect(Collectors.toList());
+					songs = Files.list(dir)
+							.filter(Files::isRegularFile)
+							.map(Path::getFileName)
+							.map(Path::toString)
+							.collect(Collectors.toList());
+				}
+				catch (IOException e) {
+					SongPlayer.addChatMessage("§cError reading folder: §4" + e.getMessage());
+					return true;
+				}
+
 				if (subdirectories.size() == 0 && songs.size() == 0) {
 					SongPlayer.addChatMessage("§bNo songs found. You can put midi or nbs files in the §3.minecraft/songs §6folder.");
 				}
@@ -466,12 +472,7 @@ public class CommandProcessor {
 			}
 		}
 		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
-			if (!args.contains(" ")) {
-				return Util.giveSongDirectorySuggestions(args, suggestionsBuilder);
-			}
-			else {
-				return null;
-			}
+			return Util.giveSongDirectorySuggestions(args, suggestionsBuilder);
 		}
 	}
 
@@ -487,7 +488,7 @@ public class CommandProcessor {
 					"delete <playlist> <song>",
 					"addSong <playlist> <song>",
 					"removeSong <playlist> <song>",
-					"renameSong <playlist> <old name> <new name>",
+					"renameSong <playlist> <index> <new name>",
 					"loop",
 					"shuffle",
 			};
@@ -506,7 +507,7 @@ public class CommandProcessor {
 					playlistDir = SongPlayer.PLAYLISTS_DIR.resolve(split[1]);
 				}
 				switch (split[0].toLowerCase(Locale.ROOT)) {
-					case "play":
+					case "play": {
 						if (split.length != 2) return false;
 						if (!Files.exists(playlistDir)) {
 							SongPlayer.addChatMessage("§cPlaylist does not exist");
@@ -514,7 +515,8 @@ public class CommandProcessor {
 						}
 						SongHandler.getInstance().setPlaylist(playlistDir);
 						return true;
-					case "create":
+					}
+					case "create": {
 						if (split.length > 2) {
 							SongPlayer.addChatMessage("§cCannot have spaces in playlist name");
 							return true;
@@ -523,15 +525,17 @@ public class CommandProcessor {
 						Playlist.createPlaylist(split[1]);
 						SongPlayer.addChatMessage(String.format("§6Created playlist §3%s", split[1]));
 						return true;
-					case "delete":
+					}
+					case "delete": {
 						if (split.length != 2) return false;
 						Playlist.deletePlaylist(playlistDir);
 						SongPlayer.addChatMessage(String.format("§6Deleted playlist §3%s", split[1]));
 						return true;
-					case "list":
+					}
+					case "list": {
 						if (split.length == 1) {
 							if (!Files.exists(SongPlayer.PLAYLISTS_DIR)) return true;
-							List<String> playlists = Util.listFilesSilently(SongPlayer.PLAYLISTS_DIR)
+							List<String> playlists = Files.list(SongPlayer.PLAYLISTS_DIR)
 									.filter(Files::isDirectory)
 									.map(Path::getFileName)
 									.map(Path::toString)
@@ -552,47 +556,63 @@ public class CommandProcessor {
 						}
 						SongPlayer.addChatMessage("§6------------------------------");
 						return true;
-					case "addsong":
-						if (split.length != 3) return false;
-						Playlist.addSong(playlistDir, SongPlayer.SONG_DIR.resolve(split[2]));
-						SongPlayer.addChatMessage(String.format("§6Added §3%s §6to §3%s", split[2], split[1]));
+					}
+					case "addsong": {
+						if (split.length < 3) return false;
+						String location = String.join(" ", Arrays.copyOfRange(split, 2, split.length));
+						Playlist.addSong(playlistDir, SongPlayer.SONG_DIR.resolve(location));
+						SongPlayer.addChatMessage(String.format("§6Added §3%s §6to §3%s", location, split[1]));
 						return true;
-					case "removesong":
-						if (split.length != 3) return false;
-						Playlist.removeSong(playlistDir, split[2]);
-						SongPlayer.addChatMessage(String.format("§6Removed §3%s §6from §3%s", split[2], split[1]));
+					}
+					case "removesong": {
+						if (split.length < 3) return false;
+						String location = String.join(" ", Arrays.copyOfRange(split, 2, split.length));
+						Playlist.removeSong(playlistDir, location);
+						SongPlayer.addChatMessage(String.format("§6Removed §3%s §6from §3%s", location, split[1]));
 						return true;
-					case "renamesong":
-						if (split.length != 4) return false;
-						Playlist.renameSong(playlistDir, split[2], split[3]);
-						SongPlayer.addChatMessage(String.format("§6Renamed song from §3%s §6from to §3%s", split[2], split[3]));
+					}
+					case "renamesong": {
+						if (split.length < 4) return false;
+						String location = String.join(" ", Arrays.copyOfRange(split, 3, split.length));
+						int index = 0;
+						try {
+							index = Integer.parseInt(split[2]);
+						}
+						catch (Exception e) {
+							SongPlayer.addChatMessage(String.format("§cIndex must be an integer"));
+							return true;
+						}
+						String oldName = Playlist.renameSong(playlistDir, index-1, location);
+						SongPlayer.addChatMessage(String.format("§6Renamed §3%s §6to §3%s", oldName, location));
 						return true;
-					case "loop":
+					}
+					case "loop": {
 						if (split.length != 1) return false;
 						Config.getConfig().loopPlaylists = !Config.getConfig().loopPlaylists;
 						SongHandler.getInstance().setPlaylistLoop(Config.getConfig().loopPlaylists);
 						if (Config.getConfig().loopPlaylists) {
 							SongPlayer.addChatMessage("§6Enabled playlist looping");
-						}
-						else {
+						} else {
 							SongPlayer.addChatMessage("§6Disabled playlist looping");
 						}
 						Config.saveConfigWithErrorHandling();
 						return true;
-					case "shuffle":
+					}
+					case "shuffle": {
 						if (split.length != 1) return false;
 						Config.getConfig().shufflePlaylists = !Config.getConfig().shufflePlaylists;
 						SongHandler.getInstance().setPlaylistShuffle(Config.getConfig().shufflePlaylists);
 						if (Config.getConfig().loopPlaylists) {
 							SongPlayer.addChatMessage("§6Enabled playlist shuffling");
-						}
-						else {
+						} else {
 							SongPlayer.addChatMessage("§6Disabled playlist shuffling");
 						}
 						Config.saveConfigWithErrorHandling();
 						return true;
-					default:
+					}
+					default: {
 						return false;
+					}
 				}
 			}
 			catch (IOException e) {
@@ -603,7 +623,7 @@ public class CommandProcessor {
 		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
 			String[] split = args.split(" ", -1);
 			if (split.length <= 1) {
-				return CommandSource.suggestMatching(new String[] {
+				return CommandSource.suggestMatching(new String[]{
 						"play",
 						"create",
 						"delete",
@@ -619,29 +639,30 @@ public class CommandProcessor {
 				case "create":
 				case "loop":
 				case "shuffle":
-				default:
+				default: {
 					return null;
+				}
 				case "play":
 				case "list":
-				case "delete":
+				case "delete": {
 					if (split.length == 2) {
 						return Util.givePlaylistSuggestions(suggestionsBuilder);
 					}
 					return null;
-				case "addsong":
+				}
+				case "addsong": {
 					if (split.length == 2) {
 						return Util.givePlaylistSuggestions(suggestionsBuilder);
-					}
-					else if (split.length == 3) {
-						return Util.giveSongSuggestions(split[2], suggestionsBuilder);
+					} else if (split.length >= 3) {
+						String location = String.join(" ", Arrays.copyOfRange(split, 2, split.length));
+						return Util.giveSongSuggestions(location, suggestionsBuilder);
 					}
 					return null;
-				case "removesong":
-				case "renamesong":
+				}
+				case "removesong": {
 					if (split.length == 2) {
 						return Util.givePlaylistSuggestions(suggestionsBuilder);
-					}
-					else if (split.length == 3) {
+					} else if (split.length == 3) {
 						Path playlistDir = SongPlayer.PLAYLISTS_DIR.resolve(split[1]);
 						Stream<Path> playlistFiles = Playlist.getSongFiles(playlistDir);
 						if (playlistFiles == null) {
@@ -653,6 +674,22 @@ public class CommandProcessor {
 								suggestionsBuilder);
 					}
 					return null;
+				}
+				case "renamesong": {
+					if (split.length == 2) {
+						return Util.givePlaylistSuggestions(suggestionsBuilder);
+					} else if (split.length == 3) {
+						Path playlistDir = SongPlayer.PLAYLISTS_DIR.resolve(split[1]);
+						Stream<Path> playlistFiles = Playlist.getSongFiles(playlistDir);
+						if (playlistFiles == null) {
+							return null;
+						}
+						int max = playlistFiles.collect(Collectors.toList()).size();
+						Stream<String> suggestions = IntStream.range(1, max+1).mapToObj(Integer::toString);
+						return CommandSource.suggestMatching(suggestions, suggestionsBuilder);
+					}
+					return null;
+				}
 			}
 		}
 	}
@@ -923,9 +960,10 @@ public class CommandProcessor {
 			String[] split = args.split(" ");
 			switch (split[0].toLowerCase(Locale.ROOT)) {
 				case "create":
-					if (split.length != 2) return false;
+					if (split.length < 2) return false;
+					String location = String.join(" ", Arrays.copyOfRange(split, 1, split.length));
 					try {
-						(new SongItemCreatorThread(split[1])).start();
+						(new SongItemCreatorThread(location)).start();
 					} catch (IOException e) {
 						SongPlayer.addChatMessage("§cError creating song item: §4" + e.getMessage());
 					}
@@ -957,8 +995,9 @@ public class CommandProcessor {
 			}
 			switch (split[0].toLowerCase(Locale.ROOT)) {
 				case "create":
-					if (split.length == 2) {
-						return Util.giveSongSuggestions(split[1], suggestionsBuilder);
+					if (split.length >= 2) {
+						String location = String.join(" ", Arrays.copyOfRange(split, 1, split.length));
+						return Util.giveSongSuggestions(location, suggestionsBuilder);
 					}
 				case "setsongname":
 				default:
