@@ -602,7 +602,7 @@ public class CommandProcessor {
 						if (split.length != 1) return false;
 						Config.getConfig().shufflePlaylists = !Config.getConfig().shufflePlaylists;
 						SongHandler.getInstance().setPlaylistShuffle(Config.getConfig().shufflePlaylists);
-						if (Config.getConfig().loopPlaylists) {
+						if (Config.getConfig().shufflePlaylists) {
 							SongPlayer.addChatMessage("§6Enabled playlist shuffling");
 						} else {
 							SongPlayer.addChatMessage("§6Disabled playlist shuffling");
