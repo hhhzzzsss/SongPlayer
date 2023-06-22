@@ -14,7 +14,7 @@ public class SongItemLoaderThread extends SongLoaderThread {
     public int maxNotesPerSecond = 0;
     public double avgNotesPerSecond = 0;
 
-    public SongItemLoaderThread(ItemStack stack) throws IOException {
+    public SongItemLoaderThread(ItemStack stack) throws IOException, IllegalArgumentException {
         songData = SongItemUtils.getSongData(stack);
         if (songData == null) {
             throw new IOException("Song data is missing");

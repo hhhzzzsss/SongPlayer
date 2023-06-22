@@ -32,6 +32,9 @@ public class MinecraftClientMixin {
 	@Shadow
 	public HitResult crosshairTarget;
 
+	@Shadow
+	private int itemUseCooldown;
+
 	@Inject(at = @At("HEAD"), method = "render(Z)V")
 	public void onRender(boolean tick, CallbackInfo ci) {
 		if (SongPlayer.MC.world != null && SongPlayer.MC.player != null && SongPlayer.MC.interactionManager != null) {
@@ -72,9 +75,10 @@ public class MinecraftClientMixin {
 		if (SongItemUtils.isSongItem(stack)) {
 			try {
 				SongPlayer.MC.setScreen(new SongItemConfirmationScreen(stack));
-			} catch (IOException e) {
+			} catch (Exception e) {
 				SongPlayer.addChatMessage("§cFailed to load song item: §4" + e.getMessage());
 			}
+			itemUseCooldown = 4;
 			ci.cancel();
 		}
 	}

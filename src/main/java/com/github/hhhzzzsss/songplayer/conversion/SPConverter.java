@@ -1,5 +1,6 @@
 package com.github.hhhzzzsss.songplayer.conversion;
 
+import com.github.hhhzzzsss.songplayer.Util;
 import com.github.hhhzzzsss.songplayer.song.Note;
 import com.github.hhhzzzsss.songplayer.song.Song;
 
@@ -12,9 +13,10 @@ import java.util.zip.GZIPOutputStream;
 
 public class SPConverter {
     public static final byte[] FILE_TYPE_SIGNATURE = {-53, 123, -51, -124, -122, -46, -35, 38};
+    public static final long MAX_UNCOMPRESSED_SIZE = 50*1024*1024;
 
     public static Song getSongFromBytes(byte[] bytes, String fileName) throws IOException {
-        InputStream is = new GZIPInputStream(new ByteArrayInputStream(bytes));
+        InputStream is = new Util.LimitedSizeInputStream(new GZIPInputStream(new ByteArrayInputStream(bytes)), MAX_UNCOMPRESSED_SIZE);
         bytes = is.readAllBytes();
         is.close();
 

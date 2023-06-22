@@ -50,7 +50,7 @@ public class SongItemUtils {
         return getSongItemTag(stack) != null;
     }
 
-    public static byte[] getSongData(ItemStack stack) {
+    public static byte[] getSongData(ItemStack stack) throws IllegalArgumentException {
         NbtCompound songPlayerNbt = getSongItemTag(stack);
         if (songPlayerNbt == null || !songPlayerNbt.contains(SONG_DATA_KEY, NbtElement.STRING_TYPE)) {
             return null;

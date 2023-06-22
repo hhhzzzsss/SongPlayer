@@ -25,7 +25,7 @@ public class SongItemConfirmationScreen extends Screen {
     private static final Text CONFIRM = Text.literal("Play");
     private static final Text CANCEL = Text.literal("Cancel");
 
-    public SongItemConfirmationScreen(ItemStack stack) throws IOException {
+    public SongItemConfirmationScreen(ItemStack stack) throws IOException, IllegalArgumentException {
         super(Text.literal("Use song item"));
         this.stack = stack;
         this.loaderThread = new SongItemLoaderThread(stack);
