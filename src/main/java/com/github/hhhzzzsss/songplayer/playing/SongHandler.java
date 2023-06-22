@@ -168,6 +168,9 @@ public class SongHandler {
         currentSong = song;
         building = true;
         setCreativeIfNeeded();
+        if (Config.getConfig().doAnnouncement) {
+            sendMessage(Config.getConfig().announcementMessage.replaceAll("\\[name\\]", song.name));
+        }
         if (stage == null) {
             stage = new Stage();
             stage.movePlayerToStagePosition();
@@ -177,6 +180,7 @@ public class SongHandler {
         }
         getAndSaveBuildSlot();
         SongPlayer.addChatMessage("§6Building noteblocks");
+
     }
 
     private void queueSong(Song song) {
@@ -408,14 +412,29 @@ public class SongHandler {
 
     private long lastCommandTime = System.currentTimeMillis();
     private String cachedCommand = null;
+    private String cachedMessage = null;
     private void sendGamemodeCommand(String command) {
         cachedCommand = command;
     }
+    private void sendMessage(String message) {
+        cachedMessage = message;
+    }
     private void checkCommandCache() {
-        if (cachedCommand != null && System.currentTimeMillis() >= lastCommandTime + 1500) {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime >= lastCommandTime + 1500 && cachedCommand != null) {
             SongPlayer.MC.getNetworkHandler().sendCommand(cachedCommand);
             cachedCommand = null;
-            lastCommandTime = System.currentTimeMillis();
+            lastCommandTime = currentTime;
+        }
+        else if (currentTime >= lastCommandTime + 500 && cachedMessage != null) {
+            if (cachedMessage.startsWith("/")) {
+                SongPlayer.MC.getNetworkHandler().sendCommand(cachedMessage.substring(1));
+            }
+            else {
+                SongPlayer.MC.getNetworkHandler().sendChatMessage(cachedMessage);
+            }
+            cachedMessage = null;
+            lastCommandTime = currentTime;
         }
     }
     private void setCreativeIfNeeded() {

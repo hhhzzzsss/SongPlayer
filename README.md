@@ -113,10 +113,18 @@ Sets the type of noteblock stage to build. Thanks Sk8kman and Lizard16 for the s
 - Wide: A cylindrical stage with a maximum of 360 noteblocks
 - Spherical: A densely packed spherical stage that can contain all 400 possible noteblocks
 
-### $toggleMovement <swing | rotate>
+### $toggleMovement \<swing | rotate>
 *aliases: `$movement`*
 
 Toggles whether you swing your arm when hitting a noteblock and rotate to look at the noteblocks you are hitting.
+
+### $announcement \<enable | disable | getMessage>
+### $announcement setMessage
+
+Set an announcement message that is sent when you start playing a song.
+With setMessage, write `[name]` where the song name should go.
+
+Example: `$announcement setMessage &6Now playing: &3[name]`
 
 ### $songItem create \<song or url>
 ### $songItem setSongName \<name>

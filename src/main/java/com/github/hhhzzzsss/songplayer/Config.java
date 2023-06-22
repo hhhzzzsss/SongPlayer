@@ -24,6 +24,8 @@ public class Config {
     public Stage.StageType stageType = Stage.StageType.DEFAULT;
     public boolean swing = false;
     public boolean rotate = false;
+    public boolean doAnnouncement = false;
+    public String announcementMessage = "&6Now playing: &3[name]";
 
     public static Config getConfig() {
         if (config == null) {

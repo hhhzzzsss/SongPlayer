@@ -50,6 +50,7 @@ public class CommandProcessor {
 		commands.add(new toggleFakePlayerCommand());
 		commands.add(new setStageTypeCommand());
 		commands.add(new toggleMovementCommand());
+		commands.add(new announcementCommand());
 		commands.add(new songItemCommand());
 		commands.add(new testSongCommand());
 
@@ -921,6 +922,60 @@ public class CommandProcessor {
 		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
 			if (!args.contains(" ")) {
 				return CommandSource.suggestMatching(new String[]{"swing", "rotate"}, suggestionsBuilder);
+			}
+			else {
+				return null;
+			}
+		}
+	}
+
+	private static class announcementCommand extends Command {
+		public String getName() {
+			return "announcement";
+		}
+		public String[] getSyntax() {
+			return new String[] {
+					"enable",
+					"disable",
+					"getMessage",
+					"setMessage <message>",
+			};
+		}
+		public String getDescription() {
+			return "Set an announcement message that is sent when you start playing a song. With setMessage, write [name] where the song name should go.";
+		}
+		public boolean processCommand(String args) {
+			String[] split = args.split(" ", 2);
+			switch (split[0].toLowerCase(Locale.ROOT)) {
+				case "enable":
+					if (split.length != 1) return false;
+					Config.getConfig().doAnnouncement = true;
+					SongPlayer.addChatMessage("§6Enabled song announcements");
+					Config.saveConfigWithErrorHandling();
+					return true;
+				case "disable":
+					if (split.length != 1) return false;
+					Config.getConfig().doAnnouncement = false;
+					SongPlayer.addChatMessage("§6Disabled song announcements");
+					Config.saveConfigWithErrorHandling();
+					return true;
+				case "getmessage":
+					if (split.length != 1) return false;
+					SongPlayer.addChatMessage("§6Current announcement message is §r" + Config.getConfig().announcementMessage);
+					return true;
+				case "setmessage":
+					if (split.length != 2) return false;
+					Config.getConfig().announcementMessage = split[1];
+					SongPlayer.addChatMessage("§6Set announcement message to §r" + split[1]);
+					Config.saveConfigWithErrorHandling();
+					return true;
+				default:
+					return false;
+			}
+		}
+		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
+			if (!args.contains(" ")) {
+				return CommandSource.suggestMatching(new String[]{"enable", "disable", "getMessage", "setMessage"}, suggestionsBuilder);
 			}
 			else {
 				return null;
