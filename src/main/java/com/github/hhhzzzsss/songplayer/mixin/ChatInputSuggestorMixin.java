@@ -44,7 +44,13 @@ public class ChatInputSuggestorMixin {
         }
 
         int wordStart = getStartOfCurrentWord(preStr);
-        CompletableFuture<Suggestions> suggestions = CommandProcessor.handleSuggestions(preStr, new SuggestionsBuilder(preStr, wordStart));
+        CompletableFuture<Suggestions> suggestions;
+        try {
+            suggestions = CommandProcessor.handleSuggestions(preStr, new SuggestionsBuilder(preStr, wordStart));
+        }
+        catch (Throwable e) {
+            suggestions = null;
+        }
         if (suggestions != null) {
             this.pendingSuggestions = suggestions;
             this.show(true);

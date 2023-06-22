@@ -197,9 +197,9 @@ public class Playlist {
         return validateAndLoadIndex(directory);
     }
 
-    public static void createPlaylist(String playlist) {
-        Path playlistDir = SongPlayer.PLAYLISTS_DIR.resolve(playlist);
-        Util.createDirectoriesSilently(playlistDir);
+    public static void createPlaylist(String playlist) throws IOException {
+        Path playlistDir = Util.resolveWithIOException(SongPlayer.PLAYLISTS_DIR, playlist);
+        Files.createDirectories(playlistDir);
     }
 
     public static void addSong(Path directory, Path songFile) throws IOException {
@@ -214,7 +214,7 @@ public class Playlist {
         if (index.contains(songFile.getFileName().toString())) {
             throw new IOException("Playlist already contains a song by this name");
         }
-        Files.copy(songFile, directory.resolve(songFile.getFileName().toString()));
+        Files.copy(songFile, Util.resolveWithIOException(directory, songFile.getFileName().toString()));
         index.add(songFile.getFileName().toString());
         saveIndex(directory, index);
     }
@@ -223,7 +223,7 @@ public class Playlist {
         if (!Files.exists(directory)) {
             throw new IOException("Playlist does not exist");
         }
-        Path songFile = directory.resolve(songName);
+        Path songFile = Util.resolveWithIOException(directory, songName);
         if (!Files.exists(songFile)) {
             throw new IOException("Playlist does not contain a song by this name");
         }
@@ -250,8 +250,8 @@ public class Playlist {
         if (pos < 0 || pos >= index.size()) {
             throw new IOException("Index out of bounds");
         }
-        Path oldPath = directory.resolve(index.get(pos));
-        Files.move(oldPath, directory.resolve(newName));
+        Path oldPath = Util.resolveWithIOException(directory, index.get(pos));
+        Files.move(oldPath, Util.resolveWithIOException(directory, newName));
         index.set(pos, newName);
         saveIndex(directory, index);
         return oldPath.getFileName().toString();

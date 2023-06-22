@@ -1,6 +1,7 @@
 package com.github.hhhzzzsss.songplayer.song;
 
 import com.github.hhhzzzsss.songplayer.SongPlayer;
+import com.github.hhhzzzsss.songplayer.Util;
 import com.github.hhhzzzsss.songplayer.conversion.MidiConverter;
 import com.github.hhhzzzsss.songplayer.conversion.NBSConverter;
 
@@ -83,7 +84,7 @@ public class SongLoaderThread extends Thread{
 		}
 	}
 
-	private Path getSongFile(String name) {
-		return SongPlayer.SONG_DIR.resolve(name);
+	private Path getSongFile(String name) throws IOException {
+		return Util.resolveWithIOException(SongPlayer.SONG_DIR, name);
 	}
 }

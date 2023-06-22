@@ -14,6 +14,7 @@ import net.minecraft.text.Text;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,15 @@ public class Util {
             Files.createDirectories(path);
         }
         catch (IOException e) {}
+    }
+
+    public static Path resolveWithIOException(Path path, String other) throws IOException {
+        try {
+            return path.resolve(other);
+        }
+        catch (InvalidPathException e) {
+            throw new IOException(e.getMessage());
+        }
     }
 
     public static class LimitedSizeInputStream extends InputStream {
@@ -113,7 +123,12 @@ public class Util {
         Path dir = SongPlayer.SONG_DIR;
         if (lastSlash >= 0) {
             dirString = arg.substring(0, lastSlash+1);
-            dir = dir.resolve(dirString);
+            try {
+                dir = resolveWithIOException(dir, dirString);
+            }
+            catch (IOException e) {
+                return null;
+            }
         }
 
         Stream<Path> songFiles;
@@ -166,7 +181,12 @@ public class Util {
         Path dir = SongPlayer.SONG_DIR;
         if (lastSlash >= 0) {
             dirString = arg.substring(0, lastSlash+1);
-            dir = dir.resolve(dirString);
+            try {
+                dir = resolveWithIOException(dir, dirString);
+            }
+            catch (IOException e) {
+                return null;
+            }
         }
         else {
             dirString = "";
