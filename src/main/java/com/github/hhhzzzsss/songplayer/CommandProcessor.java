@@ -67,7 +67,7 @@ public class CommandProcessor {
 	// returns true if it is a command and should be cancelled
 	public static boolean processChatMessage(String message) {
 		if (message.startsWith(Config.getConfig().prefix)) {
-			String[] parts = message.substring(1).split(" ", 2);
+			String[] parts = message.substring(Config.getConfig().prefix.length()).split(" ", 2);
 			String name = parts.length>0 ? parts[0] : "";
 			String args = parts.length>1 ? parts[1] : "";
 			Command c = commandMap.get(name.toLowerCase(Locale.ROOT));
