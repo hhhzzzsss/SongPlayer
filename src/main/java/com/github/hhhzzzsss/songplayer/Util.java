@@ -6,7 +6,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
-import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.PlainTextContent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -216,19 +216,19 @@ public class Util {
     }
 
     public static MutableText getStyledText(String str, Style style) {
-        MutableText text = MutableText.of(new LiteralTextContent(str));
+        MutableText text = MutableText.of(PlainTextContent.of(str));
         text.setStyle(style);
         return text;
     }
 
     public static void setItemName(ItemStack stack, Text text) {
-        stack.getOrCreateSubNbt(ItemStack.DISPLAY_KEY).putString(ItemStack.NAME_KEY, Text.Serializer.toJson(text));
+        stack.getOrCreateSubNbt(ItemStack.DISPLAY_KEY).putString(ItemStack.NAME_KEY, Text.Serialization.toJsonString(text));
     }
 
     public static void setItemLore(ItemStack stack, Text... loreLines) {
         NbtList lore = new NbtList();
         for (Text line : loreLines) {
-            lore.add(NbtString.of(Text.Serializer.toJson(line)));
+            lore.add(NbtString.of(Text.Serialization.toJsonString(line)));
         }
         stack.getOrCreateSubNbt(ItemStack.DISPLAY_KEY).put(ItemStack.LORE_KEY, lore);
     }

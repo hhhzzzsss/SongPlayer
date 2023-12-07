@@ -23,41 +23,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
-	@Shadow
-	private final ClientConnection connection;
-	
-	public ClientPlayNetworkHandlerMixin() {
-		connection = null;
-	}
-	
-	@Inject(at = @At("HEAD"), method = "sendPacket(Lnet/minecraft/network/packet/Packet;)V", cancellable = true)
-	private void onSendPacket(Packet<?> packet, CallbackInfo ci) {
-		Stage stage = SongHandler.getInstance().stage;
-
-		if (stage != null && packet instanceof PlayerMoveC2SPacket) {
-			if (!Config.getConfig().rotate) {
-				connection.send(new PlayerMoveC2SPacket.Full(stage.position.getX() + 0.5, stage.position.getY(), stage.position.getZ() + 0.5, SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch(), true));
-				if (SongPlayer.fakePlayer != null) {
-					SongPlayer.fakePlayer.copyStagePosAndPlayerLook();
-				}
-			}
-			ci.cancel();
-		}
-		else if (packet instanceof ClientCommandC2SPacket) {
-			ClientCommandC2SPacket.Mode mode = ((ClientCommandC2SPacket) packet).getMode();
-			if (SongPlayer.fakePlayer != null) {
-				if (mode == ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY) {
-					SongPlayer.fakePlayer.setSneaking(true);
-					SongPlayer.fakePlayer.setPose(EntityPose.CROUCHING);
-				}
-				else if (mode == ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY) {
-					SongPlayer.fakePlayer.setSneaking(false);
-					SongPlayer.fakePlayer.setPose(EntityPose.STANDING);
-				}
-			}
-		}
-	}
-
 	@Inject(at = @At("HEAD"), method = "sendChatMessage(Ljava/lang/String;)V", cancellable=true)
 	private void onSendChatMessage(String content, CallbackInfo ci) {
 		boolean isCommand = CommandProcessor.processChatMessage(content);
