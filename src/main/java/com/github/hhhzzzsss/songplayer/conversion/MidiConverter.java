@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 public class MidiConverter {
@@ -58,7 +58,7 @@ public class MidiConverter {
 			}
 		}
 		
-		Collections.sort(tempoEvents, (a, b) -> Long.compare(a.getTick(), b.getTick()));
+		tempoEvents.sort(Comparator.comparingLong(MidiEvent::getTick));
 		
 		for (Track track : sequence.getTracks()) {
 
@@ -163,213 +163,213 @@ public class MidiConverter {
 		return null;
 	}
 
-	public static HashMap<Integer, com.github.hhhzzzsss.songplayer.song.Instrument[]> instrumentMap = new HashMap<>();
+	public static HashMap<Integer, Instrument[]> instrumentMap = new HashMap<>();
 	static {
 		// Piano (HARP BASS BELL)
-		instrumentMap.put(0, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Acoustic Grand Piano
-		instrumentMap.put(1, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Bright Acoustic Piano
-		instrumentMap.put(2, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Electric Grand Piano
-		instrumentMap.put(3, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Honky-tonk Piano
-		instrumentMap.put(4, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Electric Piano 1
-		instrumentMap.put(5, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Electric Piano 2
-		instrumentMap.put(6, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Harpsichord
-		instrumentMap.put(7, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Clavinet
+		instrumentMap.put(0, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Acoustic Grand Piano
+		instrumentMap.put(1, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Bright Acoustic Piano
+		instrumentMap.put(2, new Instrument[]{Instrument.BIT, Instrument.DIDGERIDOO, Instrument.BELL}); // Electric Grand Piano
+		instrumentMap.put(3, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Honky-tonk Piano
+		instrumentMap.put(4, new Instrument[]{Instrument.BIT, Instrument.DIDGERIDOO, Instrument.BELL}); // Electric Piano 1
+		instrumentMap.put(5, new Instrument[]{Instrument.BIT, Instrument.DIDGERIDOO, Instrument.BELL}); // Electric Piano 2
+		instrumentMap.put(6, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Harpsichord
+		instrumentMap.put(7, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Clavinet
 
 		// Chromatic Percussion (IRON_XYLOPHONE XYLOPHONE BASS)
-		instrumentMap.put(8, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Celesta
-		instrumentMap.put(9, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Glockenspiel
-		instrumentMap.put(10, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Music Box
-		instrumentMap.put(11, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Vibraphone
-		instrumentMap.put(12, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Marimba
-		instrumentMap.put(13, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Xylophone
-		instrumentMap.put(14, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Tubular Bells
-		instrumentMap.put(15, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Dulcimer
+		instrumentMap.put(8, new Instrument[]{Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, Instrument.XYLOPHONE}); // Celesta
+		instrumentMap.put(9, new Instrument[]{Instrument.IRON_XYLOPHONE, Instrument.BASS, Instrument.XYLOPHONE}); // Glockenspiel
+		instrumentMap.put(10, new Instrument[]{Instrument.IRON_XYLOPHONE, Instrument.BASS, Instrument.XYLOPHONE}); // Music Box
+		instrumentMap.put(11, new Instrument[]{Instrument.IRON_XYLOPHONE, Instrument.BASS, Instrument.XYLOPHONE}); // Vibraphone
+		instrumentMap.put(12, new Instrument[]{Instrument.IRON_XYLOPHONE, Instrument.BASS, Instrument.XYLOPHONE}); // Marimba
+		instrumentMap.put(13, new Instrument[]{Instrument.IRON_XYLOPHONE, Instrument.BASS, Instrument.XYLOPHONE}); // Xylophone
+		instrumentMap.put(14, new Instrument[]{Instrument.IRON_XYLOPHONE, Instrument.BASS, Instrument.XYLOPHONE}); // Tubular Bells
+		instrumentMap.put(15, new Instrument[]{Instrument.IRON_XYLOPHONE, Instrument.BASS, Instrument.XYLOPHONE}); // Dulcimer
 
 		// Organ (BIT DIDGERIDOO BELL)
-		instrumentMap.put(16, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Drawbar Organ
-		instrumentMap.put(17, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Percussive Organ
-		instrumentMap.put(18, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Rock Organ
-		instrumentMap.put(19, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Church Organ
-		instrumentMap.put(20, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Reed Organ
-		instrumentMap.put(21, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Accordian
-		instrumentMap.put(22, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Harmonica
-		instrumentMap.put(23, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Tango Accordian
+		instrumentMap.put(16, new Instrument[]{Instrument.DIDGERIDOO, Instrument.BIT, Instrument.XYLOPHONE}); // Drawbar Organ
+		instrumentMap.put(17, new Instrument[]{Instrument.DIDGERIDOO, Instrument.BIT, Instrument.XYLOPHONE}); // Percussive Organ
+		instrumentMap.put(18, new Instrument[]{Instrument.DIDGERIDOO, Instrument.BIT, Instrument.XYLOPHONE}); // Rock Organ
+		instrumentMap.put(19, new Instrument[]{Instrument.DIDGERIDOO, Instrument.BIT, Instrument.XYLOPHONE}); // Church Organ
+		instrumentMap.put(20, new Instrument[]{Instrument.DIDGERIDOO, Instrument.BIT, Instrument.XYLOPHONE}); // Reed Organ
+		instrumentMap.put(21, new Instrument[]{Instrument.DIDGERIDOO, Instrument.BIT, Instrument.XYLOPHONE}); // Accordian
+		instrumentMap.put(22, new Instrument[]{Instrument.DIDGERIDOO, Instrument.BIT, Instrument.XYLOPHONE}); // Harmonica
+		instrumentMap.put(23, new Instrument[]{Instrument.DIDGERIDOO, Instrument.BIT, Instrument.XYLOPHONE}); // Tango Accordian
 
 		// Guitar (BIT DIDGERIDOO BELL)
-		instrumentMap.put(24, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.GUITAR, com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Acoustic Guitar (nylon)
-		instrumentMap.put(25, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.GUITAR, com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Acoustic Guitar (steel)
-		instrumentMap.put(26, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.GUITAR, com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Electric Guitar (jazz)
-		instrumentMap.put(27, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.GUITAR, com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Electric Guitar (clean)
-		instrumentMap.put(28, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.GUITAR, com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Electric Guitar (muted)
-		instrumentMap.put(29, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Overdriven Guitar
-		instrumentMap.put(30, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Distortion Guitar
-		instrumentMap.put(31, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.GUITAR, com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Guitar Harmonics
+		instrumentMap.put(24, new Instrument[]{Instrument.GUITAR, Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Acoustic Guitar (nylon)
+		instrumentMap.put(25, new Instrument[]{Instrument.GUITAR, Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Acoustic Guitar (steel)
+		instrumentMap.put(26, new Instrument[]{Instrument.GUITAR, Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Electric Guitar (jazz)
+		instrumentMap.put(27, new Instrument[]{Instrument.GUITAR, Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Electric Guitar (clean)
+		instrumentMap.put(28, new Instrument[]{Instrument.GUITAR, Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Electric Guitar (muted)
+		instrumentMap.put(29, new Instrument[]{Instrument.DIDGERIDOO, Instrument.BIT, Instrument.XYLOPHONE}); // Overdriven Guitar
+		instrumentMap.put(30, new Instrument[]{Instrument.DIDGERIDOO, Instrument.BIT, Instrument.XYLOPHONE}); // Distortion Guitar
+		instrumentMap.put(31, new Instrument[]{Instrument.GUITAR, Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Guitar Harmonics
 
 		// Bass
-		instrumentMap.put(32, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Acoustic Bass
-		instrumentMap.put(33, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Electric Bass (finger)
-		instrumentMap.put(34, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Electric Bass (pick)
-		instrumentMap.put(35, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Fretless Bass
-		instrumentMap.put(36, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Slap Bass 1
-		instrumentMap.put(37, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Slap Bass 2
-		instrumentMap.put(38, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Synth Bass 1
-		instrumentMap.put(39, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE}); // Synth Bass 2
+		instrumentMap.put(32, new Instrument[]{Instrument.BASS, Instrument.HARP, Instrument.BELL}); // Acoustic Bass
+		instrumentMap.put(33, new Instrument[]{Instrument.BASS, Instrument.HARP, Instrument.BELL}); // Electric Bass (finger)
+		instrumentMap.put(34, new Instrument[]{Instrument.BASS, Instrument.HARP, Instrument.BELL}); // Electric Bass (pick)
+		instrumentMap.put(35, new Instrument[]{Instrument.BASS, Instrument.HARP, Instrument.BELL}); // Fretless Bass
+		instrumentMap.put(36, new Instrument[]{Instrument.DIDGERIDOO, Instrument.BIT, Instrument.XYLOPHONE}); // Slap Bass 1
+		instrumentMap.put(37, new Instrument[]{Instrument.DIDGERIDOO, Instrument.BIT, Instrument.XYLOPHONE}); // Slap Bass 2
+		instrumentMap.put(38, new Instrument[]{Instrument.DIDGERIDOO, Instrument.BIT, Instrument.XYLOPHONE}); // Synth Bass 1
+		instrumentMap.put(39, new Instrument[]{Instrument.DIDGERIDOO, Instrument.BIT, Instrument.XYLOPHONE}); // Synth Bass 2
 
 		// Strings
-		instrumentMap.put(40, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.GUITAR, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Violin
-		instrumentMap.put(41, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.GUITAR, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Viola
-		instrumentMap.put(42, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.GUITAR, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Cello
-		instrumentMap.put(43, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.GUITAR, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Contrabass
-		instrumentMap.put(44, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Tremolo Strings
-		instrumentMap.put(45, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Pizzicato Strings
-		instrumentMap.put(46, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.CHIME}); // Orchestral Harp
-		instrumentMap.put(47, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Timpani
+		instrumentMap.put(40, new Instrument[]{Instrument.FLUTE, Instrument.GUITAR, Instrument.BASS, Instrument.BELL}); // Violin
+		instrumentMap.put(41, new Instrument[]{Instrument.FLUTE, Instrument.GUITAR, Instrument.BASS, Instrument.BELL}); // Viola
+		instrumentMap.put(42, new Instrument[]{Instrument.FLUTE, Instrument.GUITAR, Instrument.BASS, Instrument.BELL}); // Cello
+		instrumentMap.put(43, new Instrument[]{Instrument.FLUTE, Instrument.GUITAR, Instrument.BASS, Instrument.BELL}); // Contrabass
+		instrumentMap.put(44, new Instrument[]{Instrument.BIT, Instrument.DIDGERIDOO, Instrument.BELL}); // Tremolo Strings
+		instrumentMap.put(45, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Pizzicato Strings
+		instrumentMap.put(46, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.CHIME}); // Orchestral Harp
+		instrumentMap.put(47, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Timpani
 
 		// Ensenble
-		instrumentMap.put(48, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // String Ensemble 1
-		instrumentMap.put(49, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // String Ensemble 2
-		instrumentMap.put(50, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Synth Strings 1
-		instrumentMap.put(51, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Synth Strings 2
-		instrumentMap.put(52, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Choir Aahs
-		instrumentMap.put(53, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Voice Oohs
-		instrumentMap.put(54, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Synth Choir
-		instrumentMap.put(55, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL}); // Orchestra Hit
+		instrumentMap.put(48, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL}); // String Ensemble 1
+		instrumentMap.put(49, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL}); // String Ensemble 2
+		instrumentMap.put(50, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Synth Strings 1
+		instrumentMap.put(51, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Synth Strings 2
+		instrumentMap.put(52, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Choir Aahs
+		instrumentMap.put(53, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Voice Oohs
+		instrumentMap.put(54, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Synth Choir
+		instrumentMap.put(55, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL}); // Orchestra Hit
 
 		// Brass
-		instrumentMap.put(56, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(57, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(58, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(59, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(60, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(61, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(62, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(63, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
+		instrumentMap.put(56, new Instrument[]{Instrument.BIT, Instrument.DIDGERIDOO, Instrument.BELL});
+		instrumentMap.put(57, new Instrument[]{Instrument.BIT, Instrument.DIDGERIDOO, Instrument.BELL});
+		instrumentMap.put(58, new Instrument[]{Instrument.BIT, Instrument.DIDGERIDOO, Instrument.BELL});
+		instrumentMap.put(59, new Instrument[]{Instrument.BIT, Instrument.DIDGERIDOO, Instrument.BELL});
+		instrumentMap.put(60, new Instrument[]{Instrument.BIT, Instrument.DIDGERIDOO, Instrument.BELL});
+		instrumentMap.put(61, new Instrument[]{Instrument.BIT, Instrument.DIDGERIDOO, Instrument.BELL});
+		instrumentMap.put(62, new Instrument[]{Instrument.BIT, Instrument.DIDGERIDOO, Instrument.BELL});
+		instrumentMap.put(63, new Instrument[]{Instrument.BIT, Instrument.DIDGERIDOO, Instrument.BELL});
 
 		// Reed
-		instrumentMap.put(64, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(65, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(66, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(67, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(68, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(69, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(70, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(71, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
+		instrumentMap.put(64, new Instrument[]{Instrument.FLUTE, Instrument.DIDGERIDOO, Instrument.IRON_XYLOPHONE, Instrument.BELL});
+		instrumentMap.put(65, new Instrument[]{Instrument.FLUTE, Instrument.DIDGERIDOO, Instrument.IRON_XYLOPHONE, Instrument.BELL});
+		instrumentMap.put(66, new Instrument[]{Instrument.FLUTE, Instrument.DIDGERIDOO, Instrument.IRON_XYLOPHONE, Instrument.BELL});
+		instrumentMap.put(67, new Instrument[]{Instrument.FLUTE, Instrument.DIDGERIDOO, Instrument.IRON_XYLOPHONE, Instrument.BELL});
+		instrumentMap.put(68, new Instrument[]{Instrument.FLUTE, Instrument.DIDGERIDOO, Instrument.IRON_XYLOPHONE, Instrument.BELL});
+		instrumentMap.put(69, new Instrument[]{Instrument.FLUTE, Instrument.DIDGERIDOO, Instrument.IRON_XYLOPHONE, Instrument.BELL});
+		instrumentMap.put(70, new Instrument[]{Instrument.FLUTE, Instrument.DIDGERIDOO, Instrument.IRON_XYLOPHONE, Instrument.BELL});
+		instrumentMap.put(71, new Instrument[]{Instrument.FLUTE, Instrument.DIDGERIDOO, Instrument.IRON_XYLOPHONE, Instrument.BELL});
 
 		// Pipe
-		instrumentMap.put(72, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(73, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(74, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(75, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(76, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(77, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(78, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(79, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.FLUTE, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
+		instrumentMap.put(72, new Instrument[]{Instrument.FLUTE, Instrument.DIDGERIDOO, Instrument.IRON_XYLOPHONE, Instrument.BELL});
+		instrumentMap.put(73, new Instrument[]{Instrument.FLUTE, Instrument.DIDGERIDOO, Instrument.IRON_XYLOPHONE, Instrument.BELL});
+		instrumentMap.put(74, new Instrument[]{Instrument.FLUTE, Instrument.DIDGERIDOO, Instrument.IRON_XYLOPHONE, Instrument.BELL});
+		instrumentMap.put(75, new Instrument[]{Instrument.FLUTE, Instrument.DIDGERIDOO, Instrument.IRON_XYLOPHONE, Instrument.BELL});
+		instrumentMap.put(76, new Instrument[]{Instrument.FLUTE, Instrument.DIDGERIDOO, Instrument.IRON_XYLOPHONE, Instrument.BELL});
+		instrumentMap.put(77, new Instrument[]{Instrument.FLUTE, Instrument.DIDGERIDOO, Instrument.IRON_XYLOPHONE, Instrument.BELL});
+		instrumentMap.put(78, new Instrument[]{Instrument.FLUTE, Instrument.DIDGERIDOO, Instrument.IRON_XYLOPHONE, Instrument.BELL});
+		instrumentMap.put(79, new Instrument[]{Instrument.FLUTE, Instrument.DIDGERIDOO, Instrument.IRON_XYLOPHONE, Instrument.BELL});
 
 		// Synth Lead
-		instrumentMap.put(80, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(81, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(82, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(83, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(84, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(85, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(86, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(87, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
+		instrumentMap.put(80, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(81, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(82, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(83, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(84, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(85, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(86, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(87, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
 
 		// Synth Pad
-		instrumentMap.put(88, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(89, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(90, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(91, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(92, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(93, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(94, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(95, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
+		instrumentMap.put(88, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(89, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(90, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(91, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(92, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(93, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(94, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(95, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
 
 		// Synth Effects
 //		instrumentMap.put(96, new Instrument[]{});
 //		instrumentMap.put(97, new Instrument[]{});
-		instrumentMap.put(98, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BIT, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(99, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(100, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(101, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(102, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(103, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
+		instrumentMap.put(98, new Instrument[]{Instrument.BIT, Instrument.DIDGERIDOO, Instrument.BELL});
+		instrumentMap.put(99, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(100, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(101, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(102, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(103, new Instrument[]{Instrument.HARP, Instrument.BASS, Instrument.BELL});
 
 		// Ethnic
-		instrumentMap.put(104, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BANJO, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(105, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BANJO, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(106, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BANJO, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(107, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BANJO, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(108, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.BANJO, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(109, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(110, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
-		instrumentMap.put(111, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.HARP, com.github.hhhzzzsss.songplayer.song.Instrument.DIDGERIDOO, com.github.hhhzzzsss.songplayer.song.Instrument.BELL});
+		instrumentMap.put(104, new Instrument[]{Instrument.BANJO, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(105, new Instrument[]{Instrument.BANJO, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(106, new Instrument[]{Instrument.BANJO, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(107, new Instrument[]{Instrument.BANJO, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(108, new Instrument[]{Instrument.BANJO, Instrument.BASS, Instrument.BELL});
+		instrumentMap.put(109, new Instrument[]{Instrument.HARP, Instrument.DIDGERIDOO, Instrument.BELL});
+		instrumentMap.put(110, new Instrument[]{Instrument.HARP, Instrument.DIDGERIDOO, Instrument.BELL});
+		instrumentMap.put(111, new Instrument[]{Instrument.HARP, Instrument.DIDGERIDOO, Instrument.BELL});
 
 		// Percussive
-		instrumentMap.put(112, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE});
-		instrumentMap.put(113, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE});
-		instrumentMap.put(114, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE});
-		instrumentMap.put(115, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE});
-		instrumentMap.put(116, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE});
-		instrumentMap.put(117, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE});
-		instrumentMap.put(118, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE});
-		instrumentMap.put(119, new com.github.hhhzzzsss.songplayer.song.Instrument[]{com.github.hhhzzzsss.songplayer.song.Instrument.IRON_XYLOPHONE, com.github.hhhzzzsss.songplayer.song.Instrument.BASS, com.github.hhhzzzsss.songplayer.song.Instrument.XYLOPHONE});
+		instrumentMap.put(112, new Instrument[]{Instrument.IRON_XYLOPHONE, Instrument.BASS, Instrument.XYLOPHONE});
+		instrumentMap.put(113, new Instrument[]{Instrument.IRON_XYLOPHONE, Instrument.BASS, Instrument.XYLOPHONE});
+		instrumentMap.put(114, new Instrument[]{Instrument.IRON_XYLOPHONE, Instrument.BASS, Instrument.XYLOPHONE});
+		instrumentMap.put(115, new Instrument[]{Instrument.IRON_XYLOPHONE, Instrument.BASS, Instrument.XYLOPHONE});
+		instrumentMap.put(116, new Instrument[]{Instrument.IRON_XYLOPHONE, Instrument.BASS, Instrument.XYLOPHONE});
+		instrumentMap.put(117, new Instrument[]{Instrument.IRON_XYLOPHONE, Instrument.BASS, Instrument.XYLOPHONE});
+		instrumentMap.put(118, new Instrument[]{Instrument.IRON_XYLOPHONE, Instrument.BASS, Instrument.XYLOPHONE});
+		instrumentMap.put(119, new Instrument[]{Instrument.IRON_XYLOPHONE, Instrument.BASS, Instrument.XYLOPHONE});
 	}
 
 	public static HashMap<Integer, Integer> percussionMap = new HashMap<>();
 	static {
-		percussionMap.put(35, 10 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.BASEDRUM.instrumentId);
-		percussionMap.put(36, 6  + 25* com.github.hhhzzzsss.songplayer.song.Instrument.BASEDRUM.instrumentId);
-		percussionMap.put(37, 6  + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(38, 8  + 25* com.github.hhhzzzsss.songplayer.song.Instrument.SNARE.instrumentId);
-		percussionMap.put(39, 6  + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(40, 4  + 25* com.github.hhhzzzsss.songplayer.song.Instrument.SNARE.instrumentId);
-		percussionMap.put(41, 6  + 25* com.github.hhhzzzsss.songplayer.song.Instrument.BASEDRUM.instrumentId);
-		percussionMap.put(42, 22 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.SNARE.instrumentId);
-		percussionMap.put(43, 13 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.BASEDRUM.instrumentId);
-		percussionMap.put(44, 22 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.SNARE.instrumentId);
-		percussionMap.put(45, 15 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.BASEDRUM.instrumentId);
-		percussionMap.put(46, 18 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.SNARE.instrumentId);
-		percussionMap.put(47, 20 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.BASEDRUM.instrumentId);
-		percussionMap.put(48, 23 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.BASEDRUM.instrumentId);
-		percussionMap.put(49, 17 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.SNARE.instrumentId);
-		percussionMap.put(50, 23 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.BASEDRUM.instrumentId);
-		percussionMap.put(51, 24 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.SNARE.instrumentId);
-		percussionMap.put(52, 8  + 25* com.github.hhhzzzsss.songplayer.song.Instrument.SNARE.instrumentId);
-		percussionMap.put(53, 13 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.SNARE.instrumentId);
-		percussionMap.put(54, 18 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(55, 18 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.SNARE.instrumentId);
-		percussionMap.put(56, 1  + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(57, 13 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.SNARE.instrumentId);
-		percussionMap.put(58, 2  + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(59, 13 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.SNARE.instrumentId);
-		percussionMap.put(60, 9  + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(61, 2  + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(62, 8  + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(63, 22 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.BASEDRUM.instrumentId);
-		percussionMap.put(64, 15 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.BASEDRUM.instrumentId);
-		percussionMap.put(65, 13 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.SNARE.instrumentId);
-		percussionMap.put(66, 8  + 25* com.github.hhhzzzsss.songplayer.song.Instrument.SNARE.instrumentId);
-		percussionMap.put(67, 8  + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(68, 3  + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(69, 20 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(70, 23 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(71, 24 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(72, 24 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(73, 17 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(74, 11 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(75, 18 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(76, 9  + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(77, 5  + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(78, 22 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(79, 19 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.SNARE.instrumentId);
-		percussionMap.put(80, 17 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(81, 22 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(82, 22 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.SNARE.instrumentId);
-		percussionMap.put(83, 24 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.CHIME.instrumentId);
-		percussionMap.put(84, 24 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.CHIME.instrumentId);
-		percussionMap.put(85, 21 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.HAT.instrumentId);
-		percussionMap.put(86, 14 + 25* com.github.hhhzzzsss.songplayer.song.Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(35, 10 + 25* Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(36, 6  + 25* Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(37, 6  + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(38, 8  + 25* Instrument.SNARE.instrumentId);
+		percussionMap.put(39, 6  + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(40, 4  + 25* Instrument.SNARE.instrumentId);
+		percussionMap.put(41, 6  + 25* Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(42, 22 + 25* Instrument.SNARE.instrumentId);
+		percussionMap.put(43, 13 + 25* Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(44, 22 + 25* Instrument.SNARE.instrumentId);
+		percussionMap.put(45, 15 + 25* Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(46, 18 + 25* Instrument.SNARE.instrumentId);
+		percussionMap.put(47, 20 + 25* Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(48, 23 + 25* Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(49, 17 + 25* Instrument.SNARE.instrumentId);
+		percussionMap.put(50, 23 + 25* Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(51, 24 + 25* Instrument.SNARE.instrumentId);
+		percussionMap.put(52, 8  + 25* Instrument.SNARE.instrumentId);
+		percussionMap.put(53, 13 + 25* Instrument.SNARE.instrumentId);
+		percussionMap.put(54, 18 + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(55, 18 + 25* Instrument.SNARE.instrumentId);
+		percussionMap.put(56, 1  + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(57, 13 + 25* Instrument.SNARE.instrumentId);
+		percussionMap.put(58, 2  + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(59, 13 + 25* Instrument.SNARE.instrumentId);
+		percussionMap.put(60, 9  + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(61, 2  + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(62, 8  + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(63, 22 + 25* Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(64, 15 + 25* Instrument.BASEDRUM.instrumentId);
+		percussionMap.put(65, 13 + 25* Instrument.SNARE.instrumentId);
+		percussionMap.put(66, 8  + 25* Instrument.SNARE.instrumentId);
+		percussionMap.put(67, 8  + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(68, 3  + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(69, 20 + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(70, 23 + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(71, 24 + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(72, 24 + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(73, 17 + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(74, 11 + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(75, 18 + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(76, 9  + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(77, 5  + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(78, 22 + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(79, 19 + 25* Instrument.SNARE.instrumentId);
+		percussionMap.put(80, 17 + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(81, 22 + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(82, 22 + 25* Instrument.SNARE.instrumentId);
+		percussionMap.put(83, 24 + 25* Instrument.CHIME.instrumentId);
+		percussionMap.put(84, 24 + 25* Instrument.CHIME.instrumentId);
+		percussionMap.put(85, 21 + 25* Instrument.HAT.instrumentId);
+		percussionMap.put(86, 14 + 25* Instrument.BASEDRUM.instrumentId);
 		percussionMap.put(87, 7  + 25* Instrument.BASEDRUM.instrumentId);
 	}
 }
