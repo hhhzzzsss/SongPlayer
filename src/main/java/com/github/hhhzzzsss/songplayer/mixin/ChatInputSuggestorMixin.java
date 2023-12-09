@@ -1,6 +1,6 @@
 package com.github.hhhzzzsss.songplayer.mixin;
 
-import com.github.hhhzzzsss.songplayer.CommandProcessor;
+import com.github.hhhzzzsss.songplayer.commands.CommandProcessor;
 import com.github.hhhzzzsss.songplayer.Config;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;

@@ -25,7 +25,7 @@ public class MidiConverter {
     public static final int NOTE_OFF = 0x80;
 
 	public static Song getSongFromUrl(URL url) throws IOException, InvalidMidiDataException, URISyntaxException, NoSuchAlgorithmException, KeyManagementException {
-		Sequence sequence = MidiSystem.getSequence(DownloadUtils.DownloadToInputStream(url, 5*1024*1024));
+		Sequence sequence = MidiSystem.getSequence(DownloadUtils.downloadToInputStream(url, 5*1024*1024));
 		return getSong(sequence, Paths.get(url.toURI().getPath()).getFileName().toString());
 	}
 

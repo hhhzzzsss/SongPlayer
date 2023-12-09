@@ -10,7 +10,6 @@ import java.net.URLConnection;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 public class DownloadUtils {
@@ -18,10 +17,10 @@ public class DownloadUtils {
 	private static class DefaultTrustManager implements X509TrustManager {
 
         @Override
-        public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {}
+        public void checkClientTrusted(X509Certificate[] arg0, String arg1) {}
 
         @Override
-        public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {}
+        public void checkServerTrusted(X509Certificate[] arg0, String arg1) {}
 
         @Override
         public X509Certificate[] getAcceptedIssuers() {
@@ -29,7 +28,7 @@ public class DownloadUtils {
         }
     }
 	
-	public static byte[] DownloadToByteArray(URL url, int maxSize) throws IOException, KeyManagementException, NoSuchAlgorithmException {
+	public static byte[] downloadToByteArray(URL url, int maxSize) throws IOException, KeyManagementException, NoSuchAlgorithmException {
 		SSLContext ctx = SSLContext.getInstance("TLS");
         ctx.init(new KeyManager[0], new TrustManager[] {new DefaultTrustManager()}, new SecureRandom());
         SSLContext.setDefault(ctx);
@@ -39,7 +38,7 @@ public class DownloadUtils {
 		conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0");
 		BufferedInputStream downloadStream = new BufferedInputStream(conn.getInputStream());
 		ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
-		
+
 		try {
 			byte[] buf = new byte[1024];
 			int n;
@@ -61,7 +60,7 @@ public class DownloadUtils {
 		}
 	}
 	
-	public static InputStream DownloadToInputStream(URL url, int maxSize) throws KeyManagementException, NoSuchAlgorithmException, IOException {
-		return new ByteArrayInputStream(DownloadToByteArray(url, maxSize));
+	public static InputStream downloadToInputStream(URL url, int maxSize) throws KeyManagementException, NoSuchAlgorithmException, IOException {
+		return new ByteArrayInputStream(downloadToByteArray(url, maxSize));
 	}
 }

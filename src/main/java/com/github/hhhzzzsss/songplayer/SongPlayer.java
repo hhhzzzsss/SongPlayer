@@ -1,5 +1,6 @@
 package com.github.hhhzzzsss.songplayer;
 
+import com.github.hhhzzzsss.songplayer.commands.CommandProcessor;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;

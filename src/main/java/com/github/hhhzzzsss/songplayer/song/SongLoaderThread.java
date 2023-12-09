@@ -29,20 +29,15 @@ public class SongLoaderThread extends Thread{
 		if (location.startsWith("http://") || location.startsWith("https://")) {
 			isUrl = true;
 			songUrl = new URL(location);
-		}
-		else if (Files.exists(getSongFile(location))) {
+		} else if (Files.exists(getSongFile(location))) {
 			songPath = getSongFile(location);
-		}
-		else if (Files.exists(getSongFile(location+".mid"))) {
+		} else if (Files.exists(getSongFile(location+".mid"))) {
 			songPath = getSongFile(location+".mid");
-		}
-		else if (Files.exists(getSongFile(location+".midi"))) {
+		} else if (Files.exists(getSongFile(location+".midi"))) {
 			songPath = getSongFile(location+".midi");
-		}
-		else if (Files.exists(getSongFile(location+".nbs"))) {
+		} else if (Files.exists(getSongFile(location+".nbs"))) {
 			songPath = getSongFile(location+".nbs");
-		}
-		else {
+		} else {
 			throw new IOException("Could not find song: " + location);
 		}
 	}
@@ -55,7 +50,7 @@ public class SongLoaderThread extends Thread{
 		try {
 			byte[] bytes;
 			if (isUrl) {
-				bytes = DownloadUtils.DownloadToByteArray(songUrl, 10*1024*1024);
+				bytes = DownloadUtils.downloadToByteArray(songUrl, 10*1024*1024);
 				filename = Paths.get(songUrl.toURI().getPath()).getFileName().toString();
 			}
 			else {
