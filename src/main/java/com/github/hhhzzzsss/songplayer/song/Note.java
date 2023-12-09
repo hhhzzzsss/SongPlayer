@@ -12,18 +12,8 @@ public class Note implements Comparable<Note> {
 	public int compareTo(Note other) {
 		if (time < other.time) {
 			return -1;
-		}
-		else if (time > other.time) {
+		} else if (time > other.time) {
 			return 1;
-		}
-		else if (noteId < other.noteId) {
-			return -1;
-		}
-		else if (noteId > other.noteId) {
-			return 1;
-		}
-		else {
-			return 0;
-		}
+		} else return Integer.compare(noteId, other.noteId);
 	}
 }

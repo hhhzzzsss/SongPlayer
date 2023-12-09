@@ -26,7 +26,7 @@ public enum Instrument {
 		this.offset = offset;
 	}
 
-	private static Instrument[] values = values();
+	private static final Instrument[] values = values();
 	public static Instrument getInstrumentFromId(int instrumentId) {
 		return values[instrumentId];
 	}

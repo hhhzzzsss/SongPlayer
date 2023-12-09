@@ -187,7 +187,7 @@ public class Stage {
 				})
 				.collect(Collectors.toCollection(LinkedList::new));
 
-		if (requiredBreaks.stream().allMatch(bp -> !withinBreakingDist(bp.getX()-position.getX(), bp.getY()-position.getY(), bp.getZ()-position.getZ()))) {
+		if (requiredBreaks.stream().noneMatch(bp -> withinBreakingDist(bp.getX()-position.getX(), bp.getY()-position.getY(), bp.getZ()-position.getZ()))) {
 			requiredBreaks.clear();
 		}
 

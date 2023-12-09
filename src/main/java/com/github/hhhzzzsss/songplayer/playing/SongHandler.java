@@ -54,12 +54,12 @@ public class SongHandler {
         if (currentSong == null && currentPlaylist != null && currentPlaylist.loaded) {
             if (!playlistChecked) {
                 playlistChecked = true;
-                if (currentPlaylist.songsFailedToLoad.size() > 0) {
+                if (!currentPlaylist.songsFailedToLoad.isEmpty()) {
                     SongPlayer.addChatMessage("§cFailed to load the following songs from the playlist: §4" + String.join(" ", currentPlaylist.songsFailedToLoad));
                 }
             }
             Song nextSong = currentPlaylist.getNext();
-            if (currentPlaylist.songs.size() == 0) {
+            if (currentPlaylist.songs.isEmpty()) {
                 SongPlayer.addChatMessage("§cPlaylist has no playable songs");
                 currentPlaylist = null;
             }
@@ -74,7 +74,7 @@ public class SongHandler {
         }
 
         // Check queue and load song from it if necessary
-        if (currentSong == null && currentPlaylist == null && songQueue.size() > 0) {
+        if (currentSong == null && currentPlaylist == null && !songQueue.isEmpty()) {
             setSong(songQueue.poll());
         }
 

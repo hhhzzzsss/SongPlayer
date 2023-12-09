@@ -21,8 +21,8 @@ public class Playlist {
     private static final Gson gson = new Gson();
 
     public String name;
-    public boolean loop = false;
-    public boolean shuffle = false;
+    public boolean loop;
+    public boolean shuffle;
 
     public List<String> index;
     public List<Path> songFiles;
