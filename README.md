@@ -1,46 +1,60 @@
+<img src="./src/main/resources/assets/songplayer/icon.png" alt="songplayer icon" width="200"/>
+
 # SongPlayer
-A Fabric mod for Minecraft that plays songs with noteblocks.
+SongPlayer is a Fabric mod for Minecraft that plays songs with noteblocks.
 The current version is for Minecraft 1.20.3.
 
-# How to install
-You can grab the mod jar from releases section.
-This mod requires fabric api.
+## How it works
+SongPlayer places noteblocks with nbt and instrument data already in them, so the noteblocks do not need to be individually tuned.
 
-# Adding songs
-You can put midis or NoteBlockStudio files in the `.minecraft/songs` folder.
-SongPlayer supports any valid midi and all versions of NBS files.
+The client will automatically detect what noteblocks are needed and place them automatically before each song is played, which makes playing songs quite easy. The only drawback is that you need to be able to switch between creative and survival mode, which my client will attempt to do automatically.
 
-# Using the client
-To get started, add some midis or nbs files to your songs folder, and use `$play <filename>` in an open area.
-Spaces are not supported in filenames or filepaths.
-If you have provided it a valid midi or nbs file, it will try to set your gamemode to creative, place the required noteblocks for the song, try to switch you to survival, then start playing.
+When playing a song, freecam is enabled. You will be able to move around freely, but in reality you are only moving your camera while your player stays at the center of the noteblocks. This is because noteblocks can only be played if you're within reach distance of them, so you have to stand at the center of the noteblocks to play them, but it's still nice to be able to move around while your song is playing.
 
-You can also organize songs into subdirectories in your songs folder. Tab completion will make it easy to navigate. Symlinked directories are supported too.
 
-# Commands
-All the commands are case insensitive.
+## How to install
+To install the mod download it from the release section and place it in your `mods` folder.<br>
+This mod also requires fabric api to function properly. Download it [here](https://www.curseforge.com/minecraft/mc-mods/fabric-api)
 
-### $help
-### $help \<command>
+## How to use
+
+### Adding songs
+To add songs to SongPlayer you can place any of the supported formats inside the `.minecraft/songs` folder.
+
+You are able to organize songs easily by placing them into subdirectories. Tab completion will make it easy to navigate. Symlinked directories are supported too.
+
+#### Supported formats
+- Any valid midi file.
+- NBS files (all versions)
+- SP (SongPlayers format, used in item feature)
+
+### Playing songs
+To play songs use the `$play <filename|url>` command.<br>
+When executing the command the mod will try to set your gamemode to creative, place the required noteblocks for the song, try to switch you to survival, then start playing.
+
+
+## Commands
+
+#### $help (command)
 If no arguments are given, lists all SongPlayer commands.
 Otherwise, explains the specified command and shows its syntax.
 
 ### $play \<filename or url>
-Plays a particular midi from the .minecraft/songs folder, or, if a url is specified, downloads the song at that url and tries to play it.
+Plays a particular midi from the `.minecraft/songs` folder, or, if an url is specified, caches the song at that url and tries to play it.
 
 If there is a song already playing, the new song will be added to the queue.
 
 ### $stop
-Stops playing/building and clears the queue.
+Stops playing or building and clears the queue.
 
 ### $skip
 Skips the current song and goes to the next one.
 
 ### $goto \<mm:ss>
-Goes to a specific time in the song.
+Goes to a specific time in the current playing song.
 
 ### $loop
-Toggles song looping.
+Toggles the looping mode on the current song.
 
 ### $status
 *aliases: `$current`*
@@ -137,13 +151,6 @@ It will automatically generate custom item names and lore, but these can be modi
 ### $testSong
 A command I used for testing during development.
 It plays all 400 possible noteblock sounds in order.
-
-# Mechanism
-SongPlayer places noteblocks with nbt and instrument data already in them, so the noteblocks do not need to be individually tuned.
-
-The client will automatically detect what noteblocks are needed and place them automatically before each song is played, which makes playing songs quite easy. The only drawback is that you need to be able to switch between creative and survival mode, which my client will attempt to do automatically.
-
-When playing a song, freecam is enabled. You will be able to move around freely, but in reality you are only moving your camera while your player stays at the center of the noteblocks. This is because noteblocks can only be played if you're within reach distance of them, so you have to stand at the center of the noteblocks to play them, but it's still nice to be able to move around while your song is playing.
 
 ## Acknowledgements
 **Ayunami2000**: Came up with the concept of directly placing noteblocks with nbt data instead of manually tuning them.
