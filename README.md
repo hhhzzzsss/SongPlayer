@@ -78,41 +78,19 @@ Shows all the songs in the queue.
 
 Create, edit, delete, or play playlists. You can also toggle looping or shuffling.
 
-### $songs
-### $songs \<subdirectory>
+### $songs (subdirectory)
 *aliases: `$list`*
 
 If no arguments are given, lists songs in the `songs` folder. Otherwise, lists songs in the specified subdirectory.
 
-### $setCreativeCommand \<command>
-*aliases: `$sc`*
+### $setCommands use \<vanilla|essentials>
+Switch to using Essentials or vanilla gamemode commands.
 
-By default, the client uses /gmc to go into creative mode.
-However, /gmc does not work on all servers.
-If the creative command is different, set it with this command.
-For example, if the server uses vanilla commands, do `$setCreativeCommand /gamemode creative`.
+### $setCommands creative \<command>
+Sets the command that will be used to switch to creative mode.
 
-### $setSurvivalCommand \<command>
-*aliases: `$ss`*
-
-By default, the client uses /gms to go into survival mode.
-However, /gms does not work on all servers.
-If the survival command is different, set it with this command.
-For example, if the server uses vanilla commands, do `$setSurvivalCommand /gamemode survival`.
-
-### $useVanillaCommands
-*aliases: `$essentials`, `$useEssentials`, `$essentialsCommands`*
-
-Switch to using Essentials gamemode commands.
-
-Equivalent to `$setCreativeCommand /gmc` and `$setSurvivalCommand /gms`
-
-### $useVanillaCommands
-*$aliases: `$vanilla`, `$useVanilla`, `$vanillaCommands`*
-
-Switch to using vanilla gamemode commands.
-
-Equivalent to `$setCreativeCommand /gamemode creative` and `$setSurvivalCommand /gamemode survival`
+### $setCommands survival \<command>
+Sets the command that will be used to switch to survival mode.
 
 ### $toggleFakePlayer
 *aliases: `$fakePlayer`, `$fp`*

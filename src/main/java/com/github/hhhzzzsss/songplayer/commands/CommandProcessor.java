@@ -27,16 +27,13 @@ public class CommandProcessor {
 		commands.add(new QueueCommand());
 		commands.add(new SongsCommand());
 		commands.add(new PlaylistCommand());
-		commands.add(new SetCreativeCommandCommand());
-		commands.add(new SetSurvivalCommandCommand());
-		commands.add(new UseEssentialsCommandsCommand());
-		commands.add(new UseVanillaCommandsCommand());
 		commands.add(new ToggleFakePlayerCommand());
 		commands.add(new SetStageTypeCommand());
 		commands.add(new ToggleMovementCommand());
 		commands.add(new AnnouncementCommand());
 		commands.add(new SongItemCommand());
 		commands.add(new TestSongCommand());
+		commands.add(new SetCommandsCommand());
 
 		for (Command command : commands) {
 			commandMap.put(command.getName().toLowerCase(Locale.ROOT), command);
