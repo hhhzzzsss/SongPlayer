@@ -49,11 +49,8 @@ public class MidiConverter {
 			for (int i = 0; i < track.size(); i++) {
 				MidiEvent event = track.get(i);
 				MidiMessage message = event.getMessage();
-				if (message instanceof MetaMessage) {
-					MetaMessage mm = (MetaMessage) message;
-					if (mm.getType() == SET_TEMPO) {
-						tempoEvents.add(event);
-					}
+				if (message instanceof MetaMessage mm && mm.getType() == SET_TEMPO) {
+					tempoEvents.add(event);
 				}
 			}
 		}
@@ -61,7 +58,6 @@ public class MidiConverter {
 		tempoEvents.sort(Comparator.comparingLong(MidiEvent::getTick));
 		
 		for (Track track : sequence.getTracks()) {
-
 			long microTime = 0;
 			int[] instrumentIds = new int[16];
 			int mpq = 500000;
@@ -84,9 +80,8 @@ public class MidiConverter {
 					tempoEventIdx++;
 				}
 				
-				if (message instanceof ShortMessage) {
-					ShortMessage sm = (ShortMessage) message;
-					if (sm.getCommand() == SET_INSTRUMENT) {
+				if (message instanceof ShortMessage sm) {
+                    if (sm.getCommand() == SET_INSTRUMENT) {
 						instrumentIds[sm.getChannel()] = sm.getData1();
 					}
 					else if (sm.getCommand() == NOTE_ON) {
@@ -131,10 +126,10 @@ public class MidiConverter {
 	}
 
 	public static Note getMidiInstrumentNote(int midiInstrument, int midiPitch, long microTime) {
-		com.github.hhhzzzsss.songplayer.song.Instrument instrument = null;
-		com.github.hhhzzzsss.songplayer.song.Instrument[] instrumentList = instrumentMap.get(midiInstrument);
+		Instrument instrument = null;
+		Instrument[] instrumentList = instrumentMap.get(midiInstrument);
 		if (instrumentList != null) {
-			for (com.github.hhhzzzsss.songplayer.song.Instrument candidateInstrument : instrumentList) {
+			for (Instrument candidateInstrument : instrumentList) {
 				if (midiPitch >= candidateInstrument.offset && midiPitch <= candidateInstrument.offset+24) {
 					instrument = candidateInstrument;
 					break;
