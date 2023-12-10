@@ -2,7 +2,7 @@
 
 # SongPlayer
 SongPlayer is a Fabric mod for Minecraft that plays songs with noteblocks.
-The current version is for Minecraft 1.20.3.
+The current version is for Minecraft 1.20.4.
 
 ## How it works
 SongPlayer places noteblocks with nbt and instrument data already in them, so the noteblocks do not need to be individually tuned.
