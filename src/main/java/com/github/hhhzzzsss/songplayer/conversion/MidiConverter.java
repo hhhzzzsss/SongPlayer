@@ -1,6 +1,5 @@
 package com.github.hhhzzzsss.songplayer.conversion;
 
-import com.github.hhhzzzsss.songplayer.song.DownloadUtils;
 import com.github.hhhzzzsss.songplayer.song.Instrument;
 import com.github.hhhzzzsss.songplayer.song.Note;
 import com.github.hhhzzzsss.songplayer.song.Song;
@@ -8,12 +7,6 @@ import com.github.hhhzzzsss.songplayer.song.Song;
 import javax.sound.midi.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -23,16 +16,6 @@ public class MidiConverter {
 	public static final int SET_TEMPO = 0x51;
 	public static final int NOTE_ON = 0x90;
     public static final int NOTE_OFF = 0x80;
-
-	public static Song getSongFromUrl(URL url) throws IOException, InvalidMidiDataException, URISyntaxException, NoSuchAlgorithmException, KeyManagementException {
-		Sequence sequence = MidiSystem.getSequence(DownloadUtils.downloadToInputStream(url, 5*1024*1024));
-		return getSong(sequence, Paths.get(url.toURI().getPath()).getFileName().toString());
-	}
-
-	public static Song getSongFromFile(Path file) throws InvalidMidiDataException, IOException {
-		Sequence sequence = MidiSystem.getSequence(file.toFile());
-		return getSong(sequence, file.getFileName().toString());
-	}
 
 	public static Song getSongFromBytes(byte[] bytes, String name) throws InvalidMidiDataException, IOException {
 		Sequence sequence = MidiSystem.getSequence(new ByteArrayInputStream(bytes));
