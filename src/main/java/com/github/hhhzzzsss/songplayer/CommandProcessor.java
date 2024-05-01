@@ -179,8 +179,8 @@ public class CommandProcessor {
 			return "Sets the command prefix used by SongPlayer";
 		}
 		public boolean processCommand(String args) {
-			if (args.contains(" ")) {
-				SongPlayer.addChatMessage("§cPrefix cannot contain a space");
+			if (args.contains(" ") || args.startsWith("/")) {
+				SongPlayer.addChatMessage(args.startsWith("/") ? "§cPrefix can not start with §4/" : "Prefix cannot contain a space");
 				return true;
 			}
 			else if (args.length() > 0) {

@@ -22,6 +22,9 @@ public class SongPlayer implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		if (Config.getConfig().prefix.startsWith("/")) {
+			Config.getConfig().prefix = "$";
+		}
 		if (!Files.exists(SONG_DIR)) {
 			Util.createDirectoriesSilently(SONG_DIR);
 		}

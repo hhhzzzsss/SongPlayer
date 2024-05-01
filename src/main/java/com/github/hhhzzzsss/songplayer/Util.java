@@ -3,13 +3,13 @@ package com.github.hhhzzzsss.songplayer;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
-import net.minecraft.text.PlainTextContent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.text.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -222,14 +222,15 @@ public class Util {
     }
 
     public static void setItemName(ItemStack stack, Text text) {
-        stack.getOrCreateSubNbt(ItemStack.DISPLAY_KEY).putString(ItemStack.NAME_KEY, Text.Serialization.toJsonString(text));
+        stack.set(DataComponentTypes.CUSTOM_NAME, text);
     }
 
     public static void setItemLore(ItemStack stack, Text... loreLines) {
-        NbtList lore = new NbtList();
-        for (Text line : loreLines) {
-            lore.add(NbtString.of(Text.Serialization.toJsonString(line)));
+        LoreComponent lore = LoreComponent.DEFAULT;
+        for (Text line : loreLines.clone()) {
+            System.out.println("line: " + line);
+            lore.with(line);
         }
-        stack.getOrCreateSubNbt(ItemStack.DISPLAY_KEY).put(ItemStack.LORE_KEY, lore);
+        stack.set(DataComponentTypes.LORE, lore);
     }
 }

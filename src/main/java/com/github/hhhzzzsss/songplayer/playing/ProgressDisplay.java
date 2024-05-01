@@ -29,21 +29,18 @@ public class ProgressDisplay {
         fade = 100;
     }
 
-    public void onRenderHUD(DrawContext context, int scaledWidth, int scaledHeight, int heldItemTooltipFade) {
+    public void onRenderHUD(DrawContext context, int heldItemTooltipFade) {
         if (fade <= 0) {
             return;
         }
 
         int bottomTextWidth = SongPlayer.MC.textRenderer.getWidth(bottomText);
         int topTextWidth = SongPlayer.MC.textRenderer.getWidth(topText);
-        int bottomTextX = (scaledWidth - bottomTextWidth) / 2;
-        int topTextX = (scaledWidth - topTextWidth) / 2;
-        int bottomTextY = scaledHeight - 59;
+        int i = SongPlayer.MC.inGameHud.getTextRenderer().getWidth(topText);
+        int x = (context.getScaledWindowWidth() - i) / 2;
+        int bottomTextY = context.getScaledWindowHeight() - (heldItemTooltipFade > 0 ? 73 : 59);
         if (!SongPlayer.MC.interactionManager.hasStatusBars()) {
             bottomTextY += 14;
-        }
-        if (heldItemTooltipFade > 0) {
-            bottomTextY -= 12;
         }
         int topTextY = bottomTextY - 12;
 
@@ -55,8 +52,8 @@ public class ProgressDisplay {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         Objects.requireNonNull(SongPlayer.MC.textRenderer);
-        context.drawTextWithShadow(SongPlayer.MC.textRenderer, bottomText, bottomTextX, bottomTextY, 16777215 + (opacity << 24));
-        context.drawTextWithShadow(SongPlayer.MC.textRenderer, topText, topTextX, topTextY, 16777215 + (opacity << 24));
+        context.drawCenteredTextWithShadow(SongPlayer.MC.textRenderer, bottomText, x, bottomTextY, 16777215 + (opacity << 24));
+        context.drawCenteredTextWithShadow(SongPlayer.MC.textRenderer, topText, x, topTextY, 16777215 + (opacity << 24));
         RenderSystem.disableBlend();
     }
 

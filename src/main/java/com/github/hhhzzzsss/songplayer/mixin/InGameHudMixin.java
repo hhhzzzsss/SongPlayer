@@ -13,17 +13,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(InGameHud.class)
 public class InGameHudMixin {
     @Shadow
-    private int scaledWidth;
-
-    @Shadow
-    private int scaledHeight;
-
-    @Shadow
     private int heldItemTooltipFade;
 
     @Inject(method = "render",
-            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableBlend()V", ordinal = 3))
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableDepthTest()V"))
     private void onRender(DrawContext context, float tickDelta, CallbackInfo ci) {
-        ProgressDisplay.getInstance().onRenderHUD(context, scaledWidth, scaledHeight, heldItemTooltipFade);
+        ProgressDisplay.getInstance().onRenderHUD(context, heldItemTooltipFade);
     }
 }

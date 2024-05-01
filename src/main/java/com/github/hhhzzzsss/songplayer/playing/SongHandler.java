@@ -8,10 +8,14 @@ import com.github.hhhzzzsss.songplayer.mixin.ClientPlayerInteractionManagerAcces
 import com.github.hhhzzzsss.songplayer.song.*;
 import net.minecraft.block.Block;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.BlockStateComponent;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.state.property.Properties;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -450,25 +454,20 @@ public class SongHandler {
         }
     }
 
-    private final String[] instrumentNames = {"harp", "basedrum", "snare", "hat", "bass", "flute", "bell", "guitar", "chime", "xylophone", "iron_xylophone", "cow_bell", "didgeridoo", "bit", "banjo", "pling"};
+    private final net.minecraft.block.enums.Instrument[] instruments = {net.minecraft.block.enums.Instrument.HARP, net.minecraft.block.enums.Instrument.BASEDRUM, net.minecraft.block.enums.Instrument.SNARE, net.minecraft.block.enums.Instrument.HAT, net.minecraft.block.enums.Instrument.BASS, net.minecraft.block.enums.Instrument.FLUTE, net.minecraft.block.enums.Instrument.BELL, net.minecraft.block.enums.Instrument.GUITAR, net.minecraft.block.enums.Instrument.CHIME, net.minecraft.block.enums.Instrument.XYLOPHONE, net.minecraft.block.enums.Instrument.IRON_XYLOPHONE, net.minecraft.block.enums.Instrument.COW_BELL, net.minecraft.block.enums.Instrument.DIDGERIDOO, net.minecraft.block.enums.Instrument.BIT, net.minecraft.block.enums.Instrument.BANJO, net.minecraft.block.enums.Instrument.PLING};
     private void holdNoteblock(int id, int slot) {
         PlayerInventory inventory = SongPlayer.MC.player.getInventory();
         inventory.selectedSlot = slot;
         ((ClientPlayerInteractionManagerAccessor) SongPlayer.MC.interactionManager).invokeSyncSelectedSlot();
         int instrument = id/25;
         int note = id%25;
-        NbtCompound nbt = new NbtCompound();
-        nbt.putString("id", "minecraft:note_block");
-        nbt.putByte("Count", (byte) 1);
-        NbtCompound tag = new NbtCompound();
-        NbtCompound bsTag = new NbtCompound();
-        bsTag.putString("instrument", instrumentNames[instrument]);
-        bsTag.putString("note", Integer.toString(note));
-        tag.put("BlockStateTag", bsTag);
-        nbt.put("tag", tag);
-        ItemStack noteblockStack = ItemStack.fromNbt(nbt);
-        inventory.main.set(slot, noteblockStack);
-        SongPlayer.MC.interactionManager.clickCreativeStack(noteblockStack, 36 + slot);
+
+        ItemStack noteblock = Items.NOTE_BLOCK.getDefaultStack();
+        BlockStateComponent bsc = BlockStateComponent.DEFAULT.with(Properties.INSTRUMENT, instruments[instrument]).with(Properties.NOTE, note);
+        noteblock.set(DataComponentTypes.BLOCK_STATE, bsc);
+
+        inventory.main.set(inventory.selectedSlot, noteblock);
+        SongPlayer.MC.interactionManager.clickCreativeStack(SongPlayer.MC.player.getStackInHand(Hand.MAIN_HAND), 36 + inventory.selectedSlot);
     }
     private void placeBlock(BlockPos bp) {
         double fx = Math.max(0.0, Math.min(1.0, (stage.position.getX() + 0.5 - bp.getX())));
