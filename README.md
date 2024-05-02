@@ -1,6 +1,6 @@
 # SongPlayer
 A Fabric mod for Minecraft that plays songs with noteblocks.
-The current version is for Minecraft 1.20.4.
+The current version is for Minecraft 1.20.5 - 1.20.6.
 
 # How to install
 You can grab the mod jar from releases section.

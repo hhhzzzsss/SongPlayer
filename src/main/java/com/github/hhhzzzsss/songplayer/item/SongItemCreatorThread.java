@@ -3,6 +3,8 @@ package com.github.hhhzzzsss.songplayer.item;
 import com.github.hhhzzzsss.songplayer.SongPlayer;
 import com.github.hhhzzzsss.songplayer.conversion.SPConverter;
 import com.github.hhhzzzsss.songplayer.song.SongLoaderThread;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
@@ -39,7 +41,7 @@ public class SongItemCreatorThread extends SongLoaderThread {
             ItemStack newStack;
             if (stack.isEmpty()) {
                 newStack = Items.PAPER.getDefaultStack();
-                newStack.getOrCreateNbt().putInt("CustomModelData", 751642938);
+                newStack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(751642938));
             }
             else {
                 newStack = stack.copy();

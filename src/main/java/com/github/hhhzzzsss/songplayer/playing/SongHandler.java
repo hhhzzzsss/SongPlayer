@@ -8,8 +8,11 @@ import com.github.hhhzzzsss.songplayer.mixin.ClientPlayerInteractionManagerAcces
 import com.github.hhhzzzsss.songplayer.song.*;
 import net.minecraft.block.Block;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.BlockStateComponent;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.text.MutableText;
@@ -26,6 +29,7 @@ import net.minecraft.world.GameMode;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedList;
+import java.util.Map;
 
 public class SongHandler {
     private static SongHandler instance = null;
@@ -457,16 +461,11 @@ public class SongHandler {
         ((ClientPlayerInteractionManagerAccessor) SongPlayer.MC.interactionManager).invokeSyncSelectedSlot();
         int instrument = id/25;
         int note = id%25;
-        NbtCompound nbt = new NbtCompound();
-        nbt.putString("id", "minecraft:note_block");
-        nbt.putByte("Count", (byte) 1);
-        NbtCompound tag = new NbtCompound();
-        NbtCompound bsTag = new NbtCompound();
-        bsTag.putString("instrument", instrumentNames[instrument]);
-        bsTag.putString("note", Integer.toString(note));
-        tag.put("BlockStateTag", bsTag);
-        nbt.put("tag", tag);
-        ItemStack noteblockStack = ItemStack.fromNbt(nbt);
+        ItemStack noteblockStack = Items.NOTE_BLOCK.getDefaultStack();
+        noteblockStack.set(DataComponentTypes.BLOCK_STATE, new BlockStateComponent(Map.of(
+                "instrument", instrumentNames[instrument],
+                "note", Integer.toString(note)
+        )));
         inventory.main.set(slot, noteblockStack);
         SongPlayer.MC.interactionManager.clickCreativeStack(noteblockStack, 36 + slot);
     }

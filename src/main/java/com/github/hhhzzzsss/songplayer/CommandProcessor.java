@@ -10,6 +10,8 @@ import com.github.hhhzzzsss.songplayer.song.Song;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Hand;
@@ -1030,7 +1032,7 @@ public class CommandProcessor {
 						return true;
 					}
 					String name = String.join(" ", Arrays.copyOfRange(split, 1, split.length));
-					songPlayerNBT.putString(SongItemUtils.DISPLAY_NAME_KEY, name);
+					NbtComponent.set(DataComponentTypes.CUSTOM_DATA, stack, nbt -> nbt.getCompound(SongItemUtils.SONG_ITEM_KEY).putString(SongItemUtils.DISPLAY_NAME_KEY, name));
 					SongItemUtils.addSongItemDisplay(stack);
 					MC.player.setStackInHand(Hand.MAIN_HAND, stack);
 					MC.interactionManager.clickCreativeStack(MC.player.getStackInHand(Hand.MAIN_HAND), 36 + MC.player.getInventory().selectedSlot);

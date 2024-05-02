@@ -1,6 +1,8 @@
 package com.github.hhhzzzsss.songplayer.item;
 
 import com.github.hhhzzzsss.songplayer.Util;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -18,10 +20,10 @@ public class SongItemUtils {
 
     public static ItemStack createSongItem(ItemStack stack, byte[] songData, String filename, String displayName) {
         NbtCompound songPlayerNbt = new NbtCompound();
-        stack.setSubNbt(SONG_ITEM_KEY, songPlayerNbt);
         songPlayerNbt.putString(SONG_DATA_KEY, Base64.getEncoder().encodeToString(songData));
         songPlayerNbt.putString(FILE_NAME_KEY, filename);
         songPlayerNbt.putString(DISPLAY_NAME_KEY, displayName);
+        NbtComponent.set(DataComponentTypes.CUSTOM_DATA, stack, nbt -> nbt.put(SONG_ITEM_KEY, songPlayerNbt));
         addSongItemDisplay(stack);
         return stack;
     }
@@ -43,7 +45,12 @@ public class SongItemUtils {
     }
 
     public static NbtCompound getSongItemTag(ItemStack stack) {
-        return stack.getSubNbt(SONG_ITEM_KEY);
+        NbtCompound nbt = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).copyNbt();
+        if (nbt.contains(SONG_ITEM_KEY, NbtElement.COMPOUND_TYPE)) {
+            return (NbtCompound)nbt.get(SONG_ITEM_KEY);
+        } else {
+            return null;
+        }
     }
 
     public static boolean isSongItem(ItemStack stack) {

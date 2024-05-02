@@ -3,6 +3,8 @@ package com.github.hhhzzzsss.songplayer;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
@@ -222,14 +224,10 @@ public class Util {
     }
 
     public static void setItemName(ItemStack stack, Text text) {
-        stack.getOrCreateSubNbt(ItemStack.DISPLAY_KEY).putString(ItemStack.NAME_KEY, Text.Serialization.toJsonString(text));
+        stack.set(DataComponentTypes.CUSTOM_NAME, text);
     }
 
     public static void setItemLore(ItemStack stack, Text... loreLines) {
-        NbtList lore = new NbtList();
-        for (Text line : loreLines) {
-            lore.add(NbtString.of(Text.Serialization.toJsonString(line)));
-        }
-        stack.getOrCreateSubNbt(ItemStack.DISPLAY_KEY).put(ItemStack.LORE_KEY, lore);
+        stack.set(DataComponentTypes.LORE, new LoreComponent(List.of(loreLines)));
     }
 }
