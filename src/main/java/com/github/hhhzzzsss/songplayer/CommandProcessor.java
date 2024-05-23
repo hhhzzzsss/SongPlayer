@@ -185,6 +185,10 @@ public class CommandProcessor {
 				SongPlayer.addChatMessage("§cPrefix cannot contain a space");
 				return true;
 			}
+			else if (args.startsWith("/")) {
+				SongPlayer.addChatMessage("§cPrefix cannot start with a /");
+				return true;
+			}
 			else if (args.length() > 0) {
 				Config.getConfig().prefix = args;
 				SongPlayer.addChatMessage("§6Set prefix to " + args);
