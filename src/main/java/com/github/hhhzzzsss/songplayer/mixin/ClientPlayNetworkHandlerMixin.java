@@ -5,10 +5,7 @@ import com.github.hhhzzzsss.songplayer.SongPlayer;
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
 import com.github.hhhzzzsss.songplayer.playing.Stage;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerAbilitiesS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
+import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -49,6 +46,13 @@ public class ClientPlayNetworkHandlerMixin {
 		SongHandler handler = SongHandler.getInstance();
 		if (handler.currentSong != null || handler.currentPlaylist != null || handler.songQueue.size() > 0) {
 			SongPlayer.MC.player.getAbilities().flying = handler.wasFlying;
+		}
+	}
+
+	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;setVelocityClient(DDD)V"), method = "onEntityVelocityUpdate", cancellable = true)
+	public void onOnEntityVelocityUpdate(EntityVelocityUpdateS2CPacket packet, CallbackInfo ci) {
+		if (!SongHandler.getInstance().isIdle() && packet.getId() == SongPlayer.MC.player.getId()) {
+			ci.cancel();
 		}
 	}
 }
