@@ -4,6 +4,7 @@ import com.github.hhhzzzsss.songplayer.SongPlayer;
 import com.github.hhhzzzsss.songplayer.Util;
 import com.github.hhhzzzsss.songplayer.conversion.MidiConverter;
 import com.github.hhhzzzsss.songplayer.conversion.NBSConverter;
+import com.github.hhhzzzsss.songplayer.conversion.TxtConverter;
 
 import java.io.IOException;
 import java.net.URL;
@@ -71,6 +72,13 @@ public class SongLoaderThread extends Thread{
 			if (song == null) {
 				try {
 					song = NBSConverter.getSongFromBytes(bytes, filename);
+				}
+				catch (Exception e) {}
+			}
+
+			if (song == null) {
+				try {
+					song = TxtConverter.getSongFromBytes(bytes, filename);
 				}
 				catch (Exception e) {}
 			}
