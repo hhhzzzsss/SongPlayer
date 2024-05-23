@@ -13,7 +13,6 @@ import net.minecraft.component.type.BlockStateComponent;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -523,5 +522,9 @@ public class SongHandler {
             SongPlayer.MC.interactionManager.clickCreativeStack(prevHeldItem, 36 + buildSlot);
             buildSlot = -1;
         }
+    }
+
+    public boolean isIdle() {
+        return currentSong == null && currentPlaylist == null && songQueue.isEmpty();
     }
 }

@@ -1,22 +1,16 @@
 package com.github.hhhzzzsss.songplayer.mixin;
 
 import com.github.hhhzzzsss.songplayer.CommandProcessor;
-import com.github.hhhzzzsss.songplayer.Config;
 import com.github.hhhzzzsss.songplayer.SongPlayer;
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
 import com.github.hhhzzzsss.songplayer.playing.Stage;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerAbilitiesS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -39,6 +33,15 @@ public class ClientPlayNetworkHandlerMixin {
 	@Inject(at = @At("TAIL"), method = "onPlayerRespawn(Lnet/minecraft/network/packet/s2c/play/PlayerRespawnS2CPacket;)V")
 	public void onOnPlayerRespawn(PlayerRespawnS2CPacket packet, CallbackInfo ci) {
 		SongHandler.getInstance().cleanup();
+	}
+
+	@Inject(at = @At("TAIL"), method = "onPlayerPositionLook(Lnet/minecraft/network/packet/s2c/play/PlayerPositionLookS2CPacket;)V")
+	public void onOnPlayerPositionLook(PlayerPositionLookS2CPacket packet, CallbackInfo ci) {
+		Stage stage = SongHandler.getInstance().stage;
+		if (!SongHandler.getInstance().isIdle() && stage != null && Vec3d.ofBottomCenter(stage.position).squaredDistanceTo(SongPlayer.MC.player.getPos()) > 3*3) {
+			SongPlayer.addChatMessage("§6Stopped playing because the server moved the player too far from the stage!");
+			SongHandler.getInstance().cleanup();
+		}
 	}
 
 	@Inject(at = @At("TAIL"), method = "onPlayerAbilities(Lnet/minecraft/network/packet/s2c/play/PlayerAbilitiesS2CPacket;)V")
