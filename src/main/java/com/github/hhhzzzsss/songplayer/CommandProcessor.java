@@ -9,12 +9,17 @@ import com.github.hhhzzzsss.songplayer.song.Playlist;
 import com.github.hhhzzzsss.songplayer.song.Song;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.minecraft.block.BlockState;
 import net.minecraft.command.CommandSource;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.state.property.Property;
+import net.minecraft.text.*;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.GameMode;
 
 import java.io.IOException;
@@ -52,9 +57,12 @@ public class CommandProcessor {
 		commands.add(new toggleFakePlayerCommand());
 		commands.add(new setStageTypeCommand());
 		commands.add(new toggleMovementCommand());
+		commands.add(new toggleAutoCleanup());
+		commands.add(new cleanupLastStageCommand());
 		commands.add(new announcementCommand());
 		commands.add(new songItemCommand());
 		commands.add(new testSongCommand());
+		commands.add(new testBlockStateCommand());
 
 		for (Command command : commands) {
 			commandMap.put(command.getName().toLowerCase(Locale.ROOT), command);
@@ -236,16 +244,21 @@ public class CommandProcessor {
 			return "Stops playing";
 		}
 		public boolean processCommand(String args) {
-			if (SongHandler.getInstance().currentSong == null && SongHandler.getInstance().songQueue.isEmpty()) {
+			if (SongHandler.getInstance().isIdle()) {
 				SongPlayer.addChatMessage("§6No song is currently playing");
 				return true;
 			}
 			if (args.length() == 0) {
-				if (SongHandler.getInstance().stage != null) {
-					SongHandler.getInstance().stage.movePlayerToStagePosition();
+				if (SongHandler.getInstance().cleaningUp) {
+					SongHandler.getInstance().restoreStateAndReset();
+					SongPlayer.addChatMessage("§6Stopped cleanup");
+				} else if (Config.getConfig().autoCleanup && SongHandler.getInstance().originalBlocks.size() != 0) {
+					SongHandler.getInstance().partionResetAndCleanup();
+					SongPlayer.addChatMessage("§6Stopped playing and switched to cleanup");
+				} else {
+					SongHandler.getInstance().restoreStateAndReset();
+					SongPlayer.addChatMessage("§6Stopped playing");
 				}
-				SongHandler.getInstance().restoreStateAndCleanUp();
-				SongPlayer.addChatMessage("§6Stopped playing");
 				return true;
 			}
 			else {
@@ -935,6 +948,92 @@ public class CommandProcessor {
 		}
 	}
 
+	private static class toggleAutoCleanup extends Command {
+		public String getName() {
+			return "toggleAutoCleanup";
+		}
+		public String[] getAliases() {
+			return new String[]{"autoCleanup"};
+		}
+		public String[] getSyntax() {
+			return new String[0];
+		}
+		public String getDescription() {
+			return "Toggles whether you automatically clean up your stage and restore the original blocks after playing";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() == 0) {
+				Config.getConfig().autoCleanup = !Config.getConfig().autoCleanup;
+				if (Config.getConfig().autoCleanup) {
+					SongPlayer.addChatMessage("§6Enabled automatic cleanup");
+				}
+				else {
+					SongPlayer.addChatMessage("§6Disabled automatic cleanup");
+				}
+				Config.saveConfigWithErrorHandling();
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+
+	private static class cleanupLastStageCommand extends Command {
+		public String getName() {
+			return "cleanupLastStage";
+		}
+		public String[] getAliases() {
+			return new String[]{};
+		}
+		public String[] getSyntax() {
+			return new String[0];
+		}
+		public String getDescription() {
+			return "Cleans up your most recent stage and restores the original blocks";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() == 0) {
+				Stage lastStage = SongHandler.getInstance().lastStage;
+				if (!SongHandler.getInstance().isIdle()) {
+					SongPlayer.addChatMessage("§cYou cannot start cleanup if you are in the middle of another action");
+					return true;
+				}
+				if (lastStage == null || SongHandler.getInstance().originalBlocks.size() == 0) {
+					SongPlayer.addChatMessage("§6There is nothing to clean up");
+					return true;
+				}
+				if (SongPlayer.MC.player.getPos().squaredDistanceTo(lastStage.getOriginBottomCenter()) > 3*3) {
+					System.out.println(SongPlayer.MC.player.getPos().squaredDistanceTo(lastStage.getOriginBottomCenter()));
+					String coordStr = String.format(
+							"%d %d %d",
+							lastStage.position.getX(), lastStage.position.getY(), lastStage.position.getZ()
+					);
+					SongPlayer.addChatMessage("§6You must be within §33 §6blocks of the center of your stage to start cleanup.");
+					MutableText coordText = Util.joinTexts(null,
+							Text.literal("This is at ").setStyle(Style.EMPTY.withColor(Formatting.GOLD)),
+							Text.literal(coordStr).setStyle(
+									Style.EMPTY
+											.withColor(Formatting.DARK_AQUA)
+											.withUnderline(true)
+											.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, coordStr))
+											.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Copy \"" + coordStr + "\"")))
+							),
+							Text.literal(" (click to copy)").setStyle(Style.EMPTY.withColor(Formatting.GOLD))
+					);
+					SongPlayer.addChatMessage(coordText);
+					return true;
+				}
+
+				SongHandler.getInstance().startCleanup();
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+
 	private static class announcementCommand extends Command {
 		public String getName() {
 			return "announcement";
@@ -1085,6 +1184,39 @@ public class CommandProcessor {
 				}
 				song.length = 400*50;
 				SongHandler.getInstance().setSong(song);
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+
+	private static class testBlockStateCommand extends Command {
+		public String getName() {
+			return "testBlockState";
+		}
+		public String[] getSyntax() {
+			return new String[0];
+		}
+		public String getDescription() {
+			return "for dev purposes";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() == 0) {
+				if (MC.crosshairTarget instanceof BlockHitResult) {
+					BlockHitResult hitResult = (BlockHitResult) MC.crosshairTarget;
+					BlockState bs = MC.world.getBlockState(hitResult.getBlockPos());
+					ItemStack stack = new ItemStack(bs.getBlock());
+					SongPlayer.addChatMessage(stack.toString());
+					for (Map.Entry<Property<?>, Comparable<?>> entry : bs.getEntries().entrySet()) {
+						Property<?> property = entry.getKey();
+						Comparable<?> value = entry.getValue();
+//						SongPlayer.addChatMessage(net.minecraft.util.Util.getValueAsString(property, comparable));
+						System.out.println(property.getClass());
+						System.out.println(value.getClass());
+					}
+				}
 				return true;
 			}
 			else {

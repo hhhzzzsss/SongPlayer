@@ -6,10 +6,8 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.text.PlainTextContent;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.PlainTextContent;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
@@ -229,5 +227,15 @@ public class Util {
 
     public static void setItemLore(ItemStack stack, Text... loreLines) {
         stack.set(DataComponentTypes.LORE, new LoreComponent(List.of(loreLines)));
+    }
+
+    public static MutableText joinTexts(MutableText base, Text... children) {
+        if (base == null) {
+            base = Text.empty();
+        }
+        for (Text child : children) {
+            base.append(child);
+        }
+        return base;
     }
 }

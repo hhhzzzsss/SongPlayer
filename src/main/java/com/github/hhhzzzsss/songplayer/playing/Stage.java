@@ -468,4 +468,8 @@ public class Stage {
 		}
 		return false;
 	}
+
+	public Vec3d getOriginBottomCenter() {
+		return Vec3d.ofBottomCenter(position);
+	}
 }

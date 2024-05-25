@@ -24,27 +24,54 @@ public class ClientPlayNetworkHandlerMixin {
 	
 	@Inject(at = @At("TAIL"), method = "onGameJoin(Lnet/minecraft/network/packet/s2c/play/GameJoinS2CPacket;)V")
 	public void onOnGameJoin(GameJoinS2CPacket packet, CallbackInfo ci) {
-		SongHandler.getInstance().cleanup();
+		SongHandler.getInstance().reset();
 	}
 
 	@Inject(at = @At("TAIL"), method = "onPlayerRespawn(Lnet/minecraft/network/packet/s2c/play/PlayerRespawnS2CPacket;)V")
 	public void onOnPlayerRespawn(PlayerRespawnS2CPacket packet, CallbackInfo ci) {
-		SongHandler.getInstance().cleanup();
+		SongHandler.getInstance().reset();
 	}
 
 	@Inject(at = @At("TAIL"), method = "onPlayerPositionLook(Lnet/minecraft/network/packet/s2c/play/PlayerPositionLookS2CPacket;)V")
 	public void onOnPlayerPositionLook(PlayerPositionLookS2CPacket packet, CallbackInfo ci) {
-		Stage stage = SongHandler.getInstance().stage;
-		if (!SongHandler.getInstance().isIdle() && stage != null && Vec3d.ofBottomCenter(stage.position).squaredDistanceTo(SongPlayer.MC.player.getPos()) > 3*3) {
-			SongPlayer.addChatMessage("§6Stopped playing because the server moved the player too far from the stage!");
-			SongHandler.getInstance().cleanup();
+		Stage lastStage = SongHandler.getInstance().lastStage;
+		if (!SongHandler.getInstance().isIdle() && lastStage != null && lastStage.getOriginBottomCenter().squaredDistanceTo(SongPlayer.MC.player.getPos()) > 3*3) {
+			Vec3d stageOriginBottomCenter = lastStage.getOriginBottomCenter();
+			boolean xrel = packet.getFlags().contains(PositionFlag.X);
+			boolean yrel = packet.getFlags().contains(PositionFlag.Y);
+			boolean zrel = packet.getFlags().contains(PositionFlag.Z);
+			double dx = 0.0;
+			double dy = 0.0;
+			double dz = 0.0;
+			if (xrel) {
+				dx = packet.getX();
+			} else {
+				dx = SongPlayer.MC.player.getX() - stageOriginBottomCenter.getX();
+			}
+			if (yrel) {
+				dy = packet.getY();
+			} else {
+				dy = SongPlayer.MC.player.getY() - stageOriginBottomCenter.getY();
+			}
+			if (zrel) {
+				dz = packet.getZ();
+			} else {
+				dz = SongPlayer.MC.player.getZ() - stageOriginBottomCenter.getZ();
+			}
+			double dist = dx*dx + dy*dy + dz*dz;
+			if (dist > 3.0) {
+				SongPlayer.addChatMessage("§6Stopped playing/building because the server moved the player too far from the stage!");
+				SongHandler.getInstance().reset();
+			} else {
+				lastStage.movePlayerToStagePosition();
+			}
 		}
 	}
 
 	@Inject(at = @At("TAIL"), method = "onPlayerAbilities(Lnet/minecraft/network/packet/s2c/play/PlayerAbilitiesS2CPacket;)V")
 	public void onOnPlayerAbilities(PlayerAbilitiesS2CPacket packet, CallbackInfo ci) {
 		SongHandler handler = SongHandler.getInstance();
-		if (handler.currentSong != null || handler.currentPlaylist != null || handler.songQueue.size() > 0) {
+		if (handler.wasFlying) {
 			SongPlayer.MC.player.getAbilities().flying = handler.wasFlying;
 		}
 	}

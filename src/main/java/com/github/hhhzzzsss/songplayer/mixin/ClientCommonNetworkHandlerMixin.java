@@ -27,11 +27,11 @@ public class ClientCommonNetworkHandlerMixin {
 
     @Inject(at = @At("HEAD"), method = "sendPacket(Lnet/minecraft/network/packet/Packet;)V", cancellable = true)
     private void onSendPacket(Packet<?> packet, CallbackInfo ci) {
-        Stage stage = SongHandler.getInstance().stage;
+        Stage lastStage = SongHandler.getInstance().lastStage;
 
-        if (stage != null && packet instanceof PlayerMoveC2SPacket) {
+        if (!SongHandler.getInstance().isIdle() && lastStage != null && packet instanceof PlayerMoveC2SPacket) {
             if (!Config.getConfig().rotate) {
-                connection.send(new PlayerMoveC2SPacket.Full(stage.position.getX() + 0.5, stage.position.getY(), stage.position.getZ() + 0.5, SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch(), true));
+                connection.send(new PlayerMoveC2SPacket.Full(lastStage.position.getX() + 0.5, lastStage.position.getY(), lastStage.position.getZ() + 0.5, SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch(), true));
                 if (SongPlayer.fakePlayer != null) {
                     SongPlayer.fakePlayer.copyStagePosAndPlayerLook();
                 }

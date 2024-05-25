@@ -26,6 +26,7 @@ public class Config {
     public boolean rotate = false;
     public boolean doAnnouncement = false;
     public String announcementMessage = "&6Now playing: &3[name]";
+    public boolean autoCleanup = false;
 
     public static Config getConfig() {
         if (config == null) {
