@@ -470,7 +470,7 @@ public class SongHandler {
             cleaningUp = false;
             SongPlayer.addChatMessage("§6Finished restoring original blocks");
             if (!cleanupUnplaceableBlocks.isEmpty()) {
-                SongPlayer.addChatMessage(String.format("§3%d §6blocks were not successfully restored"));
+                SongPlayer.addChatMessage(String.format("§3%d §6blocks could not be restored", cleanupUnplaceableBlocks.size()));
             }
         }
     }
@@ -503,6 +503,14 @@ public class SongHandler {
                         return 1;
                     } else if (!a_grav && b_grav) {
                         return -1;
+                    }
+                    // If there's gravity, sort by y coordinate
+                    if (a_grav && b_grav) {
+                        if (a.getY() < b.getY()) {
+                            return -1;
+                        } else if (a.getY() > b.getY()) {
+                            return 1;
+                        }
                     }
                     // Then sort by distance
                     int a_dx = a.getX() - lastStage.position.getX();
@@ -540,6 +548,14 @@ public class SongHandler {
                         return -1;
                     } else if (!a_grav && b_grav) {
                         return 1;
+                    }
+                    // If there's gravity, sort by y coordinate
+                    if (a_grav && b_grav) {
+                        if (a.getY() < b.getY()) {
+                            return 1;
+                        } else if (a.getY() > b.getY()) {
+                            return -1;
+                        }
                     }
                     // Then sort by distance
                     int a_dx = a.getX() - lastStage.position.getX();
