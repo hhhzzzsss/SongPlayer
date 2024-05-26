@@ -116,16 +116,14 @@ public class SongHandler {
                 SongPlayer.fakePlayer.getInventory().clone(SongPlayer.MC.player.getInventory());
             }
 
-            // Allow flying
-            SongPlayer.MC.player.getAbilities().allowFlying = true;
+            // Maintain flying status
             wasFlying = SongPlayer.MC.player.getAbilities().flying;
         }
 
         // Check if doing cleanup
         if (cleaningUp) {
             if (tick) {
-                // Allow flying while doing cleanup
-                SongPlayer.MC.player.getAbilities().allowFlying = true;
+                // Maintain flying status
                 wasFlying = SongPlayer.MC.player.getAbilities().flying;
 
                 handleCleanup();
@@ -153,7 +151,7 @@ public class SongHandler {
         else {
             if (dirty) {
                 if (Config.getConfig().autoCleanup && originalBlocks.size() != 0) {
-                    partionResetAndCleanup();
+                    partialResetAndCleanup();
                 } else {
                     restoreStateAndReset();
                 }
@@ -634,10 +632,13 @@ public class SongHandler {
                 sendGamemodeCommand(Config.getConfig().survivalCommand);
             }
         }
+        if (SongPlayer.MC.player.getAbilities().allowFlying == false) {
+            SongPlayer.MC.player.getAbilities().flying = false;
+        }
         restoreBuildSlot();
         reset();
     }
-    public void partionResetAndCleanup() {
+    public void partialResetAndCleanup() {
         restoreBuildSlot();
         currentSong = null;
         currentPlaylist = null;

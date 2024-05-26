@@ -253,7 +253,7 @@ public class CommandProcessor {
 					SongHandler.getInstance().restoreStateAndReset();
 					SongPlayer.addChatMessage("§6Stopped cleanup");
 				} else if (Config.getConfig().autoCleanup && SongHandler.getInstance().originalBlocks.size() != 0) {
-					SongHandler.getInstance().partionResetAndCleanup();
+					SongHandler.getInstance().partialResetAndCleanup();
 					SongPlayer.addChatMessage("§6Stopped playing and switched to cleanup");
 				} else {
 					SongHandler.getInstance().restoreStateAndReset();
