@@ -773,6 +773,16 @@ public class SongHandler {
         );
     }
     private boolean isPlaceable(BlockState bs) {
+        Map<Property<?>, Comparable<?>> entries = bs.getEntries();
+        for (Map.Entry<Property<?>, Comparable<?>> entry : entries.entrySet()) {
+            Property<?> property = entry.getKey();
+            Comparable<?> value = entry.getValue();
+            String propertyName = property.getName();
+            String valueName = net.minecraft.util.Util.getValueAsString(property, value);
+            if (propertyName == "half" && valueName == "upper") {
+                return false;
+            }
+        }
         Block block = bs.getBlock();
         if (bs.isAir() || bs.isLiquid()) {
             return false;
