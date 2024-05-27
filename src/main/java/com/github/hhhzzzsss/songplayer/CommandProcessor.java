@@ -62,7 +62,6 @@ public class CommandProcessor {
 		commands.add(new announcementCommand());
 		commands.add(new songItemCommand());
 		commands.add(new testSongCommand());
-		commands.add(new testBlockStateCommand());
 
 		for (Command command : commands) {
 			commandMap.put(command.getName().toLowerCase(Locale.ROOT), command);
@@ -1184,39 +1183,6 @@ public class CommandProcessor {
 				}
 				song.length = 400*50;
 				SongHandler.getInstance().setSong(song);
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-	}
-
-	private static class testBlockStateCommand extends Command {
-		public String getName() {
-			return "testBlockState";
-		}
-		public String[] getSyntax() {
-			return new String[0];
-		}
-		public String getDescription() {
-			return "for dev purposes";
-		}
-		public boolean processCommand(String args) {
-			if (args.length() == 0) {
-				if (MC.crosshairTarget instanceof BlockHitResult) {
-					BlockHitResult hitResult = (BlockHitResult) MC.crosshairTarget;
-					BlockState bs = MC.world.getBlockState(hitResult.getBlockPos());
-					ItemStack stack = new ItemStack(bs.getBlock());
-					SongPlayer.addChatMessage(stack.toString());
-					for (Map.Entry<Property<?>, Comparable<?>> entry : bs.getEntries().entrySet()) {
-						Property<?> property = entry.getKey();
-						Comparable<?> value = entry.getValue();
-//						SongPlayer.addChatMessage(net.minecraft.util.Util.getValueAsString(property, comparable));
-						System.out.println(property.getClass());
-						System.out.println(value.getClass());
-					}
-				}
 				return true;
 			}
 			else {
