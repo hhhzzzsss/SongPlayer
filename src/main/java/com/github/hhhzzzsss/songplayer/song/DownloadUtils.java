@@ -41,7 +41,7 @@ public class DownloadUtils {
 		ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
 		
 		try {
-			byte[] buf = new byte[1024];
+			byte buf[] = new byte[1024];
 			int n;
 			int tot = 0;
 			while ((n = downloadStream.read(buf)) > 0) {

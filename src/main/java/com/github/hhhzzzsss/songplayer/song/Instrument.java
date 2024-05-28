@@ -2,9 +2,9 @@ package com.github.hhhzzzsss.songplayer.song;
 
 public enum Instrument {
 	HARP(0, 54),
-	BASEDRUM(1, 0),
-	SNARE(2, 0),
-	HAT(3, 0),
+	BASEDRUM(1, 18),
+	SNARE(2, 42),
+	HAT(3, 30),
 	BASS(4, 30),
 	FLUTE(5, 66),
 	BELL(6, 78),

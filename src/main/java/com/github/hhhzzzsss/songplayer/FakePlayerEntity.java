@@ -1,69 +1,61 @@
 package com.github.hhhzzzsss.songplayer;
 
-import com.github.hhhzzzsss.songplayer.mixin.ClientPlayNetworkHandlerAccessor;
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
 import com.github.hhhzzzsss.songplayer.playing.Stage;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.OtherClientPlayerEntity;
-import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerEntity;
 
-import java.util.UUID;
-
 public class FakePlayerEntity extends OtherClientPlayerEntity {
-	public static final UUID FAKE_PLAYER_UUID = UUID.randomUUID();
-
-	ClientPlayerEntity player = SongPlayer.MC.player;
 	ClientWorld world = SongPlayer.MC.world;
-	
+
 	public FakePlayerEntity() {
-		super(SongPlayer.MC.world, getProfile());
-		
+		super(SongPlayer.MC.world, SongPlayer.MC.player.getGameProfile());
 		copyStagePosAndPlayerLook();
-		
-		getInventory().clone(player.getInventory());
-		
-		Byte playerModel = player.getDataTracker().get(PlayerEntity.PLAYER_MODEL_PARTS);
+		getInventory().clone(SongPlayer.MC.player.getInventory());
+		Byte playerModel = SongPlayer.MC.player.getDataTracker().get(PlayerEntity.PLAYER_MODEL_PARTS);
 		getDataTracker().set(PlayerEntity.PLAYER_MODEL_PARTS, playerModel);
-		
-		headYaw = player.headYaw;
-		bodyYaw = player.bodyYaw;
-
-		if (player.isSneaking()) {
-			setSneaking(true);
-			setPose(EntityPose.CROUCHING);
-		}
-
+		headYaw = SongPlayer.MC.player.headYaw;
+		bodyYaw = SongPlayer.MC.player.bodyYaw;
 		capeX = getX();
 		capeY = getY();
 		capeZ = getZ();
-		
 		world.addEntity(this);
+		SongPlayer.fakePlayer = this;
 	}
-	
-	public void resetPlayerPosition() {
-		player.refreshPositionAndAngles(getX(), getY(), getZ(), getYaw(), getPitch());
-	}
-	
-	public void copyStagePosAndPlayerLook() {
-		Stage lastStage = SongHandler.getInstance().lastStage;
-		if (lastStage != null) {
-			refreshPositionAndAngles(lastStage.position.getX()+0.5, lastStage.position.getY(), lastStage.position.getZ()+0.5, player.getYaw(), player.getPitch());
-			headYaw = player.headYaw;
-		}
-		else {
-			copyPositionAndRotation(player);
+
+	public void updateFakePlayer() {
+		if (SongPlayer.fakePlayer != null && SongPlayer.showFakePlayer) {
+			ClientPlayerEntity player = SongPlayer.MC.player;
+			this.getInventory().clone(player.getInventory());
+			this.getAttributes().setFrom(player.getAttributes());
+			this.getInventory().selectedSlot = player.getInventory().selectedSlot;
+			this.setSneaking(player.isSneaking());
+			this.setCurrentHand(SongPlayer.MC.player.getActiveHand());
+			if (this.isSneaking()) {
+				this.setPose(EntityPose.CROUCHING);
+			} else {
+				this.setPose(EntityPose.STANDING);
+			}
 		}
 	}
 
-	private static GameProfile getProfile() {
-		GameProfile profile = new GameProfile(FAKE_PLAYER_UUID, SongPlayer.MC.player.getGameProfile().getName());
-		profile.getProperties().putAll(SongPlayer.MC.player.getGameProfile().getProperties());
-		PlayerListEntry playerListEntry = new PlayerListEntry(SongPlayer.MC.player.getGameProfile(), false);
-		((ClientPlayNetworkHandlerAccessor)SongPlayer.MC.getNetworkHandler()).getPlayerListEntries().put(FAKE_PLAYER_UUID, playerListEntry);
-		return profile;
+	public void copyStagePosAndPlayerLook() {
+		Stage stage = SongHandler.getInstance().stage;
+		if (stage == null) {
+			copyPositionAndRotation(SongPlayer.MC.player);
+			return;
+		}
+		if (SongPlayer.rotate) {
+			refreshPositionAndAngles(stage.position.getX() + 0.5, stage.position.getY(), stage.position.getZ() + 0.5, Util.yaw, Util.pitch);
+			headYaw = Util.yaw;
+			bodyYaw = Util.yaw;
+		} else {
+			refreshPositionAndAngles(stage.position.getX() + 0.5, stage.position.getY(), stage.position.getZ() + 0.5, SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch());
+			headYaw = SongPlayer.MC.player.headYaw;
+			bodyYaw = SongPlayer.MC.player.bodyYaw;
+		}
 	}
 }

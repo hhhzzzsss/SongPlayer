@@ -55,12 +55,6 @@ public class Song {
 		}
 	}
 
-	public void reset() {
-		paused = true;
-		setTime(0);
-		currentLoop = 0;
-	}
-
 	public void setTime(long t) {
 		time = t;
 		startTime = System.currentTimeMillis() - time;
@@ -77,18 +71,14 @@ public class Song {
 	public boolean reachedNextNote() {
 		if (position < notes.size()) {
 			return notes.get(position).time <= time;
-		} else {
-			if (time > length && shouldLoop()) {
-				loop();
-				if (position < notes.size()) {
-					return notes.get(position).time <= time;
-				} else {
-					return false;
-				}
-			} else {
-				return false;
+		}
+		if (time > length && shouldLoop()) {
+			loop();
+			if (position < notes.size()) {
+				return notes.get(position).time <= time;
 			}
 		}
+		return false;
 	}
 
 	public Note getNextNote() {

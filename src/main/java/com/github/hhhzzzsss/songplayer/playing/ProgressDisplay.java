@@ -29,16 +29,16 @@ public class ProgressDisplay {
         fade = 100;
     }
 
-    public void onRenderHUD(DrawContext context, int heldItemTooltipFade) {
+    public void onRenderHUD(DrawContext context, int scaledWidth, int scaledHeight, int heldItemTooltipFade) {
         if (fade <= 0) {
             return;
         }
 
         int bottomTextWidth = SongPlayer.MC.textRenderer.getWidth(bottomText);
         int topTextWidth = SongPlayer.MC.textRenderer.getWidth(topText);
-        int bottomTextX = (SongPlayer.MC.getWindow().getScaledWidth() - bottomTextWidth) / 2;
-        int topTextX = (SongPlayer.MC.getWindow().getScaledWidth() - topTextWidth) / 2;
-        int bottomTextY = SongPlayer.MC.getWindow().getScaledHeight() - 59;
+        int bottomTextX = (scaledWidth - bottomTextWidth) / 2;
+        int topTextX = (scaledWidth - topTextWidth) / 2;
+        int bottomTextY = scaledHeight - 59;
         if (!SongPlayer.MC.interactionManager.hasStatusBars()) {
             bottomTextY += 14;
         }

@@ -7,13 +7,11 @@
   ],
   "client": [
     "ChatInputSuggestorMixin",
-    "ClientCommonNetworkHandlerMixin",
-    "ClientPlayerEntityMixin",
-    "ClientPlayerInteractionManagerAccessor",
-    "ClientPlayNetworkHandlerAccessor",
     "ClientPlayNetworkHandlerMixin",
+    "ClientCommonNetworkHandlerMixin",
     "InGameHudMixin",
-    "MinecraftClientMixin"
+    "MinecraftClientMixin",
+    "MessageHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

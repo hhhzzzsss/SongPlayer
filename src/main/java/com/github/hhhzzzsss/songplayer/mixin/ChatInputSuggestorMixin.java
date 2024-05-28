@@ -1,7 +1,7 @@
 package com.github.hhhzzzsss.songplayer.mixin;
 
 import com.github.hhhzzzsss.songplayer.CommandProcessor;
-import com.github.hhhzzzsss.songplayer.Config;
+import com.github.hhhzzzsss.songplayer.SongPlayer;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.client.gui.screen.ChatInputSuggestor;
@@ -39,18 +39,12 @@ public class ChatInputSuggestorMixin {
         String textStr = this.textField.getText();
         int cursorPos = this.textField.getCursor();
         String preStr = textStr.substring(0, cursorPos);
-        if (!preStr.startsWith(Config.getConfig().prefix)) {
+        if (!preStr.startsWith(SongPlayer.prefix)) {
             return;
         }
 
         int wordStart = getStartOfCurrentWord(preStr);
-        CompletableFuture<Suggestions> suggestions;
-        try {
-            suggestions = CommandProcessor.handleSuggestions(preStr, new SuggestionsBuilder(preStr, wordStart));
-        }
-        catch (Throwable e) {
-            suggestions = null;
-        }
+        CompletableFuture<Suggestions> suggestions = CommandProcessor.handleSuggestions(preStr, new SuggestionsBuilder(preStr, wordStart));
         if (suggestions != null) {
             this.pendingSuggestions = suggestions;
             this.show(true);

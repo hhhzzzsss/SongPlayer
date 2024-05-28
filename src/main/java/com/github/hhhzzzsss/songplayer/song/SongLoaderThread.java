@@ -1,84 +1,79 @@
 package com.github.hhhzzzsss.songplayer.song;
 
 import com.github.hhhzzzsss.songplayer.SongPlayer;
-import com.github.hhhzzzsss.songplayer.Util;
-import com.github.hhhzzzsss.songplayer.conversion.MidiConverter;
-import com.github.hhhzzzsss.songplayer.conversion.NBSConverter;
-import com.github.hhhzzzsss.songplayer.conversion.TxtConverter;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class SongLoaderThread extends Thread{
 	
 	private String location;
-	private Path songPath;
+	private File songPath;
 	private URL songUrl;
 	public Exception exception;
 	public Song song;
-	public String filename;
 
 	private boolean isUrl = false;
 
-	protected SongLoaderThread() {}
-
-	public SongLoaderThread(String location) throws IOException {
+	public SongLoaderThread(String location, File dir) throws IOException {
 		this.location = location;
 		if (location.startsWith("http://") || location.startsWith("https://")) {
 			isUrl = true;
 			songUrl = new URL(location);
 		}
-		else if (Files.exists(getSongFile(location))) {
-			songPath = getSongFile(location);
+		else if (location.contains("/") || location.contains("\\")) {
+			throw new IOException("Invalid characters in song name: " + location);
 		}
-		else if (Files.exists(getSongFile(location+".mid"))) {
-			songPath = getSongFile(location+".mid");
+		else if (getSongFile(location, dir).exists()) {
+			songPath = getSongFile(location, dir);
 		}
-		else if (Files.exists(getSongFile(location+".midi"))) {
-			songPath = getSongFile(location+".midi");
+		else if (getSongFile(location+".mid", dir).exists()) {
+			songPath = getSongFile(location+".mid", dir);
 		}
-		else if (Files.exists(getSongFile(location+".nbs"))) {
-			songPath = getSongFile(location+".nbs");
+		else if (getSongFile(location+".midi", dir).exists()) {
+			songPath = getSongFile(location+".midi", dir);
+		}
+		else if (getSongFile(location+".nbs", dir).exists()) {
+			songPath = getSongFile(location+".nbs", dir);
+		}
+		else if (getSongFile(location+".txt", dir).exists()) {
+			songPath = getSongFile(location+".txt", dir);
 		}
 		else {
-			throw new IOException("Could not find song: " + location);
+			throw new IOException("Could not find song: \"" + location + "\"");
 		}
-	}
-
-	public SongLoaderThread(Path file) {
-		this.songPath = file;
 	}
 	
 	public void run() {
 		try {
 			byte[] bytes;
+			String name;
 			if (isUrl) {
 				bytes = DownloadUtils.DownloadToByteArray(songUrl, 10*1024*1024);
-				filename = Paths.get(songUrl.toURI().getPath()).getFileName().toString();
-			}
-			else {
-				bytes = Files.readAllBytes(songPath);
-				filename = songPath.getFileName().toString();
+				name = Paths.get(songUrl.toURI().getPath()).getFileName().toString();
+			} else {
+				bytes = Files.readAllBytes(songPath.toPath());
+				name = songPath.getName();
 			}
 
 			try {
-				song = MidiConverter.getSongFromBytes(bytes, filename);
+				song = MidiConverter.getSongFromBytes(bytes, name);
 			}
 			catch (Exception e) {}
 
 			if (song == null) {
 				try {
-					song = NBSConverter.getSongFromBytes(bytes, filename);
+					song = NBSConverter.getSongFromBytes(bytes, name);
 				}
 				catch (Exception e) {}
 			}
 
 			if (song == null) {
 				try {
-					song = TxtConverter.getSongFromBytes(bytes, filename);
+					song = TxtConverter.getSong(songPath);
 				}
 				catch (Exception e) {}
 			}
@@ -86,13 +81,14 @@ public class SongLoaderThread extends Thread{
 			if (song == null) {
 				throw new IOException("Invalid song format");
 			}
+
 		}
 		catch (Exception e) {
 			exception = e;
 		}
 	}
 
-	private Path getSongFile(String name) throws IOException {
-		return Util.resolveWithIOException(SongPlayer.SONG_DIR, name);
+	private File getSongFile(String name, File dir) {
+		return new File(dir, name);
 	}
 }
