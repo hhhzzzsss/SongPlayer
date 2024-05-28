@@ -61,8 +61,8 @@ public class CommandProcessor {
 		commands.add(new cleanupLastStageCommand());
 		commands.add(new announcementCommand());
 		commands.add(new songItemCommand());
+		commands.add(new buildDelayCommand());
 		commands.add(new testSongCommand());
-		commands.add(new testBlockStateCommand());
 
 		for (Command command : commands) {
 			commandMap.put(command.getName().toLowerCase(Locale.ROOT), command);
@@ -979,6 +979,75 @@ public class CommandProcessor {
 		}
 	}
 
+	private static class buildDelayCommand extends Command {
+		public String getName() {
+			return "buildDelay";
+		}
+
+		public String[] getAliases() {
+			return new String[]{"setBuildDelay", "updateBuildDelay", "bd"};
+		}
+
+		public String[] getSyntax() {
+			return new String[] {"buildDelay <amount> <frames, ticks>"};
+		}
+
+		public String getDescription() {
+			return "Change the delay of building a noteblock / tuning a noteblock.\n specifying frames will wait every X amount of frames before building / tuning a noteblock.\n ticks will wait X amount of in-game ticks (1/20 of second) before building / tuning a noteblock.";
+		}
+
+		public boolean processCommand(String args) {
+			String[] arguments = args.toLowerCase().split(" ");
+			if (arguments.length != 2 || args.isBlank()) {
+				return false;
+			}
+			int changeto;
+			try {
+				changeto = Integer.parseInt(arguments[0]);
+				if (changeto < 0) {
+					SongPlayer.addChatMessage("§4" + changeto + "§c cannot be below 0");
+					return true;
+				}
+			} catch (NumberFormatException e) {
+				SongPlayer.addChatMessage("§4" + arguments[0] + "§c isn't a valid number");
+				return true;
+			}
+			boolean useTicks;
+			switch (arguments[1].toLowerCase()) {
+				case "frames": {
+					useTicks = false;
+					break;
+				}
+				case "ticks": {
+					useTicks = true;
+					break;
+				}
+				default: {
+					return false;
+				}
+			}
+
+			SongHandler.getInstance().buildPerTick = useTicks;
+			SongHandler.getInstance().buildDelay = changeto;
+			//TODO: CHANGE THIS TO BE WORKING WITH YOUR VERSION OF CONFIGS
+			/*
+			ModProperties.getInstance().updateValue("countByFrames", String.valueOf(useFrames));
+			ModProperties.getInstance().updateValue("buildDelay", String.valueOf(changeto));
+			Util.updateValuesToConfig();
+			 */
+			if (changeto == 0) {
+				changeto = 1;
+			}
+			if (changeto == 1) {
+				SongPlayer.addChatMessage("§6Building / tuning notes will now occur every §3" + (arguments[1]));
+			} else {
+				SongPlayer.addChatMessage("§6Building / tuning notes will now occur every §3" + changeto + " " + arguments[1].toLowerCase());
+			}
+
+			return true;
+		}
+	}
+
 	private static class cleanupLastStageCommand extends Command {
 		public String getName() {
 			return "cleanupLastStage";
@@ -1184,39 +1253,6 @@ public class CommandProcessor {
 				}
 				song.length = 400*50;
 				SongHandler.getInstance().setSong(song);
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-	}
-
-	private static class testBlockStateCommand extends Command {
-		public String getName() {
-			return "testBlockState";
-		}
-		public String[] getSyntax() {
-			return new String[0];
-		}
-		public String getDescription() {
-			return "for dev purposes";
-		}
-		public boolean processCommand(String args) {
-			if (args.length() == 0) {
-				if (MC.crosshairTarget instanceof BlockHitResult) {
-					BlockHitResult hitResult = (BlockHitResult) MC.crosshairTarget;
-					BlockState bs = MC.world.getBlockState(hitResult.getBlockPos());
-					ItemStack stack = new ItemStack(bs.getBlock());
-					SongPlayer.addChatMessage(stack.toString());
-					for (Map.Entry<Property<?>, Comparable<?>> entry : bs.getEntries().entrySet()) {
-						Property<?> property = entry.getKey();
-						Comparable<?> value = entry.getValue();
-//						SongPlayer.addChatMessage(net.minecraft.util.Util.getValueAsString(property, comparable));
-						System.out.println(property.getClass());
-						System.out.println(value.getClass());
-					}
-				}
 				return true;
 			}
 			else {

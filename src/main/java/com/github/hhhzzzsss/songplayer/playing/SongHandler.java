@@ -51,6 +51,10 @@ public class SongHandler {
     public boolean cleaningUp = false;
     public boolean dirty = false;
 
+    //TODO: Make these assigned to your config file
+    public boolean buildPerTick = true;
+    public int buildDelay = 1;
+
     public boolean wasFlying = false;
     public GameMode originalGamemode = GameMode.CREATIVE;
 
@@ -140,9 +144,7 @@ public class SongHandler {
 
             // Run building or playing tick depending on state
             if (building) {
-                if (tick) {
-                    handleBuilding();
-                }
+                handleBuilding(tick);
             } else {
                 handlePlaying(tick);
             }
@@ -248,14 +250,16 @@ public class SongHandler {
     private int buildCooldown = 0;
     private int buildSlot = -1;
     private ItemStack prevHeldItem = null;
-    private void handleBuilding() {
+    private void handleBuilding(boolean tick) {
         setBuildProgressDisplay();
         if (buildStartDelay > 0) {
             buildStartDelay--;
             return;
         }
         if (buildCooldown > 0) {
-            buildCooldown--;
+            if (tick || !buildPerTick) {
+                buildCooldown--;
+            }
             return;
         }
         ClientWorld world = SongPlayer.MC.world;
