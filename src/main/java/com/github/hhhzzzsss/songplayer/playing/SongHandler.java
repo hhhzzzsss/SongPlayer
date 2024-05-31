@@ -276,7 +276,7 @@ public class SongHandler {
                         stage.checkSurvivalBuildStatus(currentSong);
                     } catch (Stage.NotEnoughInstrumentsException e) {
                         e.giveInstrumentSummary();
-                        reset();
+                        restoreStateAndReset();
                         return;
                     }
                 }
@@ -285,8 +285,11 @@ public class SongHandler {
         }
 
         if (stage.nothingToBuild()) { // If there's still nothing to build after checking build status, switch to playing
-            if (!Config.getConfig().survivalOnly) restoreBuildSlot();
             building = false;
+            if (!Config.getConfig().survivalOnly) {
+                setSurvivalIfNeeded();
+                restoreBuildSlot();
+            }
             stage.sendMovementPacketToStagePosition();
             SongPlayer.addChatMessage("§6Now playing §3" + currentSong.name);
         }
@@ -806,7 +809,7 @@ public class SongHandler {
             Comparable<?> value = entry.getValue();
             String propertyName = property.getName();
             String valueName = net.minecraft.util.Util.getValueAsString(property, value);
-            if (propertyName == "half" && valueName == "upper") {
+            if (propertyName.equals("half") && valueName.equals("upper")) {
                 return false;
             }
         }
@@ -859,6 +862,6 @@ public class SongHandler {
     }
 
     public boolean isIdle() {
-        return currentSong == null && currentPlaylist == null && songQueue.isEmpty() && cleaningUp == false;
+        return currentSong == null && currentPlaylist == null && songQueue.isEmpty() && !cleaningUp;
     }
 }
