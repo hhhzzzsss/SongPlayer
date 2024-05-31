@@ -218,6 +218,11 @@ public class CommandProcessor {
 		}
 		public boolean processCommand(String args) {
 			if (args.length() > 0) {
+				if (Config.getConfig().survivalOnly && SongPlayer.MC.interactionManager.getCurrentGameMode() != GameMode.SURVIVAL) {
+					SongPlayer.addChatMessage("§cTo play in survival only mode, you must be in survival mode to start with.");
+					return true;
+				}
+
 				SongHandler.getInstance().loadSong(args);
 				return true;
 			}
@@ -1177,6 +1182,11 @@ public class CommandProcessor {
 		}
 		public boolean processCommand(String args) {
 			if (args.length() == 0) {
+				if (!SongHandler.getInstance().isIdle()) {
+					SongPlayer.addChatMessage("§cYou cannot change this setting while playing or building");
+					return true;
+				}
+
 				Config.getConfig().survivalOnly = !Config.getConfig().survivalOnly;
 				if (Config.getConfig().survivalOnly) {
 					SongPlayer.addChatMessage("§6Enabled survival only mode");
