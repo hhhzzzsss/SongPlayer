@@ -546,9 +546,7 @@ public class Stage {
 		}
 	}
 
-	private static final int WRONG_INSTRUMENT_TOLERANCE = 3;
 	public boolean hasBreakingModification() {
-		int wrongInstruments = 0;
 		for (Map.Entry<Integer, BlockPos> entry : noteblockPositions.entrySet()) {
 			BlockState bs = SongPlayer.MC.world.getBlockState(entry.getValue());
 			int blockId = Block.getRawIdFromState(bs);
@@ -564,10 +562,7 @@ public class Stage {
 				return true;
 			}
 			if (targetInstrument != actualInstrument) {
-				wrongInstruments++;
-				if (wrongInstruments > WRONG_INSTRUMENT_TOLERANCE) {
-					return true;
-				}
+				return true;
 			}
 
 			BlockState aboveBs = SongPlayer.MC.world.getBlockState(entry.getValue().up());
