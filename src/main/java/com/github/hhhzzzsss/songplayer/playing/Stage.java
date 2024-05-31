@@ -2,6 +2,7 @@ package com.github.hhhzzzsss.songplayer.playing;
 
 import com.github.hhhzzzsss.songplayer.Config;
 import com.github.hhhzzzsss.songplayer.SongPlayer;
+import com.github.hhhzzzsss.songplayer.song.Instrument;
 import com.github.hhhzzzsss.songplayer.song.Song;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -25,10 +26,16 @@ public class Stage {
 	public BlockPos position;
 	public HashMap<Integer, BlockPos> noteblockPositions = new HashMap<>();
 
+	// Not used in survival-only mode
 	public LinkedList<BlockPos> requiredBreaks = new LinkedList<>();
 	public TreeSet<Integer> missingNotes = new TreeSet<>();
 	public int totalMissingNotes = 0;
-	
+
+	// Only used in survival-only mode
+	public LinkedList<BlockPos> untunedNoteblocks = new LinkedList<>();
+	public LinkedList<BlockPos> requiredClicks = new LinkedList<>();
+	public int totalUntunedNoteblocks = 0;
+
 	public Stage() {
 		position = player.getBlockPos();
 	}
@@ -193,6 +200,82 @@ public class Stage {
 
 		// Set total missing notes
 		totalMissingNotes = missingNotes.size();
+	}
+
+	public void checkSurvivalBuildStatus(Song song) throws NotEnoughInstrumentsException {
+		noteblockPositions.clear();
+
+		Map<BlockPos, Integer>[] instrumentMap = loadSurvivalBlocks();
+
+		int[] requiredInstruments = new int[16];
+		boolean hasMissing = false;
+		for (int instrumentId = 0; instrumentId < 16; instrumentId++) {
+			for (int pitch = 0; pitch < 25; pitch++) {
+				int noteId = instrumentId*25 + pitch;
+				if (song.requiredNotes[noteId]) {
+					requiredInstruments[instrumentId]++;
+				}
+			}
+			if (requiredInstruments[instrumentId] > instrumentMap[instrumentId].size()) {
+				hasMissing = true;
+			}
+		}
+
+		if (hasMissing) {
+			int[] foundInstruments = new int[16];
+			for (int i = 0; i < 16; i++) {
+				foundInstruments[i] = instrumentMap[i].size();
+			}
+			throw new NotEnoughInstrumentsException(requiredInstruments, foundInstruments);
+		}
+
+		for (int noteid=0; noteid<400; noteid++) {
+			if (song.requiredNotes[noteid]) {
+				int instrumentId = noteid / 25;
+				int targetPitch = noteid % 25;
+				Map.Entry<BlockPos, Integer> closest = instrumentMap[instrumentId].entrySet()
+						.stream()
+						.min((a, b) -> {
+							int adist = (targetPitch - a.getValue() + 25) % 25;
+							int bdist = (targetPitch - b.getValue() + 25) % 25;
+							return Integer.compare(adist, bdist);
+						})
+						.get();
+				BlockPos bp = closest.getKey();
+				int closestPitch = closest.getValue();
+				instrumentMap[instrumentId].remove(bp);
+				noteblockPositions.put(noteid, bp);
+				int repetitions = (targetPitch - closestPitch + 25) % 25;
+				for (int i = 0; i < repetitions; i++) {
+					requiredClicks.add(bp);
+				}
+			}
+		}
+	}
+
+	public class NotEnoughInstrumentsException extends Exception {
+		public int[] requiredInstruments;
+		public int[] foundInstruments;
+		public NotEnoughInstrumentsException(int[] requiredInstruments, int[] foundInstruments) {
+			this.requiredInstruments = requiredInstruments;
+			this.foundInstruments = foundInstruments;
+		}
+		public void giveInstrumentSummary() {
+			SongPlayer.addChatMessage("§c------------------------------");
+			SongPlayer.addChatMessage("§cMissing instruments required to play song:");
+			for (int instrumentId = 0; instrumentId < 16; instrumentId++) {
+				if (requiredInstruments[instrumentId] > 0) {
+					Instrument instrument = Instrument.getInstrumentFromId(instrumentId);
+					SongPlayer.addChatMessage(String.format(
+							"    §3%s (%s): §%s%d/%d",
+							instrument.name(), instrument.material,
+							foundInstruments[instrumentId] < requiredInstruments[instrumentId] ? "c" : "a",
+							foundInstruments[instrumentId], requiredInstruments[instrumentId]
+					));
+				}
+			}
+			SongPlayer.addChatMessage("§c------------------------------");
+		}
 	}
 
 	void loadDefaultBlocks(Collection<BlockPos> noteblockLocations, Collection<BlockPos> breakLocations) {
@@ -425,6 +508,29 @@ public class Stage {
 		}
 	}
 
+	Map<BlockPos, Integer>[] loadSurvivalBlocks() {
+		Map<BlockPos, Integer>[] instrumentMap = new Map[16];
+		for (int i = 0; i < 16; i++) {
+			instrumentMap[i] = new TreeMap<>();
+		}
+		for (int dx = -5; dx <= 5; dx++) {
+			for (int dz = -5; dz <= 5; dz++) {
+				for (int dy : new int[]{-1, 0, 1, 2, -2, 3, -3, 4, -4, 5, 6}) {
+					BlockPos bp = position.add(dx, dy, dz);
+					BlockState bs = SongPlayer.MC.world.getBlockState(bp);
+					int blockId = Block.getRawIdFromState(bs);
+					if (blockId >= SongPlayer.NOTEBLOCK_BASE_ID && blockId < SongPlayer.NOTEBLOCK_BASE_ID + 800) {
+						int noteId = (blockId - SongPlayer.NOTEBLOCK_BASE_ID) / 2;
+						int instrument = noteId / 25;
+						int pitch = noteId % 25;
+						instrumentMap[instrument].put(bp, pitch);
+					}
+				}
+			}
+		}
+		return instrumentMap;
+	}
+
 	// This doesn't check for whether the block above the noteblock position is also reachable
 	// Usually there is sky above you though so hopefully this doesn't cause a problem most of the time
 	boolean withinBreakingDist(int dx, int dy, int dz) {
@@ -434,7 +540,11 @@ public class Stage {
 	}
 
 	public boolean nothingToBuild() {
-		return requiredBreaks.isEmpty() && missingNotes.isEmpty();
+		if (!Config.getConfig().survivalOnly) {
+			return requiredBreaks.isEmpty() && missingNotes.isEmpty();
+		} else {
+			return requiredClicks.isEmpty();
+		}
 	}
 
 	private static final int WRONG_INSTRUMENT_TOLERANCE = 3;

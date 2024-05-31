@@ -150,7 +150,7 @@ public class SongHandler {
         // Otherwise, handle cleanup if necessary
         else {
             if (dirty) {
-                if (Config.getConfig().autoCleanup && originalBlocks.size() != 0) {
+                if (Config.getConfig().autoCleanup && originalBlocks.size() != 0 && !Config.getConfig().survivalOnly) {
                     partialResetAndCleanup();
                 } else {
                     restoreStateAndReset();
@@ -198,12 +198,12 @@ public class SongHandler {
         dirty = true;
         currentSong = song;
         building = true;
-        setCreativeIfNeeded();
+        if (!Config.getConfig().survivalOnly) setCreativeIfNeeded();
         if (Config.getConfig().doAnnouncement) {
             sendMessage(Config.getConfig().announcementMessage.replaceAll("\\[name\\]", song.name));
         }
         prepareStage();
-        getAndSaveBuildSlot();
+        if (!Config.getConfig().survivalOnly) getAndSaveBuildSlot();
         SongPlayer.addChatMessage("§6Building noteblocks");
     }
 
@@ -259,51 +259,72 @@ public class SongHandler {
             return;
         }
         ClientWorld world = SongPlayer.MC.world;
-        if (SongPlayer.MC.interactionManager.getCurrentGameMode() != GameMode.CREATIVE) {
+        if (!Config.getConfig().survivalOnly && SongPlayer.MC.interactionManager.getCurrentGameMode() != GameMode.CREATIVE) {
             return;
         }
 
-        if (stage.nothingToBuild()) {
-            if (buildEndDelay > 0) {
+        if (stage.nothingToBuild()) { // If there's nothing to build, wait for end delay then check build status
+            if (buildEndDelay > 0) { // Wait for end delay
                 buildEndDelay--;
                 return;
-            } else {
-                stage.checkBuildStatus(currentSong);
-                recordStageBlocks();
+            } else { // Check build status when end delay is over
+                if (!Config.getConfig().survivalOnly) {
+                    stage.checkBuildStatus(currentSong);
+                    recordStageBlocks();
+                } else {
+                    try {
+                        stage.checkSurvivalBuildStatus(currentSong);
+                    } catch (Stage.NotEnoughInstrumentsException e) {
+                        e.giveInstrumentSummary();
+                        reset();
+                        return;
+                    }
+                }
                 stage.sendMovementPacketToStagePosition();
             }
         }
 
-        if (!stage.requiredBreaks.isEmpty()) {
-            for (int i=0; i<5; i++) {
-                if (stage.requiredBreaks.isEmpty()) break;
-                BlockPos bp = stage.requiredBreaks.poll();
-                attackBlock(bp);
-            }
-            buildEndDelay = 20;
-        } else if (!stage.missingNotes.isEmpty()) {
-            int desiredNoteId = stage.missingNotes.pollFirst();
-            BlockPos bp = stage.noteblockPositions.get(desiredNoteId);
-            if (bp == null) {
-                return;
-            }
-            int blockId = Block.getRawIdFromState(world.getBlockState(bp));
-            int currentNoteId = (blockId-SongPlayer.NOTEBLOCK_BASE_ID)/2;
-            if (currentNoteId != desiredNoteId) {
-                holdNoteblock(desiredNoteId, buildSlot);
-                if (blockId != 0) {
-                    attackBlock(bp);
-                }
-                placeBlock(bp);
-            }
-            buildCooldown = 0; // No cooldown, so it places a block every tick
-            buildEndDelay = 20;
-        } else { // Switch to playing
-            restoreBuildSlot();
+        if (stage.nothingToBuild()) { // If there's still nothing to build after checking build status, switch to playing
+            if (!Config.getConfig().survivalOnly) restoreBuildSlot();
             building = false;
-            setSurvivalIfNeeded();
             stage.sendMovementPacketToStagePosition();
             SongPlayer.addChatMessage("§6Now playing §3" + currentSong.name);
+        }
+
+        if (!Config.getConfig().survivalOnly) { // Regular mode
+            if (!stage.requiredBreaks.isEmpty()) {
+                for (int i = 0; i < 5; i++) {
+                    if (stage.requiredBreaks.isEmpty()) break;
+                    BlockPos bp = stage.requiredBreaks.poll();
+                    attackBlock(bp);
+                }
+                buildEndDelay = 20;
+            } else if (!stage.missingNotes.isEmpty()) {
+                int desiredNoteId = stage.missingNotes.pollFirst();
+                BlockPos bp = stage.noteblockPositions.get(desiredNoteId);
+                if (bp == null) {
+                    return;
+                }
+                int blockId = Block.getRawIdFromState(world.getBlockState(bp));
+                int currentNoteId = (blockId - SongPlayer.NOTEBLOCK_BASE_ID) / 2;
+                if (currentNoteId != desiredNoteId) {
+                    holdNoteblock(desiredNoteId, buildSlot);
+                    if (blockId != 0) {
+                        attackBlock(bp);
+                    }
+                    placeBlock(bp);
+                }
+                buildCooldown = 0; // No cooldown, so it places a block every tick
+                buildEndDelay = 20;
+            }
+        } else { // Survival only mode
+            if (!stage.requiredClicks.isEmpty()) {
+                BlockPos bp = stage.requiredClicks.pollFirst();
+                if (SongPlayer.MC.world.getBlockState(bp).getBlock() == Blocks.NOTE_BLOCK) {
+                    placeBlock(bp);
+                }
+                buildEndDelay = 20;
+            }
         }
     }
     private void setBuildProgressDisplay() {
@@ -339,12 +360,22 @@ public class SongHandler {
 
         if (tick) {
             if (stage.hasBreakingModification()) {
-                stage.checkBuildStatus(currentSong);
-                recordStageBlocks();
+                if (!Config.getConfig().survivalOnly) {
+                    stage.checkBuildStatus(currentSong);
+                    recordStageBlocks();
+                } else {
+                    try {
+                        stage.checkSurvivalBuildStatus(currentSong);
+                    } catch (Stage.NotEnoughInstrumentsException e) {
+                        SongPlayer.addChatMessage("§6Stopped because stage is missing instruments required for song.");
+                        reset();
+                        return;
+                    }
+                }
             }
             if (!stage.nothingToBuild()) { // Switch to building
                 building = true;
-                setCreativeIfNeeded();
+                if (!Config.getConfig().survivalOnly) setCreativeIfNeeded();
                 stage.sendMovementPacketToStagePosition();
                 currentSong.pause();
                 buildStartDelay = 20;
@@ -354,7 +385,7 @@ public class SongHandler {
                     int instrumentId = note / 25;
                     System.out.println("Missing note: " + Instrument.getInstrumentFromId(instrumentId).name() + ":" + pitch);
                 }
-                getAndSaveBuildSlot();
+                if (!Config.getConfig().survivalOnly) getAndSaveBuildSlot();
                 SongPlayer.addChatMessage("§6Stage was altered. Rebuilding!");
                 return;
             }
@@ -585,10 +616,6 @@ public class SongHandler {
         cleanupPlaceList = cleanupPlaceList.reversed();
         cleanupTotalBlocksToPlace = cleanupPlaceList.size();
 
-        for (BlockPos bp : cleanupPlaceList) {
-            System.out.println(world.getBlockState(bp).getBlock() + " " + originalBlocks.get(bp).getBlock());
-        }
-
         boolean noNecessaryBreaks = cleanupBreakList.stream().allMatch(
                 bp -> world.getBlockState(bp).getBlock().getDefaultState().equals(originalBlocks.get(bp).getBlock().getDefaultState())
         );
@@ -624,7 +651,7 @@ public class SongHandler {
         if (lastStage != null) {
             lastStage.movePlayerToStagePosition();
         }
-        if (originalGamemode != SongPlayer.MC.interactionManager.getCurrentGameMode()) {
+        if (originalGamemode != SongPlayer.MC.interactionManager.getCurrentGameMode() && !Config.getConfig().survivalOnly) {
             if (originalGamemode == GameMode.CREATIVE) {
                 sendGamemodeCommand(Config.getConfig().creativeCommand);
             }
@@ -635,7 +662,7 @@ public class SongHandler {
         if (SongPlayer.MC.player.getAbilities().allowFlying == false) {
             SongPlayer.MC.player.getAbilities().flying = false;
         }
-        restoreBuildSlot();
+        if (!Config.getConfig().survivalOnly) restoreBuildSlot();
         reset();
     }
     public void partialResetAndCleanup() {

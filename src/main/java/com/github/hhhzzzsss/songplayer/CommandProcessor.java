@@ -9,17 +9,14 @@ import com.github.hhhzzzsss.songplayer.song.Playlist;
 import com.github.hhhzzzsss.songplayer.song.Song;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.minecraft.block.BlockState;
 import net.minecraft.command.CommandSource;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.state.property.Property;
 import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.GameMode;
 
 import java.io.IOException;
@@ -61,6 +58,7 @@ public class CommandProcessor {
 		commands.add(new cleanupLastStageCommand());
 		commands.add(new announcementCommand());
 		commands.add(new songItemCommand());
+		commands.add(new toggleSurvivalOnly());
 		commands.add(new testSongCommand());
 
 		for (Command command : commands) {
@@ -1003,7 +1001,6 @@ public class CommandProcessor {
 					return true;
 				}
 				if (SongPlayer.MC.player.getPos().squaredDistanceTo(lastStage.getOriginBottomCenter()) > 3*3) {
-					System.out.println(SongPlayer.MC.player.getPos().squaredDistanceTo(lastStage.getOriginBottomCenter()));
 					String coordStr = String.format(
 							"%d %d %d",
 							lastStage.position.getX(), lastStage.position.getY(), lastStage.position.getZ()
@@ -1161,6 +1158,37 @@ public class CommandProcessor {
 				case "setsongname":
 				default:
 					return null;
+			}
+		}
+	}
+
+	private static class toggleSurvivalOnly extends Command {
+		public String getName() {
+			return "toggleSurvivalOnly";
+		}
+		public String[] getAliases() {
+			return new String[]{"survivalOnly"};
+		}
+		public String[] getSyntax() {
+			return new String[0];
+		}
+		public String getDescription() {
+			return "Enables or disables survival-only mode, in which automatic noteblock placement is disabled and automatic tuning is done by right-clicking..";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() == 0) {
+				Config.getConfig().survivalOnly = !Config.getConfig().survivalOnly;
+				if (Config.getConfig().survivalOnly) {
+					SongPlayer.addChatMessage("§6Enabled survival only mode");
+				}
+				else {
+					SongPlayer.addChatMessage("§6Disabled survival only mode");
+				}
+				Config.saveConfigWithErrorHandling();
+				return true;
+			}
+			else {
+				return false;
 			}
 		}
 	}
