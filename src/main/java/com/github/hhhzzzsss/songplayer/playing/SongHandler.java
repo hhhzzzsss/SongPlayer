@@ -862,6 +862,6 @@ public class SongHandler {
     }
 
     public boolean isIdle() {
-        return currentSong == null && currentPlaylist == null && songQueue.isEmpty() && !cleaningUp;
+        return currentSong == null && currentPlaylist == null && songQueue.isEmpty() && !cleaningUp && !dirty;
     }
 }

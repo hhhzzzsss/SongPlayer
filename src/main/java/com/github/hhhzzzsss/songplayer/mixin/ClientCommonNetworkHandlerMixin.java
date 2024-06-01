@@ -29,11 +29,13 @@ public class ClientCommonNetworkHandlerMixin {
     private void onSendPacket(Packet<?> packet, CallbackInfo ci) {
         Stage lastStage = SongHandler.getInstance().lastStage;
 
-        if (!SongHandler.getInstance().isIdle() && lastStage != null && packet instanceof PlayerMoveC2SPacket) {
-            if (!Config.getConfig().rotate) {
-                connection.send(new PlayerMoveC2SPacket.Full(lastStage.position.getX() + 0.5, lastStage.position.getY(), lastStage.position.getZ() + 0.5, SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch(), true));
-                if (SongPlayer.fakePlayer != null) {
-                    SongPlayer.fakePlayer.copyStagePosAndPlayerLook();
+        if (!SongHandler.getInstance().isIdle() && packet instanceof PlayerMoveC2SPacket) {
+            if (lastStage != null) {
+                if (!Config.getConfig().rotate) {
+                    connection.send(new PlayerMoveC2SPacket.Full(lastStage.position.getX() + 0.5, lastStage.position.getY(), lastStage.position.getZ() + 0.5, SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch(), true));
+                    if (SongPlayer.fakePlayer != null) {
+                        SongPlayer.fakePlayer.copyStagePosAndPlayerLook();
+                    }
                 }
             }
             ci.cancel();
