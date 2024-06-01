@@ -126,6 +126,17 @@ public class MidiConverter {
 		}
 
 		song.sort();
+
+		// Shift to beginning if delay is too long
+		if (!song.notes.isEmpty()) {
+			long shift = song.notes.get(0).time - 1000;
+			if (song.notes.get(0).time > 1000) {
+				for (Note note : song.notes) {
+					note.time -= shift;
+				}
+			}
+			song.length -= shift;
+		}
 		
 		return song;
 	}
