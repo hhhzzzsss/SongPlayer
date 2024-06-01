@@ -147,8 +147,11 @@ public class NBSConverter {
                 continue;
             }
 
-            if (note.key < 33 || note.key > 57) {
-                continue;
+            while (note.key < 33) {
+                note.key += 12;
+            }
+            while (note.key > 57) {
+                note.key -= 12;
             }
 
             byte layerVolume = 100;
