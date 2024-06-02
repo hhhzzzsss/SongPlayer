@@ -400,10 +400,12 @@ public class SongHandler {
         currentSong.advanceTime();
         while (currentSong.reachedNextNote()) {
             Note note = currentSong.getNextNote();
-            BlockPos bp = stage.noteblockPositions.get(note.noteId);
-            if (bp != null) {
-                attackBlock(bp);
-                somethingPlayed = true;
+            if (note.velocity >= Config.getConfig().velocityThreshold) {
+                BlockPos bp = stage.noteblockPositions.get(note.noteId);
+                if (bp != null) {
+                    attackBlock(bp);
+                    somethingPlayed = true;
+                }
             }
         }
         if (somethingPlayed) {

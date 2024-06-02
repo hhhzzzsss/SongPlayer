@@ -54,6 +54,7 @@ public class CommandProcessor {
 		commands.add(new toggleFakePlayerCommand());
 		commands.add(new setStageTypeCommand());
 		commands.add(new toggleMovementCommand());
+		commands.add(new setVelocityThresholdCommand());
 		commands.add(new toggleAutoCleanup());
 		commands.add(new cleanupLastStageCommand());
 		commands.add(new announcementCommand());
@@ -948,6 +949,40 @@ public class CommandProcessor {
 				return null;
 			}
 		}
+	}
+
+	private static class setVelocityThresholdCommand extends Command {
+		public String getName() {
+			return "setVelocityThreshold";
+		}
+		public String[] getAliases() {
+			return new String[]{"velocityThreshold", "threshold"};
+		}
+		public String[] getSyntax() {
+			return new String[] {"<number>"};
+		}
+		public String getDescription() {
+			return "Sets the minimum velocity below which notes won't be played (applies to midi and nbs). This must be a number from 0 to 100. For song items, the threshold is baked in upon item creation.";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() > 0) {
+				try {
+					int threshold = Integer.parseInt(args);
+					if (threshold < 0 || threshold > 100) {
+						SongPlayer.addChatMessage("§cVelocity threshold must be a value between 0 and 100");
+						return true;
+					}
+					Config.getConfig().velocityThreshold = threshold;
+					SongPlayer.addChatMessage("§6Set velocity threshold to " + threshold);
+					Config.saveConfigWithErrorHandling();
+					return true;
+				} catch (NumberFormatException e) {
+					return false;
+				}
+			} else {
+				return false;
+			}
+        }
 	}
 
 	private static class toggleAutoCleanup extends Command {

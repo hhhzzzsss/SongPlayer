@@ -161,7 +161,7 @@ public class NBSConverter {
 
             int pitch = note.key-33;
             int noteId = pitch + instrument.instrumentId*25;
-            song.add(new Note(noteId, getMilliTime(note.tick, tempo)));
+            song.add(new Note(noteId, getMilliTime(note.tick, tempo), layerVolume));
         }
 
         song.length = song.get(song.size()-1).time + 50;

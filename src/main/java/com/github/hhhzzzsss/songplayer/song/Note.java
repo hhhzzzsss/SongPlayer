@@ -3,9 +3,17 @@ package com.github.hhhzzzsss.songplayer.song;
 public class Note implements Comparable<Note> {
 	public int noteId;
 	public long time;
+	public int velocity;
 	public Note(int note, long time) {
 		this.noteId = note;
 		this.time = time;
+		this.velocity = 100;
+	}
+
+	public Note(int note, long time, int velocity) {
+		this.noteId = note;
+		this.time = time;
+		this.velocity = velocity;
 	}
 
 	@Override

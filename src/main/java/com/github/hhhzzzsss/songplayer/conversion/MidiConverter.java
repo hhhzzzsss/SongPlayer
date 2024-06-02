@@ -90,18 +90,19 @@ public class MidiConverter {
 						instrumentIds[sm.getChannel()] = sm.getData1();
 					}
 					else if (sm.getCommand() == NOTE_ON) {
-						if (sm.getData2() == 0) continue;
 						int pitch = sm.getData1();
+						int velocity = sm.getData2();
+						if (velocity == 0) continue; // Just ignore notes with velocity 0
 						long deltaTick = event.getTick() - prevTick;
 						prevTick = event.getTick();
 						microTime += (mpq/tpq) * deltaTick;
 
 						Note note;
 						if (sm.getChannel() == 9) {
-							note = getMidiPercussionNote(pitch, microTime);
+							note = getMidiPercussionNote(pitch, velocity, microTime);
 						}
 						else {
-							note = getMidiInstrumentNote(instrumentIds[sm.getChannel()], pitch, microTime);
+							note = getMidiInstrumentNote(instrumentIds[sm.getChannel()], pitch, velocity, microTime);
 						}
 						if (note != null) {
 							song.add(note);
@@ -141,7 +142,7 @@ public class MidiConverter {
 		return song;
 	}
 
-	public static Note getMidiInstrumentNote(int midiInstrument, int midiPitch, long microTime) {
+	public static Note getMidiInstrumentNote(int midiInstrument, int midiPitch, int velocity, long microTime) {
 		com.github.hhhzzzsss.songplayer.song.Instrument instrument = null;
 		com.github.hhhzzzsss.songplayer.song.Instrument[] instrumentList = instrumentMap.get(midiInstrument);
 		if (instrumentList != null) {
@@ -161,15 +162,15 @@ public class MidiConverter {
 		int noteId = pitch + instrument.instrumentId*25;
 		long time = microTime / 1000L;
 
-		return new Note(noteId, time);
+		return new Note(noteId, time, velocity);
 	}
 
-	private static Note getMidiPercussionNote(int midiPitch, long microTime) {
+	private static Note getMidiPercussionNote(int midiPitch, int velocity, long microTime) {
 		if (percussionMap.containsKey(midiPitch)) {
 			int noteId = percussionMap.get(midiPitch);
 			long time = microTime / 1000L;
 
-			return new Note(noteId, time);
+			return new Note(noteId, time, velocity);
 		}
 		return null;
 	}

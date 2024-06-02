@@ -1,5 +1,6 @@
 package com.github.hhhzzzsss.songplayer.conversion;
 
+import com.github.hhhzzzsss.songplayer.Config;
 import com.github.hhhzzzsss.songplayer.Util;
 import com.github.hhhzzzsss.songplayer.song.Note;
 import com.github.hhhzzzsss.songplayer.song.Song;
@@ -81,7 +82,7 @@ public class SPConverter {
 
         song.sort();
         long prevTime = 0;
-        for (Note note : song.notes) {
+        for (Note note : song.notes) if (note.velocity >= Config.getConfig().velocityThreshold) {
             writeShort(os, note.noteId);
             writeVarLong(os, note.time - prevTime);
             prevTime = note.time;
