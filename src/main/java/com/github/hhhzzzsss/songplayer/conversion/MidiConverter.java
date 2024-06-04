@@ -93,6 +93,7 @@ public class MidiConverter {
 						int pitch = sm.getData1();
 						int velocity = sm.getData2();
 						if (velocity == 0) continue; // Just ignore notes with velocity 0
+						velocity = (velocity * 100) / 127; // Midi velocity goes from 0-127
 						long deltaTick = event.getTick() - prevTick;
 						prevTick = event.getTick();
 						microTime += (mpq/tpq) * deltaTick;
