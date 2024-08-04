@@ -32,9 +32,7 @@ public class Stage {
 	public int totalMissingNotes = 0;
 
 	// Only used in survival-only mode
-	public LinkedList<BlockPos> untunedNoteblocks = new LinkedList<>();
 	public LinkedList<BlockPos> requiredClicks = new LinkedList<>();
-	public int totalUntunedNoteblocks = 0;
 
 	public Stage() {
 		position = player.getBlockPos();
@@ -508,6 +506,7 @@ public class Stage {
 	}
 
 	Map<BlockPos, Integer>[] loadSurvivalBlocks() {
+		@SuppressWarnings("unchecked")
 		Map<BlockPos, Integer>[] instrumentMap = new Map[16];
 		for (int i = 0; i < 16; i++) {
 			instrumentMap[i] = new TreeMap<>();

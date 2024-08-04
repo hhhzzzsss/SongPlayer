@@ -6,7 +6,6 @@ import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 
@@ -70,8 +69,8 @@ public class SongItemConfirmationScreen extends Screen {
                         String.format("§7Max notes per second: %s%d", getNumberColor(loaderThread.maxNotesPerSecond), loaderThread.maxNotesPerSecond),
                         String.format("§7Avg notes per second: %s%.2f", getNumberColor(loaderThread.avgNotesPerSecond), loaderThread.avgNotesPerSecond),
                 };
-                List<Text> messageList = Arrays.stream(loadedMessages).map(Text::literal).collect(Collectors.toList());
-                this.loadedText = MultilineText.createFromTexts(this.textRenderer, messageList);
+                Text[] messageList = Arrays.stream(loadedMessages).map(Text::literal).toArray(Text[]::new);
+                this.loadedText = MultilineText.create(this.textRenderer, messageList);
 
                 int loadedTextHeight = this.loadedText.count() * this.textRenderer.fontHeight;
                 addButtons(60 + loadedTextHeight + 12);
