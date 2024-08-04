@@ -184,4 +184,3 @@ When playing a song, freecam is enabled. You will be able to move around freely,
 **Sk8kman**: Several of Songplayer 3.0's changes were inspired by their fork of SongPlayer. Most notably was their alternate stage designs, but it also motivated me to implement playlists and togglable movements.
 
 **Lizard16**: Cited by Sk8kman as the person who made the spherical stage design.
-
