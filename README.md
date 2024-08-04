@@ -1,6 +1,6 @@
 # SongPlayer
 A Fabric mod for Minecraft that plays songs with noteblocks.
-The current version is for Minecraft 1.20.5 - 1.20.6.
+The current version is for Minecraft 1.21
 
 # How to install
 You can grab the mod jar from releases section.
@@ -24,6 +24,11 @@ All the commands are case insensitive.
 ### $help \<command>
 If no arguments are given, lists all SongPlayer commands.
 Otherwise, explains the specified command and shows its syntax.
+
+### $setPrefix \<prefix>
+*aliases: `$prefix`*
+
+Sets the prefix used for all SongPlayer commands (by default: `$`)
 
 ### $play \<filename or url>
 Plays a particular midi from the .minecraft/songs folder, or, if a url is specified, downloads the song at that url and tries to play it.
@@ -52,6 +57,12 @@ Gets the status of the current song that is playing.
 
 Shows all the songs in the queue.
 
+### $songs
+### $songs \<subdirectory>
+*aliases: `$list`*
+
+If no arguments are given, lists songs in the `songs` folder. Otherwise, lists songs in the specified subdirectory.
+
 ### $playlist play \<playlist>
 ### $playlist create \<playlist>
 ### $playlist list \[\<playlist>]
@@ -63,12 +74,6 @@ Shows all the songs in the queue.
 ### $playlist shuffle
 
 Create, edit, delete, or play playlists. You can also toggle looping or shuffling.
-
-### $songs
-### $songs \<subdirectory>
-*aliases: `$list`*
-
-If no arguments are given, lists songs in the `songs` folder. Otherwise, lists songs in the specified subdirectory.
 
 ### $setCreativeCommand \<command>
 *aliases: `$sc`*
@@ -86,7 +91,7 @@ However, /gms does not work on all servers.
 If the survival command is different, set it with this command.
 For example, if the server uses vanilla commands, do `$setSurvivalCommand /gamemode survival`.
 
-### $useVanillaCommands
+### $useEssentialsCommands
 *aliases: `$essentials`, `$useEssentials`, `$essentialsCommands`*
 
 Switch to using Essentials gamemode commands.
@@ -118,6 +123,25 @@ Sets the type of noteblock stage to build. Thanks Sk8kman and Lizard16 for the s
 
 Toggles whether you swing your arm when hitting a noteblock and rotate to look at the noteblocks you are hitting.
 
+### $setVelocityThreshold <threshold>
+*aliases: `$velocityThreshold` `$threshold`*
+
+Sets the minimum velocity below which notes won't be played (applies to midi and nbs). This must be a number from 0 to 100. For song items, the threshold is baked in upon item creation.
+
+### $toggleAutoCleanup
+*aliases: `$autoCleanup`*
+
+Toggles whether you automatically clean up your stage and restore the original blocks after playing.
+
+### $cleanupLastStage
+
+Cleans up the most recent stage that you made and does its best to restore the blocks to their original state.
+
+If you stop playing and start playing again, the recorded modifications gets reset.
+
+Will not replace fluids or double blocks such as doors, and does not replace tile entity data.
+May not properly handle blocks that rest on other blocks such as torches, either.
+
 ### $announcement \<enable | disable | getMessage>
 ### $announcement setMessage
 
@@ -133,6 +157,15 @@ Example: `$announcement setMessage &6Now playing: &3[name]`
 Encodes song data into an item. When you right click on such an item, SongPlayer will automatically detect that it is a song item and ask if you want to play it. These items, once created, can be used by anyone that is using the necessary version of SongPlayer.
 
 It will automatically generate custom item names and lore, but these can be modified or deleted without affecting the song data, so feel free to edit the items as you wish. SongPlayer only looks at the `SongItemData` tag.
+
+### $toggleSurvivalOnly
+*aliases: `$survivalOnly`*
+
+Enables or disables survival-only mode, in which automatic noteblock placement is disabled and automatic tuning is done by right-clicking.
+
+In this mode, you must place the necessary instruments yourself.
+
+If you try to play a song and the requirements are not met, it will tell you how many instruments of each type you need.
 
 ### $testSong
 A command I used for testing during development.

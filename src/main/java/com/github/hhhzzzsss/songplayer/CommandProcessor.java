@@ -55,11 +55,11 @@ public class CommandProcessor {
 		commands.add(new setStageTypeCommand());
 		commands.add(new toggleMovementCommand());
 		commands.add(new setVelocityThresholdCommand());
-		commands.add(new toggleAutoCleanup());
+		commands.add(new toggleAutoCleanupCommand());
 		commands.add(new cleanupLastStageCommand());
 		commands.add(new announcementCommand());
 		commands.add(new songItemCommand());
-		commands.add(new toggleSurvivalOnly());
+		commands.add(new toggleSurvivalOnlyCommand());
 		commands.add(new testSongCommand());
 
 		for (Command command : commands) {
@@ -959,7 +959,7 @@ public class CommandProcessor {
 			return new String[]{"velocityThreshold", "threshold"};
 		}
 		public String[] getSyntax() {
-			return new String[] {"<number>"};
+			return new String[] {"<threshold>"};
 		}
 		public String getDescription() {
 			return "Sets the minimum velocity below which notes won't be played (applies to midi and nbs). This must be a number from 0 to 100. For song items, the threshold is baked in upon item creation.";
@@ -985,7 +985,7 @@ public class CommandProcessor {
         }
 	}
 
-	private static class toggleAutoCleanup extends Command {
+	private static class toggleAutoCleanupCommand extends Command {
 		public String getName() {
 			return "toggleAutoCleanup";
 		}
@@ -1202,7 +1202,7 @@ public class CommandProcessor {
 		}
 	}
 
-	private static class toggleSurvivalOnly extends Command {
+	private static class toggleSurvivalOnlyCommand extends Command {
 		public String getName() {
 			return "toggleSurvivalOnly";
 		}
@@ -1213,7 +1213,7 @@ public class CommandProcessor {
 			return new String[0];
 		}
 		public String getDescription() {
-			return "Enables or disables survival-only mode, in which automatic noteblock placement is disabled and automatic tuning is done by right-clicking..";
+			return "Enables or disables survival-only mode, in which automatic noteblock placement is disabled and automatic tuning is done by right-clicking.";
 		}
 		public boolean processCommand(String args) {
 			if (args.length() == 0) {
