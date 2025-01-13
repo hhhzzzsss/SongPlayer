@@ -37,24 +37,24 @@ public class ClientPlayNetworkHandlerMixin {
 		Stage lastStage = SongHandler.getInstance().lastStage;
 		if (!SongHandler.getInstance().isIdle() && lastStage != null && lastStage.getOriginBottomCenter().squaredDistanceTo(SongPlayer.MC.player.getPos()) > 3*3) {
 			Vec3d stageOriginBottomCenter = lastStage.getOriginBottomCenter();
-			boolean xrel = packet.getFlags().contains(PositionFlag.X);
-			boolean yrel = packet.getFlags().contains(PositionFlag.Y);
-			boolean zrel = packet.getFlags().contains(PositionFlag.Z);
+			boolean xrel = packet.change().position().x!=0;
+			boolean yrel = packet.change().position().y!=0;
+			boolean zrel = packet.change().position().z!=0;
 			double dx = 0.0;
 			double dy = 0.0;
 			double dz = 0.0;
 			if (xrel) {
-				dx = packet.getX();
+				dx = packet.change().position().x;
 			} else {
 				dx = SongPlayer.MC.player.getX() - stageOriginBottomCenter.getX();
 			}
 			if (yrel) {
-				dy = packet.getY();
+				dy = packet.change().position().y;
 			} else {
 				dy = SongPlayer.MC.player.getY() - stageOriginBottomCenter.getY();
 			}
 			if (zrel) {
-				dz = packet.getZ();
+				dz = packet.change().position().z;
 			} else {
 				dz = SongPlayer.MC.player.getZ() - stageOriginBottomCenter.getZ();
 			}

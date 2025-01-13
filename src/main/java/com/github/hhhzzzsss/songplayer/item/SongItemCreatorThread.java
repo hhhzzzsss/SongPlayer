@@ -11,6 +11,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 
 import java.io.IOException;
+import java.util.List;
 
 public class SongItemCreatorThread extends SongLoaderThread {
     public final int slotId;
@@ -41,7 +42,7 @@ public class SongItemCreatorThread extends SongLoaderThread {
             ItemStack newStack;
             if (stack.isEmpty()) {
                 newStack = Items.PAPER.getDefaultStack();
-                newStack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(751642938));
+                newStack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(),List.of(),List.of(),List.of(751642938)));
             }
             else {
                 newStack = stack.copy();
