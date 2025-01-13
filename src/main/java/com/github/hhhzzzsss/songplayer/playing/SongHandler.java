@@ -847,7 +847,7 @@ public class SongHandler {
             SongPlayer.MC.player.networkHandler.getConnection().send(new PlayerMoveC2SPacket.Full(
                     lastStage.position.getX() + 0.5, lastStage.position.getY(), lastStage.position.getZ() + 0.5,
                     yaw, pitch,
-                    true));
+                    true,false));
         }
     }
 
