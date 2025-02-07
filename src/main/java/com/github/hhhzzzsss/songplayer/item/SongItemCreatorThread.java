@@ -11,6 +11,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 
 import java.io.IOException;
+import java.util.List;
 
 public class SongItemCreatorThread extends SongLoaderThread {
     public final int slotId;
@@ -41,7 +42,8 @@ public class SongItemCreatorThread extends SongLoaderThread {
             ItemStack newStack;
             if (stack.isEmpty()) {
                 newStack = Items.PAPER.getDefaultStack();
-                newStack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(751642938));
+                // When going from 1.21.3 -> 1.21.4, datafixer changes the custom model data to a float array with one element
+                newStack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(751642938f), List.of(), List.of(), List.of()));
             }
             else {
                 newStack = stack.copy();

@@ -1,0 +1,26 @@
+{
+	"model": {
+		"type": "range_dispatch",
+		"property": "custom_model_data",
+		"fallback": {
+			"type": "model",
+			"model": "minecraft:item/paper"
+		},
+		"entries": [
+			{
+				"threshold": 751642880,
+				"model": {
+					"type": "model",
+					"model": "songplayer:item/song_item"
+				}
+			},
+			{
+				"threshold": 751643008,
+				"model": {
+					"type": "model",
+					"model": "minecraft:item/paper"
+				}
+			}
+		]
+	}
+}
