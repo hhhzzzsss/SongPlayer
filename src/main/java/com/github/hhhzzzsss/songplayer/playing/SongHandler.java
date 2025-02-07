@@ -202,8 +202,8 @@ public class SongHandler {
         if (Config.getConfig().doAnnouncement) {
             sendMessage(Config.getConfig().announcementMessage.replaceAll("\\[name\\]", song.name));
         }
-        prepareStage();
         if (!Config.getConfig().survivalOnly) getAndSaveBuildSlot();
+        prepareStage();
         SongPlayer.addChatMessage("§6Building noteblocks");
     }
 
@@ -237,6 +237,7 @@ public class SongHandler {
     public void startCleanup() {
         dirty = true;
         cleaningUp = true;
+        lastCleanupHash = 0;
         setCreativeIfNeeded();
         getAndSaveBuildSlot();
         lastStage.sendMovementPacketToStagePosition();
@@ -452,6 +453,7 @@ public class SongHandler {
     private LinkedList<BlockPos> cleanupBreakList = new LinkedList<>();
     private LinkedList<BlockPos> cleanupPlaceList = new LinkedList<>();
     private ArrayList<BlockPos> cleanupUnplaceableBlocks = new ArrayList<>();
+    private int lastCleanupHash = 0;
     private void handleCleanup() {
         setCleanupProgressDisplay();
 
@@ -470,6 +472,19 @@ public class SongHandler {
                 return;
             } else {
                 checkCleanupStatus();
+
+                int cleanupHash = 31 * cleanupBreakList.hashCode() + cleanupPlaceList.hashCode();
+                if (cleanupHash == lastCleanupHash) { // If loop is detected, stop
+                    cleaningUp = false;
+                    SongPlayer.addChatMessage("§6Stopped restoring original blocks due to infinite loop being detected");
+                    if (!cleanupUnplaceableBlocks.isEmpty()) {
+                        SongPlayer.addChatMessage(String.format("§3%d §6blocks could not be restored", cleanupUnplaceableBlocks.size()));
+                    }
+                    return;
+                } else {
+                    lastCleanupHash = cleanupHash;
+                }
+
                 lastStage.sendMovementPacketToStagePosition();
             }
         }
