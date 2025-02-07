@@ -667,7 +667,10 @@ public class SongHandler {
         dirty = false;
     }
     public void restoreStateAndReset() {
-        if (lastStage != null) {
+        restoreStateAndReset(true);
+    }
+    public void restoreStateAndReset(boolean returnToStage) {
+        if (returnToStage && lastStage != null) {
             lastStage.movePlayerToStagePosition();
         }
         if (originalGamemode != SongPlayer.MC.interactionManager.getCurrentGameMode() && !Config.getConfig().survivalOnly) {

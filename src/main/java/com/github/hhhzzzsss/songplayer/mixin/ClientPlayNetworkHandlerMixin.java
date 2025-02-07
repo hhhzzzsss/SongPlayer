@@ -5,6 +5,7 @@ import com.github.hhhzzzsss.songplayer.SongPlayer;
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
 import com.github.hhhzzzsss.songplayer.playing.Stage;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,6 +36,7 @@ public class ClientPlayNetworkHandlerMixin {
 	@Inject(at = @At("TAIL"), method = "onPlayerPositionLook(Lnet/minecraft/network/packet/s2c/play/PlayerPositionLookS2CPacket;)V")
 	public void onOnPlayerPositionLook(PlayerPositionLookS2CPacket packet, CallbackInfo ci) {
 		Stage lastStage = SongHandler.getInstance().lastStage;
+		ClientPlayerEntity player = SongPlayer.MC.player;
 		if (!SongHandler.getInstance().isIdle() && lastStage != null) {
 			Vec3d stageOriginBottomCenter = lastStage.getOriginBottomCenter();
 			boolean xrel = packet.relatives().contains(PositionFlag.X);
@@ -47,24 +49,29 @@ public class ClientPlayNetworkHandlerMixin {
 			if (xrel) {
 				dx = packet.change().position().getX();
 			} else {
-				dx = SongPlayer.MC.player.getX() - stageOriginBottomCenter.getX();
+				dx = player.getX() - stageOriginBottomCenter.getX();
 			}
 			if (yrel) {
 				dy = packet.change().position().getY();
 			} else {
-				dy = SongPlayer.MC.player.getY() - stageOriginBottomCenter.getY();
+				dy = player.getY() - stageOriginBottomCenter.getY();
 			}
 			if (zrel) {
 				dz = packet.change().position().getZ();
 			} else {
-				dz = SongPlayer.MC.player.getZ() - stageOriginBottomCenter.getZ();
+				dz = player.getZ() - stageOriginBottomCenter.getZ();
 			}
 			double distsq = dx*dx + dy*dy + dz*dz;
-			System.out.println(packet.change());
-			System.out.println(distsq);
 			if (distsq > 3.0*3.0) {
+				// Set client position to where server thinks player should be
+				player.refreshPositionAndAngles(
+						xrel ? stageOriginBottomCenter.getX() + dz : player.getX(),
+						yrel ? stageOriginBottomCenter.getY() + dy : player.getY(),
+						zrel ? stageOriginBottomCenter.getZ() + dz : player.getZ(),
+						player.getYaw(), player.getPitch()
+				);
 				SongPlayer.addChatMessage("§6Stopped playing/building because the server moved the player too far from the stage!");
-				SongHandler.getInstance().reset();
+				SongHandler.getInstance().restoreStateAndReset(false);
 			} else {
 				lastStage.movePlayerToStagePosition();
 			}
