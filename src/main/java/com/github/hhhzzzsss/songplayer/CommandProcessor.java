@@ -53,6 +53,8 @@ public class CommandProcessor {
 		commands.add(new useVanillaCommandsCommand());
 		commands.add(new toggleFakePlayerCommand());
 		commands.add(new setStageTypeCommand());
+		commands.add(new breakSpeedCommand());
+		commands.add(new placeSpeedCommand());
 		commands.add(new toggleMovementCommand());
 		commands.add(new setVelocityThresholdCommand());
 		commands.add(new toggleAutoCleanupCommand());
@@ -116,7 +118,7 @@ public class CommandProcessor {
 		public abstract String getDescription();
 		public abstract boolean processCommand(String args);
 		public String[] getAliases() {
-			return new String[]{};
+			return new String[0];
 		}
 		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
 			return null;
@@ -181,7 +183,7 @@ public class CommandProcessor {
 			return new String[]{"prefix"};
 		}
 		public String[] getSyntax() {
-			return new String[] {"<prefix>"};
+			return new String[]{"<prefix>"};
 		}
 		public String getDescription() {
 			return "Sets the command prefix used by SongPlayer";
@@ -212,7 +214,7 @@ public class CommandProcessor {
 			return "play";
 		}
 		public String[] getSyntax() {
-			return new String[] {"<song or url>"};
+			return new String[]{"<song or url>"};
 		}
 		public String getDescription() {
 			return "Plays a song";
@@ -300,7 +302,7 @@ public class CommandProcessor {
 			return "goto";
 		}
 		public String[] getSyntax() {
-			return new String[] {"<mm:ss>"};
+			return new String[]{"<mm:ss>"};
 		}
 		public String getDescription() {
 			return "Goes to a specific time in the song";
@@ -433,7 +435,7 @@ public class CommandProcessor {
 			return new String[]{"list"};
 		}
 		public String[] getSyntax() {
-			return new String[] {
+			return new String[]{
 					"",
 					"<subdirectory>"};
 		}
@@ -504,7 +506,7 @@ public class CommandProcessor {
 			return "playlist";
 		}
 		public String[] getSyntax() {
-			return new String[] {
+			return new String[]{
 					"play <playlist>",
 					"create <playlist>",
 					"list [<playlist>]",
@@ -725,7 +727,7 @@ public class CommandProcessor {
 			return new String[]{"sc"};
 		}
 		public String[] getSyntax() {
-			return new String[] {"<command>"};
+			return new String[]{"<command>"};
 		}
 		public String getDescription() {
 			return "Sets the command used to go into creative mode";
@@ -755,7 +757,7 @@ public class CommandProcessor {
 			return new String[]{"ss"};
 		}
 		public String[] getSyntax() {
-			return new String[] {"<command>"};
+			return new String[]{"<command>"};
 		}
 		public String getDescription() {
 			return "Sets the command used to go into survival mode";
@@ -870,7 +872,7 @@ public class CommandProcessor {
 			return new String[]{"setStage", "stageType"};
 		}
 		public String[] getSyntax() {
-			return new String[] {"<DEFAULT | WIDE | SPHERICAL>"};
+			return new String[]{"<DEFAULT | WIDE | SPHERICAL>"};
 		}
 		public String getDescription() {
 			return "Sets the type of noteblock stage to build";
@@ -902,6 +904,126 @@ public class CommandProcessor {
 		}
 	}
 
+	private static class breakSpeedCommand extends Command {
+		public String getName() {
+			return "breakSpeed";
+		}
+		public String[] getSyntax() {
+			return new String[]{
+					"set <speed>",
+					"reset"
+			};
+		}
+		public String getDescription() {
+			return "Sets the block breaking speed in blocks/sec";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() == 0) {
+				return false;
+			}
+
+			String[] split = args.split(" ");
+			switch (split[0].toLowerCase(Locale.ROOT)) {
+				case "set":
+					if (split.length != 2) return false;
+					double speed;
+					try {
+						speed = Double.parseDouble(split[1]);
+					} catch (NumberFormatException e) {
+						SongPlayer.addChatMessage("§cSpeed must be a number");
+						return true;
+					}
+					if (speed <= 0) {
+						SongPlayer.addChatMessage("§cSpeed must be greater than 0");
+						return true;
+					}
+					Config.getConfig().breakSpeed = speed;
+					Config.saveConfigWithErrorHandling();
+					SongPlayer.addChatMessage("§6Set block breaking speed to §3" + Config.getConfig().breakSpeed + " §6blocks/sec");
+					return true;
+				case "reset":
+					if (split.length != 1) return false;
+					Config.getConfig().breakSpeed = 40;
+					Config.saveConfigWithErrorHandling();
+					SongPlayer.addChatMessage("§6Reset block breaking speed to §3" + Config.getConfig().breakSpeed + " §6blocks/sec");
+					return true;
+				default:
+					return false;
+			}
+		}
+		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
+			String[] split = args.split(" ", -1);
+			if (split.length <= 1) {
+				return CommandSource.suggestMatching(new String[]{
+						"set",
+						"reset",
+				}, suggestionsBuilder);
+			} else {
+				return null;
+			}
+		}
+	}
+
+	private static class placeSpeedCommand extends Command {
+		public String getName() {
+			return "placeSpeed";
+		}
+		public String[] getSyntax() {
+			return new String[]{
+					"set <speed>",
+					"reset"
+			};
+		}
+		public String getDescription() {
+			return "Sets the block placement speed in blocks/sec";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() == 0) {
+				return false;
+			}
+
+			String[] split = args.split(" ");
+			switch (split[0].toLowerCase(Locale.ROOT)) {
+				case "set":
+					if (split.length != 2) return false;
+					double speed;
+					try {
+						speed = Double.parseDouble(split[1]);
+					} catch (NumberFormatException e) {
+						SongPlayer.addChatMessage("§cSpeed must be a number");
+						return true;
+					}
+					if (speed <= 0) {
+						SongPlayer.addChatMessage("§cSpeed must be greater than 0");
+						return true;
+					}
+					Config.getConfig().placeSpeed = speed;
+					Config.saveConfigWithErrorHandling();
+					SongPlayer.addChatMessage("§6Set block placement speed to §3" + Config.getConfig().placeSpeed + " §6blocks/sec");
+					return true;
+				case "reset":
+					if (split.length != 1) return false;
+					Config.getConfig().placeSpeed = 20;
+					Config.saveConfigWithErrorHandling();
+					SongPlayer.addChatMessage("§6Reset block placement speed to §3" + Config.getConfig().placeSpeed + " §6blocks/sec");
+					return true;
+				default:
+					return false;
+			}
+		}
+		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
+			String[] split = args.split(" ", -1);
+			if (split.length <= 1) {
+				return CommandSource.suggestMatching(new String[]{
+						"set",
+						"reset",
+				}, suggestionsBuilder);
+			} else {
+				return null;
+			}
+		}
+	}
+
 	private static class toggleMovementCommand extends Command {
 		public String getName() {
 			return "toggleMovement";
@@ -910,7 +1032,7 @@ public class CommandProcessor {
 			return new String[]{"movement"};
 		}
 		public String[] getSyntax() {
-			return new String[] {"<swing | rotate>"};
+			return new String[]{"<swing | rotate>"};
 		}
 		public String getDescription() {
 			return "Toggles different types of movements";
@@ -959,7 +1081,7 @@ public class CommandProcessor {
 			return new String[]{"velocityThreshold", "threshold"};
 		}
 		public String[] getSyntax() {
-			return new String[] {"<threshold>"};
+			return new String[]{"<threshold>"};
 		}
 		public String getDescription() {
 			return "Sets the minimum velocity below which notes won't be played (applies to midi and nbs). This must be a number from 0 to 100. For song items, the threshold is baked in upon item creation.";
@@ -1075,7 +1197,7 @@ public class CommandProcessor {
 			return "announcement";
 		}
 		public String[] getSyntax() {
-			return new String[] {
+			return new String[]{
 					"enable",
 					"disable",
 					"getMessage",
@@ -1132,7 +1254,7 @@ public class CommandProcessor {
 			return new String[]{"item"};
 		}
 		public String[] getSyntax() {
-			return new String[] {
+			return new String[]{
 					"create <song or url>",
 					"setSongName <name>",
 			};
@@ -1184,7 +1306,7 @@ public class CommandProcessor {
 		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
 			String[] split = args.split(" ", -1);
 			if (split.length <= 1) {
-				return CommandSource.suggestMatching(new String[] {
+				return CommandSource.suggestMatching(new String[]{
 						"create",
 						"setSongName",
 				}, suggestionsBuilder);

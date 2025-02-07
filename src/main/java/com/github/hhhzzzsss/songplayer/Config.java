@@ -27,6 +27,8 @@ public class Config {
     public int velocityThreshold = 0;
     public boolean doAnnouncement = false;
     public String announcementMessage = "&6Now playing: &3[name]";
+    public double breakSpeed = 40.0;
+    public double placeSpeed = 20.0;
     public boolean autoCleanup = false;
     public boolean survivalOnly = false;
 

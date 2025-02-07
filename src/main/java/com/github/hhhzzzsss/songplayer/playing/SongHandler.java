@@ -245,17 +245,12 @@ public class SongHandler {
     // Runs every tick
     private int buildStartDelay = 0;
     private int buildEndDelay = 0;
-    private int buildCooldown = 0;
     private int buildSlot = -1;
     private ItemStack prevHeldItem = null;
     private void handleBuilding() {
         setBuildProgressDisplay();
         if (buildStartDelay > 0) {
             buildStartDelay--;
-            return;
-        }
-        if (buildCooldown > 0) {
-            buildCooldown--;
             return;
         }
         ClientWorld world = SongPlayer.MC.world;
@@ -296,28 +291,32 @@ public class SongHandler {
 
         if (!Config.getConfig().survivalOnly) { // Regular mode
             if (!stage.requiredBreaks.isEmpty()) {
-                for (int i = 0; i < 5; i++) {
-                    if (stage.requiredBreaks.isEmpty()) break;
+                incrementBreakAllowance();
+                while (consumeBreakAllowance()) {
+                    if (stage.requiredBreaks.isEmpty()) continue;
                     BlockPos bp = stage.requiredBreaks.poll();
                     attackBlock(bp);
                 }
                 buildEndDelay = 20;
             } else if (!stage.missingNotes.isEmpty()) {
-                int desiredNoteId = stage.missingNotes.pollFirst();
-                BlockPos bp = stage.noteblockPositions.get(desiredNoteId);
-                if (bp == null) {
-                    return;
-                }
-                int blockId = Block.getRawIdFromState(world.getBlockState(bp));
-                int currentNoteId = (blockId - SongPlayer.NOTEBLOCK_BASE_ID) / 2;
-                if (currentNoteId != desiredNoteId) {
-                    holdNoteblock(desiredNoteId, buildSlot);
-                    if (blockId != 0) {
-                        attackBlock(bp);
+                incrementPlaceAllowance();
+                while (consumePlaceAllowance()) {
+                    if (stage.missingNotes.isEmpty()) continue;
+                    int desiredNoteId = stage.missingNotes.pollFirst();
+                    BlockPos bp = stage.noteblockPositions.get(desiredNoteId);
+                    if (bp == null) {
+                        return;
                     }
-                    placeBlock(bp);
+                    int blockId = Block.getRawIdFromState(world.getBlockState(bp));
+                    int currentNoteId = (blockId - SongPlayer.NOTEBLOCK_BASE_ID) / 2;
+                    if (currentNoteId != desiredNoteId) {
+                        holdNoteblock(desiredNoteId, buildSlot);
+                        if (blockId != 0) {
+                            attackBlock(bp);
+                        }
+                        placeBlock(bp);
+                    }
                 }
-                buildCooldown = 0; // No cooldown, so it places a block every tick
                 buildEndDelay = 20;
             }
         } else { // Survival only mode
@@ -460,10 +459,6 @@ public class SongHandler {
             buildStartDelay--;
             return;
         }
-        if (buildCooldown > 0) {
-            buildCooldown--;
-            return;
-        }
         ClientWorld world = SongPlayer.MC.world;
         if (SongPlayer.MC.interactionManager.getCurrentGameMode() != GameMode.CREATIVE) {
             return;
@@ -480,24 +475,28 @@ public class SongHandler {
         }
 
         if (!cleanupBreakList.isEmpty()) {
-            for (int i=0; i<5; i++) {
-                if (cleanupBreakList.isEmpty()) break;
+            incrementBreakAllowance();
+            while (consumeBreakAllowance()) {
+                if (cleanupBreakList.isEmpty()) continue;
                 BlockPos bp = cleanupBreakList.poll();
                 attackBlock(bp);
             }
             buildEndDelay = 20;
         } else if (!cleanupPlaceList.isEmpty()) {
-            BlockPos bp = cleanupPlaceList.pollFirst();
-            BlockState actualBlockState = world.getBlockState(bp);
-            BlockState desiredBlockState = originalBlocks.get(bp);
-            if (actualBlockState != desiredBlockState) {
-                holdBlock(desiredBlockState, buildSlot);
-                if (!actualBlockState.isAir() && !actualBlockState.isLiquid()) {
-                    attackBlock(bp);
+            incrementPlaceAllowance();
+            while (consumePlaceAllowance()) {
+                if (cleanupPlaceList.isEmpty()) continue;
+                BlockPos bp = cleanupPlaceList.pollFirst();
+                BlockState actualBlockState = world.getBlockState(bp);
+                BlockState desiredBlockState = originalBlocks.get(bp);
+                if (actualBlockState != desiredBlockState) {
+                    holdBlock(desiredBlockState, buildSlot);
+                    if (!actualBlockState.isAir() && !actualBlockState.isLiquid()) {
+                        attackBlock(bp);
+                    }
+                    placeBlock(bp);
                 }
-                placeBlock(bp);
             }
-            buildCooldown = 0; // No cooldown, so it places a block every tick
             buildEndDelay = 20;
         } else {
             originalBlocks.clear();
@@ -860,6 +859,38 @@ public class SongHandler {
             SongPlayer.MC.player.getInventory().setStack(buildSlot, prevHeldItem);
             SongPlayer.MC.interactionManager.clickCreativeStack(prevHeldItem, 36 + buildSlot);
             buildSlot = -1;
+        }
+    }
+
+    // Number of blocks allowed to be broken
+    private double breakAllowance = 0.0;
+    // Called every tick where block breaking is being handled
+    private void incrementBreakAllowance() {
+        breakAllowance += Config.getConfig().breakSpeed / 20.0;
+    }
+    // If there is enough breakAllowance, decrement breakAllowance and return true. Otherwise, return false.
+    private boolean consumeBreakAllowance() {
+        if (breakAllowance >= 1.0) {
+            breakAllowance--;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Number of blocks allowed to be placed
+    private double placeAllowance = 0.0;
+    // Called every tick where block placement are being handled
+    private void incrementPlaceAllowance() {
+        placeAllowance += Config.getConfig().placeSpeed / 20.0;
+    }
+    // If there is enough placeAllowance, decrement placeAllowance and return true. Otherwise, return false.
+    private boolean consumePlaceAllowance() {
+        if (placeAllowance >= 1.0) {
+            placeAllowance--;
+            return true;
+        } else {
+            return false;
         }
     }
 
