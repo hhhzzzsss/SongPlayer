@@ -371,7 +371,7 @@ public class SongHandler {
                         stage.checkSurvivalBuildStatus(currentSong);
                     } catch (Stage.NotEnoughInstrumentsException e) {
                         SongPlayer.addChatMessage("§6Stopped because stage is missing instruments required for song.");
-                        reset();
+                        restoreStateAndReset();
                         return;
                     }
                 }
