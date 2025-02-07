@@ -835,6 +835,8 @@ public class SongHandler {
         Block block = bs.getBlock();
         if (bs.isAir() || bs.isLiquid()) {
             return false;
+        } else if (new ItemStack(block).isEmpty()) {
+            return false;
         } else if (block instanceof DoorBlock || block instanceof BedBlock) {
             return false;
         } else {
