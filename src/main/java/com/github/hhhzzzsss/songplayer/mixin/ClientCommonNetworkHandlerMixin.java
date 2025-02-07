@@ -32,7 +32,10 @@ public class ClientCommonNetworkHandlerMixin {
         if (!SongHandler.getInstance().isIdle() && packet instanceof PlayerMoveC2SPacket) {
             if (lastStage != null) {
                 if (!Config.getConfig().rotate) {
-                    connection.send(new PlayerMoveC2SPacket.Full(lastStage.position.getX() + 0.5, lastStage.position.getY(), lastStage.position.getZ() + 0.5, SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch(), true));
+                    connection.send(new PlayerMoveC2SPacket.Full(
+                            lastStage.position.getX() + 0.5, lastStage.position.getY(), lastStage.position.getZ() + 0.5,
+                            SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch(),
+                            true, false));
                     if (SongPlayer.fakePlayer != null) {
                         SongPlayer.fakePlayer.copyStagePosAndPlayerLook();
                     }

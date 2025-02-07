@@ -50,13 +50,13 @@ public class Stage {
 			SongPlayer.MC.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(
 					position.getX() + 0.5, position.getY(), position.getZ() + 0.5,
 					SongPlayer.fakePlayer.getYaw(), SongPlayer.fakePlayer.getPitch(),
-					true));
+					true, false));
 		}
 		else {
 			SongPlayer.MC.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(
 					position.getX() + 0.5, position.getY(), position.getZ() + 0.5,
 					SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch(),
-					true));
+					true, false));
 		}
 	}
 

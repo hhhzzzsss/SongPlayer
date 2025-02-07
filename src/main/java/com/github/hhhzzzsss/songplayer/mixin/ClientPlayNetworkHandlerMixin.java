@@ -35,31 +35,34 @@ public class ClientPlayNetworkHandlerMixin {
 	@Inject(at = @At("TAIL"), method = "onPlayerPositionLook(Lnet/minecraft/network/packet/s2c/play/PlayerPositionLookS2CPacket;)V")
 	public void onOnPlayerPositionLook(PlayerPositionLookS2CPacket packet, CallbackInfo ci) {
 		Stage lastStage = SongHandler.getInstance().lastStage;
-		if (!SongHandler.getInstance().isIdle() && lastStage != null && lastStage.getOriginBottomCenter().squaredDistanceTo(SongPlayer.MC.player.getPos()) > 3*3) {
+		if (!SongHandler.getInstance().isIdle() && lastStage != null) {
 			Vec3d stageOriginBottomCenter = lastStage.getOriginBottomCenter();
-			boolean xrel = packet.getFlags().contains(PositionFlag.X);
-			boolean yrel = packet.getFlags().contains(PositionFlag.Y);
-			boolean zrel = packet.getFlags().contains(PositionFlag.Z);
-			double dx = 0.0;
-			double dy = 0.0;
-			double dz = 0.0;
+			boolean xrel = packet.relatives().contains(PositionFlag.X);
+			boolean yrel = packet.relatives().contains(PositionFlag.Y);
+			boolean zrel = packet.relatives().contains(PositionFlag.Z);
+			double dx;
+			double dy;
+			double dz;
+			// Relative position sets need to be handled differently because client-side position doesn't match server-side position
 			if (xrel) {
-				dx = packet.getX();
+				dx = packet.change().position().getX();
 			} else {
 				dx = SongPlayer.MC.player.getX() - stageOriginBottomCenter.getX();
 			}
 			if (yrel) {
-				dy = packet.getY();
+				dy = packet.change().position().getY();
 			} else {
 				dy = SongPlayer.MC.player.getY() - stageOriginBottomCenter.getY();
 			}
 			if (zrel) {
-				dz = packet.getZ();
+				dz = packet.change().position().getZ();
 			} else {
 				dz = SongPlayer.MC.player.getZ() - stageOriginBottomCenter.getZ();
 			}
-			double dist = dx*dx + dy*dy + dz*dz;
-			if (dist > 3.0) {
+			double distsq = dx*dx + dy*dy + dz*dz;
+			System.out.println(packet.change());
+			System.out.println(distsq);
+			if (distsq > 3.0*3.0) {
 				SongPlayer.addChatMessage("§6Stopped playing/building because the server moved the player too far from the stage!");
 				SongHandler.getInstance().reset();
 			} else {
