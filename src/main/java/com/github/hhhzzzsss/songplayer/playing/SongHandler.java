@@ -794,12 +794,14 @@ public class SongHandler {
         fx += bp.getX();
         fy += bp.getY();
         fz += bp.getZ();
+        doRotateIfNeeded(fx, fy, fz);
         SongPlayer.MC.interactionManager.interactBlock(SongPlayer.MC.player, Hand.MAIN_HAND, new BlockHitResult(new Vec3d(fx, fy, fz), Direction.UP, bp, false));
-        doMovements(fx, fy, fz);
+        doSwingIfNeeded();
     }
     private void attackBlock(BlockPos bp) {
+        doRotateIfNeeded(bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5);
         SongPlayer.MC.interactionManager.attackBlock(bp, Direction.UP);
-        doMovements(bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5);
+        doSwingIfNeeded();
     }
     private void stopAttack() {
         SongPlayer.MC.interactionManager.cancelBlockBreaking();
@@ -844,13 +846,7 @@ public class SongHandler {
         }
     }
 
-    private void doMovements(double lookX, double lookY, double lookZ) {
-        if (Config.getConfig().swing) {
-            SongPlayer.MC.player.swingHand(Hand.MAIN_HAND);
-            if (SongPlayer.fakePlayer != null) {
-                SongPlayer.fakePlayer.swingHand(Hand.MAIN_HAND);
-            }
-        }
+    private void doRotateIfNeeded(double lookX, double lookY, double lookZ) {
         if (Config.getConfig().rotate) {
             double d = lookX - (lastStage.position.getX() + 0.5);
             double e = lookY - (lastStage.position.getY() + SongPlayer.MC.player.getStandingEyeHeight());
@@ -867,6 +863,14 @@ public class SongHandler {
                     lastStage.position.getX() + 0.5, lastStage.position.getY(), lastStage.position.getZ() + 0.5,
                     yaw, pitch,
                     true, false));
+        }
+    }
+    private void doSwingIfNeeded() {
+        if (Config.getConfig().swing) {
+            SongPlayer.MC.player.swingHand(Hand.MAIN_HAND);
+            if (SongPlayer.fakePlayer != null) {
+                SongPlayer.fakePlayer.swingHand(Hand.MAIN_HAND);
+            }
         }
     }
 
