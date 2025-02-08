@@ -60,8 +60,9 @@ public class CommandProcessor {
 		commands.add(new toggleAutoCleanupCommand());
 		commands.add(new cleanupLastStageCommand());
 		commands.add(new announcementCommand());
-		commands.add(new songItemCommand());
 		commands.add(new toggleSurvivalOnlyCommand());
+		commands.add(new toggleFlightNoclipCommand());
+		commands.add(new songItemCommand());
 		commands.add(new testSongCommand());
 
 		for (Command command : commands) {
@@ -1247,6 +1248,73 @@ public class CommandProcessor {
 		}
 	}
 
+	private static class toggleSurvivalOnlyCommand extends Command {
+		public String getName() {
+			return "toggleSurvivalOnly";
+		}
+		public String[] getAliases() {
+			return new String[]{"survivalOnly"};
+		}
+		public String[] getSyntax() {
+			return new String[0];
+		}
+		public String getDescription() {
+			return "Enables or disables survival-only mode, in which automatic noteblock placement is disabled and automatic tuning is done by right-clicking.";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() == 0) {
+				if (!SongHandler.getInstance().isIdle()) {
+					SongPlayer.addChatMessage("§cYou cannot change this setting while playing or building");
+					return true;
+				}
+
+				Config.getConfig().survivalOnly = !Config.getConfig().survivalOnly;
+				if (Config.getConfig().survivalOnly) {
+					SongPlayer.addChatMessage("§6Enabled survival only mode");
+				}
+				else {
+					SongPlayer.addChatMessage("§6Disabled survival only mode");
+				}
+				Config.saveConfigWithErrorHandling();
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+
+	private static class toggleFlightNoclipCommand extends Command {
+		public String getName() {
+			return "toggleFlightNoclip";
+		}
+		public String[] getAliases() {
+			return new String[]{"flightNoclip"};
+		}
+		public String[] getSyntax() {
+			return new String[0];
+		}
+		public String getDescription() {
+			return "Toggles flight noclip. When enabled, your local player can clip through blocks when flying while playing a song.";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() == 0) {
+				Config.getConfig().flightNoclip = !Config.getConfig().flightNoclip;
+				if (Config.getConfig().flightNoclip) {
+					SongPlayer.addChatMessage("§6Enabled flight noclip");
+				}
+				else {
+					SongPlayer.addChatMessage("§6Disabled flight noclip");
+				}
+				Config.saveConfigWithErrorHandling();
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+
 	private static class songItemCommand extends Command {
 		public String getName() {
 			return "songItem";
@@ -1321,42 +1389,6 @@ public class CommandProcessor {
 				case "setsongname":
 				default:
 					return null;
-			}
-		}
-	}
-
-	private static class toggleSurvivalOnlyCommand extends Command {
-		public String getName() {
-			return "toggleSurvivalOnly";
-		}
-		public String[] getAliases() {
-			return new String[]{"survivalOnly"};
-		}
-		public String[] getSyntax() {
-			return new String[0];
-		}
-		public String getDescription() {
-			return "Enables or disables survival-only mode, in which automatic noteblock placement is disabled and automatic tuning is done by right-clicking.";
-		}
-		public boolean processCommand(String args) {
-			if (args.length() == 0) {
-				if (!SongHandler.getInstance().isIdle()) {
-					SongPlayer.addChatMessage("§cYou cannot change this setting while playing or building");
-					return true;
-				}
-
-				Config.getConfig().survivalOnly = !Config.getConfig().survivalOnly;
-				if (Config.getConfig().survivalOnly) {
-					SongPlayer.addChatMessage("§6Enabled survival only mode");
-				}
-				else {
-					SongPlayer.addChatMessage("§6Disabled survival only mode");
-				}
-				Config.saveConfigWithErrorHandling();
-				return true;
-			}
-			else {
-				return false;
 			}
 		}
 	}

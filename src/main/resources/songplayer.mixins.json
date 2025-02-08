@@ -13,7 +13,8 @@
     "ClientPlayNetworkHandlerAccessor",
     "ClientPlayNetworkHandlerMixin",
     "InGameHudMixin",
-    "MinecraftClientMixin"
+    "MinecraftClientMixin",
+    "PlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -31,6 +31,7 @@ public class Config {
     public double placeSpeed = 20.0;
     public boolean autoCleanup = false;
     public boolean survivalOnly = false;
+    public boolean flightNoclip = false;
 
     public static Config getConfig() {
         if (config == null) {
