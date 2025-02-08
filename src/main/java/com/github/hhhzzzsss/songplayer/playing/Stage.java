@@ -514,6 +514,7 @@ public class Stage {
 		}
 	}
 
+	// Find available noteblocks in range for the player to use in survival only mode
 	Map<BlockPos, Integer>[] loadSurvivalBlocks() {
 		@SuppressWarnings("unchecked")
 		Map<BlockPos, Integer>[] instrumentMap = new Map[16];
@@ -525,8 +526,9 @@ public class Stage {
 				for (int dy : new int[]{-1, 0, 1, 2, -2, 3, -3, 4, -4, 5, 6}) {
 					BlockPos bp = position.add(dx, dy, dz);
 					BlockState bs = SongPlayer.MC.world.getBlockState(bp);
+					BlockState aboveBs = SongPlayer.MC.world.getBlockState(bp.up());
 					int blockId = Block.getRawIdFromState(bs);
-					if (blockId >= SongPlayer.NOTEBLOCK_BASE_ID && blockId < SongPlayer.NOTEBLOCK_BASE_ID + 800) {
+					if (blockId >= SongPlayer.NOTEBLOCK_BASE_ID && blockId < SongPlayer.NOTEBLOCK_BASE_ID + 800 && aboveBs.isAir()) {
 						int noteId = (blockId - SongPlayer.NOTEBLOCK_BASE_ID) / 2;
 						int instrument = noteId / 25;
 						int pitch = noteId % 25;
@@ -563,10 +565,10 @@ public class Stage {
 				return true;
 			}
 			int actualInstrument = actualNoteId / 25;
-			int actualPtich = actualNoteId % 25;
+			int actualPitch = actualNoteId % 25;
 			int targetInstrument = entry.getKey() / 25;
 			int targetPitch = entry.getKey() % 25;
-			if (targetPitch != actualPtich) {
+			if (targetPitch != actualPitch) {
 				return true;
 			}
 			if (targetInstrument != actualInstrument) {
