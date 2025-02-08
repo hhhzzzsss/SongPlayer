@@ -48,7 +48,6 @@ public class Stage {
 	}
 
 	public void movePlayerToStagePosition() {
-		MC.player.getAbilities().flying = true;
 		MC.player.refreshPositionAndAngles(position.getX() + 0.5, position.getY() + 0.0, position.getZ() + 0.5, MC.player.getYaw(), MC.player.getPitch());
 		MC.player.setVelocity(Vec3d.ZERO);
 		sendMovementPacketToStagePosition();
