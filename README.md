@@ -118,6 +118,14 @@ Sets the type of noteblock stage to build. Thanks Sk8kman and Lizard16 for the s
 - Wide: A cylindrical stage with a maximum of 360 noteblocks
 - Spherical: A densely packed spherical stage that can contain all 400 possible noteblocks
 
+### $breakSpeed set \<speed>
+### $breakSpeed reset
+Sets the block breaking speed in blocks/sec.
+
+### $placeSpeed set \<speed>
+### $placeSpeed reset
+Sets the block placement speed in blocks/sec.
+
 ### $toggleMovement \<swing | rotate>
 *aliases: `$movement`*
 
@@ -150,14 +158,6 @@ With setMessage, write `[name]` where the song name should go.
 
 Example: `$announcement setMessage &6Now playing: &3[name]`
 
-### $songItem create \<song or url>
-### $songItem setSongName \<name>
-*aliases: `$item`*
-
-Encodes song data into an item. When you right click on such an item, SongPlayer will automatically detect that it is a song item and ask if you want to play it. These items, once created, can be used by anyone that is using the necessary version of SongPlayer.
-
-It will automatically generate custom item names and lore, but these can be modified or deleted without affecting the song data, so feel free to edit the items as you wish. SongPlayer only looks at the `SongItemData` tag.
-
 ### $toggleSurvivalOnly
 *aliases: `$survivalOnly`*
 
@@ -166,6 +166,19 @@ Enables or disables survival-only mode, in which automatic noteblock placement i
 In this mode, you must place the necessary instruments yourself.
 
 If you try to play a song and the requirements are not met, it will tell you how many instruments of each type you need.
+
+### $toggleFlightNoclip
+*aliases: `$flightNoclip`*
+
+Toggles flight noclip. When enabled, your local player can clip through blocks when playing a song, but only while flying.
+
+### $songItem create \<song or url>
+### $songItem setSongName \<name>
+*aliases: `$item`*
+
+Encodes song data into an item. When you right click on such an item, SongPlayer will automatically detect that it is a song item and ask if you want to play it. These items, once created, can be used by anyone that is using the necessary version of SongPlayer.
+
+It will automatically generate custom item names and lore, but these can be modified or deleted without affecting the song data, so feel free to edit the items as you wish. SongPlayer only looks at the `SongItemData` tag.
 
 ### $testSong
 A command I used for testing during development.
