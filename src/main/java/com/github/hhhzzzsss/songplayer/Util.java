@@ -2,6 +2,7 @@ package com.github.hhhzzzsss.songplayer;
 
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandSource;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
@@ -10,6 +11,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.PlainTextContent;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.WorldSavePath;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +27,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Util {
+    static final MinecraftClient MC = MinecraftClient.getInstance();
+
     public static void createDirectoriesSilently(Path path) {
         try {
             Files.createDirectories(path);
@@ -237,5 +241,14 @@ public class Util {
             base.append(child);
         }
         return base;
+    }
+
+    public static String getWorldName() {
+        return MC.world.getRegistryKey().getValue().toString();
+    }
+
+    public static String getServerIdentifier() {
+        if (MC.isInSingleplayer()) return "local;" + MC.getServer().getSavePath(WorldSavePath.ROOT).getParent().getFileName().toString();
+        else return "remote;" + MC.getCurrentServerEntry().address;
     }
 }

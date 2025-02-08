@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class SongPlayer implements ModInitializer {
-
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final int NOTEBLOCK_BASE_ID = Block.getRawIdFromState(Blocks.NOTE_BLOCK.getDefaultState())-1;
 

@@ -2,10 +2,12 @@ package com.github.hhhzzzsss.songplayer.playing;
 
 import com.github.hhhzzzsss.songplayer.Config;
 import com.github.hhhzzzsss.songplayer.SongPlayer;
+import com.github.hhhzzzsss.songplayer.Util;
 import com.github.hhhzzzsss.songplayer.song.Instrument;
 import com.github.hhhzzzsss.songplayer.song.Song;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.BlockPos;
@@ -15,14 +17,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Stage {
-	private final ClientPlayerEntity player = SongPlayer.MC.player;
+	private final MinecraftClient MC = SongPlayer.MC;
 
 	public enum StageType {
 		DEFAULT,
 		WIDE,
 		SPHERICAL,
 	}
-	
+
+	public String worldName;
+	public String serverIdentifier;
 	public BlockPos position;
 	public HashMap<Integer, BlockPos> noteblockPositions = new HashMap<>();
 
@@ -35,13 +39,18 @@ public class Stage {
 	public LinkedList<BlockPos> requiredClicks = new LinkedList<>();
 
 	public Stage() {
-		position = player.getBlockPos();
+		position = MC.player.getBlockPos();
+
+		// Information tracked for checking cleanup conditions
+		worldName = Util.getWorldName();
+		serverIdentifier = Util.getServerIdentifier();
+		System.out.println("Server identifier: " + serverIdentifier);
 	}
-	
+
 	public void movePlayerToStagePosition() {
-		player.getAbilities().flying = true;
-		player.refreshPositionAndAngles(position.getX() + 0.5, position.getY() + 0.0, position.getZ() + 0.5, player.getYaw(), player.getPitch());
-		player.setVelocity(Vec3d.ZERO);
+		MC.player.getAbilities().flying = true;
+		MC.player.refreshPositionAndAngles(position.getX() + 0.5, position.getY() + 0.0, position.getZ() + 0.5, MC.player.getYaw(), MC.player.getPitch());
+		MC.player.setVelocity(Vec3d.ZERO);
 		sendMovementPacketToStagePosition();
 	}
 

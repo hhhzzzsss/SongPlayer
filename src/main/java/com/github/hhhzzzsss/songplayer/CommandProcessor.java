@@ -1158,11 +1158,11 @@ public class CommandProcessor {
 					SongPlayer.addChatMessage("§cYou cannot start cleanup if you are in the middle of another action");
 					return true;
 				}
-				if (lastStage == null || SongHandler.getInstance().originalBlocks.size() == 0) {
+				if (lastStage == null || SongHandler.getInstance().originalBlocks.size() == 0 || !lastStage.serverIdentifier.equals(Util.getServerIdentifier())) {
 					SongPlayer.addChatMessage("§6There is nothing to clean up");
 					return true;
 				}
-				if (SongPlayer.MC.player.getPos().squaredDistanceTo(lastStage.getOriginBottomCenter()) > 3*3) {
+				if (MC.player.getPos().squaredDistanceTo(lastStage.getOriginBottomCenter()) > 3*3 || !lastStage.worldName.equals(Util.getWorldName())) {
 					String coordStr = String.format(
 							"%d %d %d",
 							lastStage.position.getX(), lastStage.position.getY(), lastStage.position.getZ()
@@ -1177,7 +1177,8 @@ public class CommandProcessor {
 											.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, coordStr))
 											.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Copy \"" + coordStr + "\"")))
 							),
-							Text.literal(" (click to copy)").setStyle(Style.EMPTY.withColor(Formatting.GOLD))
+							Text.literal(" in world ").setStyle(Style.EMPTY.withColor(Formatting.GOLD)),
+							Text.literal(lastStage.worldName).setStyle(Style.EMPTY.withColor(Formatting.DARK_AQUA))
 					);
 					SongPlayer.addChatMessage(coordText);
 					return true;
