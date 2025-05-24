@@ -1175,8 +1175,8 @@ public class CommandProcessor {
 									Style.EMPTY
 											.withColor(Formatting.DARK_AQUA)
 											.withUnderline(true)
-											.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, coordStr))
-											.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Copy \"" + coordStr + "\"")))
+											.withClickEvent(new ClickEvent.CopyToClipboard(coordStr))
+											.withHoverEvent(new HoverEvent.ShowText(Text.literal("Copy \"" + coordStr + "\"")))
 							),
 							Text.literal(" in world ").setStyle(Style.EMPTY.withColor(Formatting.GOLD)),
 							Text.literal(lastStage.worldName).setStyle(Style.EMPTY.withColor(Formatting.DARK_AQUA))
@@ -1342,7 +1342,6 @@ public class CommandProcessor {
 			}
 
 			ItemStack stack = MC.player.getMainHandStack();
-			NbtCompound songPlayerNBT = SongItemUtils.getSongItemTag(stack);
 
 			String[] split = args.split(" ");
 			switch (split[0].toLowerCase(Locale.ROOT)) {
@@ -1357,17 +1356,19 @@ public class CommandProcessor {
 					return true;
 				case "setsongname":
 					if (split.length < 2) return false;
-					if (songPlayerNBT == null) {
+
+					if (SongItemUtils.isSongItem(stack)) {
+						String name = String.join(" ", Arrays.copyOfRange(split, 1, split.length));
+						SongItemUtils.updateSongItemTag(stack, (songItemTag) -> songItemTag.putString(SongItemUtils.DISPLAY_NAME_KEY, name));
+						SongItemUtils.addSongItemDisplay(stack);
+						MC.player.setStackInHand(Hand.MAIN_HAND, stack);
+						MC.interactionManager.clickCreativeStack(MC.player.getStackInHand(Hand.MAIN_HAND), 36 + MC.player.getInventory().getSelectedSlot());
+						SongPlayer.addChatMessage("§6Set song display name to §3" + name);
+						return true;
+					} else {
 						SongPlayer.addChatMessage("§cYou must be holding a song item");
 						return true;
 					}
-					String name = String.join(" ", Arrays.copyOfRange(split, 1, split.length));
-					NbtComponent.set(DataComponentTypes.CUSTOM_DATA, stack, nbt -> nbt.getCompound(SongItemUtils.SONG_ITEM_KEY).putString(SongItemUtils.DISPLAY_NAME_KEY, name));
-					SongItemUtils.addSongItemDisplay(stack);
-					MC.player.setStackInHand(Hand.MAIN_HAND, stack);
-					MC.interactionManager.clickCreativeStack(MC.player.getStackInHand(Hand.MAIN_HAND), 36 + MC.player.getInventory().selectedSlot);
-					SongPlayer.addChatMessage("§6Set song's display name to §3" + name);
-					return true;
 				default:
 					return false;
 			}

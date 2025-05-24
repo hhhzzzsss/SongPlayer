@@ -19,19 +19,20 @@ public class SongItemLoaderThread extends SongLoaderThread {
         if (songData == null) {
             throw new IOException("Song data is missing");
         }
-        NbtCompound songItemNbt = SongItemUtils.getSongItemTag(stack);
-        displayName = songItemNbt.getString(SongItemUtils.DISPLAY_NAME_KEY);
-        filename = songItemNbt.getString(SongItemUtils.DISPLAY_NAME_KEY);
+        NbtCompound songItemNbt = SongItemUtils.getSongItemTag(stack)
+                .orElseThrow(() -> new IOException("Song item tag is missing"));
+        displayName = songItemNbt.getString(SongItemUtils.DISPLAY_NAME_KEY).orElse(null);
+        filename = displayName;
     }
 
     @Override
     public void run() {
         try {
             song = SPConverter.getSongFromBytes(songData, filename);
-            if (displayName == null || displayName.length() > 0) {
+            if (displayName != null && displayName.length() > 0) { // Display name has priority
                 song.name = displayName;
             }
-            if (song.name == null || song.name.length() == 0) {
+            if (song.name == null || song.name.length() == 0) { // Fallback to unnamed
                 song.name = "unnamed";
             }
 

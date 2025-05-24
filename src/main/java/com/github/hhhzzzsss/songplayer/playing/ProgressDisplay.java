@@ -52,12 +52,9 @@ public class ProgressDisplay {
             opacity = 255;
         }
 
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
         Objects.requireNonNull(SongPlayer.MC.textRenderer);
         context.drawTextWithShadow(SongPlayer.MC.textRenderer, bottomText, bottomTextX, bottomTextY, 16777215 + (opacity << 24));
         context.drawTextWithShadow(SongPlayer.MC.textRenderer, topText, topTextX, topTextY, 16777215 + (opacity << 24));
-        RenderSystem.disableBlend();
     }
 
     public void onTick() {

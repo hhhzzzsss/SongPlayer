@@ -760,7 +760,7 @@ public class SongHandler {
     private final String[] instrumentNames = {"harp", "basedrum", "snare", "hat", "bass", "flute", "bell", "guitar", "chime", "xylophone", "iron_xylophone", "cow_bell", "didgeridoo", "bit", "banjo", "pling"};
     private void holdNoteblock(int id, int slot) {
         PlayerInventory inventory = SongPlayer.MC.player.getInventory();
-        inventory.selectedSlot = slot;
+        inventory.setSelectedSlot(slot);
         ((ClientPlayerInteractionManagerAccessor) SongPlayer.MC.interactionManager).invokeSyncSelectedSlot();
         int instrument = id/25;
         int note = id%25;
@@ -769,12 +769,12 @@ public class SongHandler {
                 "instrument", instrumentNames[instrument],
                 "note", Integer.toString(note)
         )));
-        inventory.main.set(slot, noteblockStack);
+        inventory.getMainStacks().set(slot, noteblockStack);
         SongPlayer.MC.interactionManager.clickCreativeStack(noteblockStack, 36 + slot);
     }
     private void holdBlock(BlockState bs, int slot) {
         PlayerInventory inventory = SongPlayer.MC.player.getInventory();
-        inventory.selectedSlot = slot;
+        inventory.setSelectedSlot(slot);
         ((ClientPlayerInteractionManagerAccessor) SongPlayer.MC.interactionManager).invokeSyncSelectedSlot();
         ItemStack stack = new ItemStack(bs.getBlock());
         Map<String, String> stateMap = new TreeMap<>();
@@ -784,7 +784,7 @@ public class SongHandler {
             stateMap.put(property.getName(), net.minecraft.util.Util.getValueAsString(property, value));
         }
         stack.set(DataComponentTypes.BLOCK_STATE, new BlockStateComponent(stateMap));
-        inventory.main.set(slot, stack);
+        inventory.getMainStacks().set(slot, stack);
         SongPlayer.MC.interactionManager.clickCreativeStack(stack, 36 + slot);
     }
     private void placeBlock(BlockPos bp) {

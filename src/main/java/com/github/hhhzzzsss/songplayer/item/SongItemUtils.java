@@ -11,6 +11,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.util.Base64;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 public class SongItemUtils {
     public static final String SONG_ITEM_KEY = "SongItemData";
@@ -19,51 +21,52 @@ public class SongItemUtils {
     public static final String DISPLAY_NAME_KEY = "DisplayName";
 
     public static ItemStack createSongItem(ItemStack stack, byte[] songData, String filename, String displayName) {
-        NbtCompound songPlayerNbt = new NbtCompound();
-        songPlayerNbt.putString(SONG_DATA_KEY, Base64.getEncoder().encodeToString(songData));
-        songPlayerNbt.putString(FILE_NAME_KEY, filename);
-        songPlayerNbt.putString(DISPLAY_NAME_KEY, displayName);
-        NbtComponent.set(DataComponentTypes.CUSTOM_DATA, stack, nbt -> nbt.put(SONG_ITEM_KEY, songPlayerNbt));
+        NbtCompound songItemTag = new NbtCompound();
+        songItemTag.putString(SONG_DATA_KEY, Base64.getEncoder().encodeToString(songData));
+        songItemTag.putString(FILE_NAME_KEY, filename);
+        songItemTag.putString(DISPLAY_NAME_KEY, displayName);
+        NbtComponent.set(DataComponentTypes.CUSTOM_DATA, stack, nbt -> nbt.put(SONG_ITEM_KEY, songItemTag));
         addSongItemDisplay(stack);
         return stack;
     }
 
     public static void addSongItemDisplay(ItemStack stack) {
-        if (!isSongItem(stack)) return;
-        NbtCompound songPlayerNbt = getSongItemTag(stack);
-        String name = songPlayerNbt.getString(DISPLAY_NAME_KEY);
-        if (name == null || name.length() == 0) name = songPlayerNbt.getString(FILE_NAME_KEY);
-        if (name == null || name.length() == 0) name = "unnamed";
-        Text nameText = Util.getStyledText(name, Style.EMPTY.withColor(Formatting.DARK_AQUA).withItalic(false));
-        Util.setItemName(stack, nameText);
-        Util.setItemLore(stack,
-                Util.getStyledText("Song Item", Style.EMPTY.withColor(Formatting.YELLOW).withItalic(false)),
-                Util.getStyledText("Right click to play", Style.EMPTY.withColor(Formatting.AQUA).withItalic(false)),
-                Util.getStyledText("Requires SongPlayer 3.0+", Style.EMPTY.withColor(Formatting.GOLD).withItalic(false)),
-                Util.getStyledText("https://github.com/hhhzzzsss/SongPlayer", Style.EMPTY.withColor(Formatting.GRAY).withItalic(false))
-        );
+        getSongItemTag(stack).ifPresent((songItemTag) -> {
+            String name = songItemTag.getString(DISPLAY_NAME_KEY)
+                    .or(() -> songItemTag.getString(FILE_NAME_KEY))
+                    .orElse("unnamed");
+            Util.setItemName(stack,
+                    Util.getStyledText(name, Style.EMPTY.withColor(Formatting.DARK_AQUA).withItalic(false))
+            );
+            Util.setItemLore(stack,
+                    Util.getStyledText("Song Item", Style.EMPTY.withColor(Formatting.YELLOW).withItalic(false)),
+                    Util.getStyledText("Right click to play", Style.EMPTY.withColor(Formatting.AQUA).withItalic(false)),
+                    Util.getStyledText("Requires SongPlayer 3.0+", Style.EMPTY.withColor(Formatting.GOLD).withItalic(false)),
+                    Util.getStyledText("https://github.com/hhhzzzsss/SongPlayer", Style.EMPTY.withColor(Formatting.GRAY).withItalic(false))
+            );
+        });
     }
 
-    public static NbtCompound getSongItemTag(ItemStack stack) {
-        NbtCompound nbt = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).copyNbt();
-        if (nbt.contains(SONG_ITEM_KEY, NbtElement.COMPOUND_TYPE)) {
-            return (NbtCompound)nbt.get(SONG_ITEM_KEY);
-        } else {
-            return null;
-        }
+    public static void updateSongItemTag(ItemStack stack, Consumer<NbtCompound> nbtSetter) {
+        NbtComponent.set(DataComponentTypes.CUSTOM_DATA, stack, (itemNbt) -> {
+            itemNbt.getCompound(SONG_ITEM_KEY).ifPresent(nbtSetter);
+        });
+    }
+
+    public static Optional<NbtCompound> getSongItemTag(ItemStack stack) {
+        return stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT)
+                .copyNbt()
+                .getCompound(SONG_ITEM_KEY);
     }
 
     public static boolean isSongItem(ItemStack stack) {
-        return getSongItemTag(stack) != null;
+        return getSongItemTag(stack).isPresent();
     }
 
     public static byte[] getSongData(ItemStack stack) throws IllegalArgumentException {
-        NbtCompound songPlayerNbt = getSongItemTag(stack);
-        if (songPlayerNbt == null || !songPlayerNbt.contains(SONG_DATA_KEY, NbtElement.STRING_TYPE)) {
-            return null;
-        }
-        else {
-            return Base64.getDecoder().decode(songPlayerNbt.getString(SONG_DATA_KEY));
-        }
+        return getSongItemTag(stack)
+                .flatMap((songItemTag) -> songItemTag.getString(SONG_DATA_KEY))
+                .map((songData) -> Base64.getDecoder().decode(songData))
+                .orElse(null);
     }
 }

@@ -18,7 +18,7 @@ public class SongItemCreatorThread extends SongLoaderThread {
     public final ItemStack stack;
     public SongItemCreatorThread(String location) throws IOException {
         super(location);
-        this.slotId = SongPlayer.MC.player.getInventory().selectedSlot;
+        this.slotId = SongPlayer.MC.player.getInventory().getSelectedSlot();
         this.stack = SongPlayer.MC.player.getInventory().getStack(slotId);
     }
 
