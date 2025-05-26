@@ -1,6 +1,8 @@
 # SongPlayer
 A Fabric mod for Minecraft that plays songs with noteblocks.
 
+If you have questions, want to share songs, or just want to talk about the mod, then come over to the [discord server](https://discord.gg/p2Frd557fF).
+
 # How to install
 You can grab the mod jar from releases section.
 This mod requires fabric api.
