@@ -8,7 +8,6 @@ import com.github.hhhzzzsss.songplayer.song.Song;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -54,18 +53,11 @@ public class Stage {
 	}
 
 	public void sendMovementPacketToStagePosition() {
-		if (SongPlayer.fakePlayer != null) {
-			SongPlayer.MC.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(
-					position.getX() + 0.5, position.getY(), position.getZ() + 0.5,
-					SongPlayer.fakePlayer.getYaw(), SongPlayer.fakePlayer.getPitch(),
-					true, false));
-		}
-		else {
-			SongPlayer.MC.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(
-					position.getX() + 0.5, position.getY(), position.getZ() + 0.5,
-					SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch(),
-					true, false));
-		}
+		// Doesn't really matter what packet I send here anymore since it gets overridden in the mixin
+		SongPlayer.MC.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(
+				position.getX() + 0.5, position.getY(), position.getZ() + 0.5,
+				SongPlayer.MC.player.getYaw(), SongPlayer.MC.player.getPitch(),
+				true, false));
 	}
 
 	public void checkBuildStatus(Song song) {
@@ -266,12 +258,12 @@ public class Stage {
 			this.foundInstruments = foundInstruments;
 		}
 		public void giveInstrumentSummary() {
-			SongPlayer.addChatMessage("§c------------------------------");
-			SongPlayer.addChatMessage("§cMissing instruments required to play song:");
+			Util.showChatMessage("§c------------------------------");
+			Util.showChatMessage("§cMissing instruments required to play song:");
 			for (int instrumentId = 0; instrumentId < 16; instrumentId++) {
 				if (requiredInstruments[instrumentId] > 0) {
 					Instrument instrument = Instrument.getInstrumentFromId(instrumentId);
-					SongPlayer.addChatMessage(String.format(
+					Util.showChatMessage(String.format(
 							"    §3%s (%s): §%s%d/%d",
 							instrument.name(), instrument.material,
 							foundInstruments[instrumentId] < requiredInstruments[instrumentId] ? "c" : "a",
@@ -279,7 +271,7 @@ public class Stage {
 					));
 				}
 			}
-			SongPlayer.addChatMessage("§c------------------------------");
+			Util.showChatMessage("§c------------------------------");
 		}
 	}
 

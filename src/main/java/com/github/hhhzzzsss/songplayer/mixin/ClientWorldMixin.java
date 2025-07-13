@@ -1,6 +1,7 @@
 package com.github.hhhzzzsss.songplayer.mixin;
 
 import com.github.hhhzzzsss.songplayer.SongPlayer;
+import com.github.hhhzzzsss.songplayer.Util;
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
 import com.github.hhhzzzsss.songplayer.playing.Stage;
 import net.minecraft.block.BlockState;
@@ -24,7 +25,7 @@ public class ClientWorldMixin {
                     BlockState oldState = SongPlayer.MC.world.getBlockState(pos);
                     if (oldState.equals(state))
                         return;
-                    SongPlayer.addChatMessage(String.format("§7Block in stage changed from §2%s §7to §2%s", oldState.toString(), state.toString()));
+                    Util.showChatMessage(String.format("§7Block in stage changed from §2%s §7to §2%s", oldState.toString(), state.toString()));
                     break;
                 }
             }

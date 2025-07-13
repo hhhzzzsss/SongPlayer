@@ -2,6 +2,7 @@ package com.github.hhhzzzsss.songplayer.mixin;
 
 import com.github.hhhzzzsss.songplayer.CommandProcessor;
 import com.github.hhhzzzsss.songplayer.SongPlayer;
+import com.github.hhhzzzsss.songplayer.Util;
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
 import com.github.hhhzzzsss.songplayer.playing.Stage;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -70,7 +71,7 @@ public class ClientPlayNetworkHandlerMixin {
 						zrel ? stageOriginBottomCenter.getZ() + dz : player.getZ(),
 						player.getYaw(), player.getPitch()
 				);
-				SongPlayer.addChatMessage("§6Stopped playing/building because the server moved the player too far from the stage!");
+				Util.showChatMessage("§6Stopped playing/building because the server moved the player too far from the stage!");
 				SongHandler.getInstance().restoreStateAndReset(false);
 			} else {
 				lastStage.movePlayerToStagePosition();

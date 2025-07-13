@@ -10,10 +10,7 @@ import com.github.hhhzzzsss.songplayer.song.Song;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -83,28 +80,28 @@ public class CommandProcessor {
 			String args = parts.length>1 ? parts[1] : "";
 			Command c = commandMap.get(name.toLowerCase(Locale.ROOT));
 			if (c == null) {
-				SongPlayer.addChatMessage("§cUnrecognized command");
+				Util.showChatMessage("§cUnrecognized command");
 			} else {
 				try {
 					boolean success = c.processCommand(args);
 					if (!success) {
 						if (c.getSyntax().length == 0) {
-							SongPlayer.addChatMessage("§cSyntax: " + Config.getConfig().prefix + c.getName());
+							Util.showChatMessage("§cSyntax: " + Config.getConfig().prefix + c.getName());
 						}
 						else if (c.getSyntax().length == 1) {
-							SongPlayer.addChatMessage("§cSyntax: " + Config.getConfig().prefix + c.getName() + " " + c.getSyntax()[0]);
+							Util.showChatMessage("§cSyntax: " + Config.getConfig().prefix + c.getName() + " " + c.getSyntax()[0]);
 						}
 						else {
-							SongPlayer.addChatMessage("§cSyntax:");
+							Util.showChatMessage("§cSyntax:");
 							for (String syntax : c.getSyntax()) {
-								SongPlayer.addChatMessage("§c    " + Config.getConfig().prefix + c.getName() + " " + syntax);
+								Util.showChatMessage("§c    " + Config.getConfig().prefix + c.getName() + " " + syntax);
 							}
 						}
 					}
 				}
 				catch (Throwable e) {
 					e.printStackTrace();
-					SongPlayer.addChatMessage("§cAn error occurred while running this command: §4" + e.getMessage());
+					Util.showChatMessage("§cAn error occurred while running this command: §4" + e.getMessage());
 				}
 			}
 			return true;
@@ -142,31 +139,31 @@ public class CommandProcessor {
 				for (Command c : commands) {
 					helpMessage.append(" " + Config.getConfig().prefix + c.getName());
 				}
-				SongPlayer.addChatMessage(helpMessage.toString());
+				Util.showChatMessage(helpMessage.toString());
 			}
 			else {
 				if (commandMap.containsKey(args.toLowerCase(Locale.ROOT))) {
 					Command c = commandMap.get(args.toLowerCase(Locale.ROOT));
-					SongPlayer.addChatMessage("§6------------------------------");
-					SongPlayer.addChatMessage("§6Help: §3" + c.getName());
-					SongPlayer.addChatMessage("§6Description: §3" + c.getDescription());
+					Util.showChatMessage("§6------------------------------");
+					Util.showChatMessage("§6Help: §3" + c.getName());
+					Util.showChatMessage("§6Description: §3" + c.getDescription());
 					if (c.getSyntax().length == 0) {
-						SongPlayer.addChatMessage("§6Usage: §3" + Config.getConfig().prefix + c.getName());
+						Util.showChatMessage("§6Usage: §3" + Config.getConfig().prefix + c.getName());
 					}
 					else if (c.getSyntax().length == 1) {
-						SongPlayer.addChatMessage("§6Usage: §3" + Config.getConfig().prefix + c.getName() + " " + c.getSyntax()[0]);
+						Util.showChatMessage("§6Usage: §3" + Config.getConfig().prefix + c.getName() + " " + c.getSyntax()[0]);
 					} else {
-						SongPlayer.addChatMessage("§6Usage:");
+						Util.showChatMessage("§6Usage:");
 						for (String syntax : c.getSyntax()) {
-							SongPlayer.addChatMessage("    §3" + Config.getConfig().prefix + c.getName() + " " + syntax);
+							Util.showChatMessage("    §3" + Config.getConfig().prefix + c.getName() + " " + syntax);
 						}
 					}
 					if (c.getAliases().length > 0) {
-						SongPlayer.addChatMessage("§6Aliases: §3" + String.join(", ", c.getAliases()));
+						Util.showChatMessage("§6Aliases: §3" + String.join(", ", c.getAliases()));
 					}
-					SongPlayer.addChatMessage("§6------------------------------");
+					Util.showChatMessage("§6------------------------------");
 				} else {
-					SongPlayer.addChatMessage("§cCommand not recognized: " + args);
+					Util.showChatMessage("§cCommand not recognized: " + args);
 				}
 			}
 			return true;
@@ -191,16 +188,16 @@ public class CommandProcessor {
 		}
 		public boolean processCommand(String args) {
 			if (args.contains(" ")) {
-				SongPlayer.addChatMessage("§cPrefix cannot contain a space");
+				Util.showChatMessage("§cPrefix cannot contain a space");
 				return true;
 			}
 			else if (args.startsWith("/")) {
-				SongPlayer.addChatMessage("§cPrefix cannot start with a /");
+				Util.showChatMessage("§cPrefix cannot start with a /");
 				return true;
 			}
 			else if (args.length() > 0) {
 				Config.getConfig().prefix = args;
-				SongPlayer.addChatMessage("§6Set prefix to " + args);
+				Util.showChatMessage("§6Set prefix to " + args);
 				Config.saveConfigWithErrorHandling();
 				return true;
 			}
@@ -223,7 +220,7 @@ public class CommandProcessor {
 		public boolean processCommand(String args) {
 			if (args.length() > 0) {
 				if (Config.getConfig().survivalOnly && SongPlayer.MC.interactionManager.getCurrentGameMode() != GameMode.SURVIVAL) {
-					SongPlayer.addChatMessage("§cTo play in survival only mode, you must be in survival mode to start with.");
+					Util.showChatMessage("§cTo play in survival only mode, you must be in survival mode to start with.");
 					return true;
 				}
 
@@ -251,19 +248,19 @@ public class CommandProcessor {
 		}
 		public boolean processCommand(String args) {
 			if (SongHandler.getInstance().isIdle()) {
-				SongPlayer.addChatMessage("§6No song is currently playing");
+				Util.showChatMessage("§6No song is currently playing");
 				return true;
 			}
 			if (args.length() == 0) {
 				if (SongHandler.getInstance().cleaningUp) {
 					SongHandler.getInstance().restoreStateAndReset();
-					SongPlayer.addChatMessage("§6Stopped cleanup");
+					Util.showChatMessage("§6Stopped cleanup");
 				} else if (Config.getConfig().autoCleanup && SongHandler.getInstance().originalBlocks.size() != 0) {
 					SongHandler.getInstance().partialResetAndCleanup();
-					SongPlayer.addChatMessage("§6Stopped playing and switched to cleanup");
+					Util.showChatMessage("§6Stopped playing and switched to cleanup");
 				} else {
 					SongHandler.getInstance().restoreStateAndReset();
-					SongPlayer.addChatMessage("§6Stopped playing");
+					Util.showChatMessage("§6Stopped playing");
 				}
 				return true;
 			}
@@ -285,7 +282,7 @@ public class CommandProcessor {
 		}
 		public boolean processCommand(String args) {
 			if (SongHandler.getInstance().currentSong == null) {
-				SongPlayer.addChatMessage("§6No song is currently playing");
+				Util.showChatMessage("§6No song is currently playing");
 				return true;
 			}
 			if (args.length() == 0) {
@@ -310,7 +307,7 @@ public class CommandProcessor {
 		}
 		public boolean processCommand(String args) {
 			if (SongHandler.getInstance().currentSong == null) {
-				SongPlayer.addChatMessage("§6No song is currently playing");
+				Util.showChatMessage("§6No song is currently playing");
 				return true;
 			}
 
@@ -318,10 +315,10 @@ public class CommandProcessor {
 				try {
 					long time = Util.parseTime(args);
 					SongHandler.getInstance().currentSong.setTime(time);
-					SongPlayer.addChatMessage("§6Set song time to §3" + Util.formatTime(time));
+					Util.showChatMessage("§6Set song time to §3" + Util.formatTime(time));
 					return true;
 				} catch (IOException e) {
-					SongPlayer.addChatMessage("§cNot a valid time stamp");
+					Util.showChatMessage("§cNot a valid time stamp");
 					return false;
 				}
 			}
@@ -343,17 +340,17 @@ public class CommandProcessor {
 		}
 		public boolean processCommand(String args) {
 			if (SongHandler.getInstance().currentSong == null) {
-				SongPlayer.addChatMessage("§6No song is currently playing");
+				Util.showChatMessage("§6No song is currently playing");
 				return true;
 			}
 
 			SongHandler.getInstance().currentSong.looping = !SongHandler.getInstance().currentSong.looping;
 			SongHandler.getInstance().currentSong.loopCount = 0;
 			if (SongHandler.getInstance().currentSong.looping) {
-				SongPlayer.addChatMessage("§6Enabled looping");
+				Util.showChatMessage("§6Enabled looping");
 			}
 			else {
-				SongPlayer.addChatMessage("§6Disabled looping");
+				Util.showChatMessage("§6Disabled looping");
 			}
 			return true;
 		}
@@ -375,13 +372,13 @@ public class CommandProcessor {
 		public boolean processCommand(String args) {
 			if (args.length() == 0) {
 				if (SongHandler.getInstance().currentSong == null) {
-					SongPlayer.addChatMessage("§6No song is currently playing");
+					Util.showChatMessage("§6No song is currently playing");
 					return true;
 				}
 				Song currentSong = SongHandler.getInstance().currentSong;
 				long currentTime = Math.min(currentSong.time, currentSong.length);
 				long totalTime = currentSong.length;
-				SongPlayer.addChatMessage(String.format("§6Currently playing %s §3(%s/%s)", currentSong.name, Util.formatTime(currentTime), Util.formatTime(totalTime)));
+				Util.showChatMessage(String.format("§6Currently playing %s §3(%s/%s)", currentSong.name, Util.formatTime(currentTime), Util.formatTime(totalTime)));
 				return true;
 			}
 			else {
@@ -406,20 +403,20 @@ public class CommandProcessor {
 		public boolean processCommand(String args) {
 			if (args.length() == 0) {
 				if (SongHandler.getInstance().currentSong == null && SongHandler.getInstance().songQueue.isEmpty()) {
-					SongPlayer.addChatMessage("§6No song is currently playing");
+					Util.showChatMessage("§6No song is currently playing");
 					return true;
 				}
 
-				SongPlayer.addChatMessage("§6------------------------------");
+				Util.showChatMessage("§6------------------------------");
 				if (SongHandler.getInstance().currentSong != null) {
-					SongPlayer.addChatMessage("§6Current song: §3" + SongHandler.getInstance().currentSong.name);
+					Util.showChatMessage("§6Current song: §3" + SongHandler.getInstance().currentSong.name);
 				}
 				int index = 0;
 				for (Song song : SongHandler.getInstance().songQueue) {
 					index++;
-					SongPlayer.addChatMessage(String.format("§6%d. §3%s", index, song.name));
+					Util.showChatMessage(String.format("§6%d. §3%s", index, song.name));
 				}
-				SongPlayer.addChatMessage("§6------------------------------");
+				Util.showChatMessage("§6------------------------------");
 				return true;
 			}
 			else {
@@ -452,7 +449,7 @@ public class CommandProcessor {
 				else {
 					dir = SongPlayer.SONG_DIR.resolve(args);
 					if (!Files.isDirectory(dir)) {
-						SongPlayer.addChatMessage("§cDirectory not found");
+						Util.showChatMessage("§cDirectory not found");
 						return true;
 					}
 				}
@@ -473,23 +470,23 @@ public class CommandProcessor {
 							.collect(Collectors.toList());
 				}
 				catch (IOException e) {
-					SongPlayer.addChatMessage("§cError reading folder: §4" + e.getMessage());
+					Util.showChatMessage("§cError reading folder: §4" + e.getMessage());
 					return true;
 				}
 
 				if (subdirectories.size() == 0 && songs.size() == 0) {
-					SongPlayer.addChatMessage("§bNo songs found. You can put midi or nbs files in the §3.minecraft/songs §6folder.");
+					Util.showChatMessage("§bNo songs found. You can put midi or nbs files in the §3.minecraft/songs §6folder.");
 				}
 				else {
-					SongPlayer.addChatMessage("§6----------------------------------------");
-					SongPlayer.addChatMessage("§eContents of .minecraft/songs/" + args);
+					Util.showChatMessage("§6----------------------------------------");
+					Util.showChatMessage("§eContents of .minecraft/songs/" + args);
 					if (subdirectories.size() > 0) {
-						SongPlayer.addChatMessage("§6Subdirectories: §3" + String.join(" ", subdirectories));
+						Util.showChatMessage("§6Subdirectories: §3" + String.join(" ", subdirectories));
 					}
 					if (songs.size() > 0) {
-						SongPlayer.addChatMessage("§6Songs: §7" + String.join(", ", songs));
+						Util.showChatMessage("§6Songs: §7" + String.join(", ", songs));
 					}
-					SongPlayer.addChatMessage("§6----------------------------------------");
+					Util.showChatMessage("§6----------------------------------------");
 				}
 				return true;
 			}
@@ -536,7 +533,7 @@ public class CommandProcessor {
 					case "play": {
 						if (split.length != 2) return false;
 						if (!Files.exists(playlistDir)) {
-							SongPlayer.addChatMessage("§cPlaylist does not exist");
+							Util.showChatMessage("§cPlaylist does not exist");
 							return true;
 						}
 						SongHandler.getInstance().setPlaylist(playlistDir);
@@ -544,18 +541,18 @@ public class CommandProcessor {
 					}
 					case "create": {
 						if (split.length > 2) {
-							SongPlayer.addChatMessage("§cCannot have spaces in playlist name");
+							Util.showChatMessage("§cCannot have spaces in playlist name");
 							return true;
 						}
 						if (split.length != 2) return false;
 						Playlist.createPlaylist(split[1]);
-						SongPlayer.addChatMessage(String.format("§6Created playlist §3%s", split[1]));
+						Util.showChatMessage(String.format("§6Created playlist §3%s", split[1]));
 						return true;
 					}
 					case "delete": {
 						if (split.length != 2) return false;
 						Playlist.deletePlaylist(playlistDir);
-						SongPlayer.addChatMessage(String.format("§6Deleted playlist §3%s", split[1]));
+						Util.showChatMessage(String.format("§6Deleted playlist §3%s", split[1]));
 						return true;
 					}
 					case "list": {
@@ -567,34 +564,34 @@ public class CommandProcessor {
 									.map(Path::toString)
 									.collect(Collectors.toList());
 							if (playlists.size() == 0) {
-								SongPlayer.addChatMessage("§6No playlists found");
+								Util.showChatMessage("§6No playlists found");
 							} else {
-								SongPlayer.addChatMessage("§6Playlists: §3" + String.join(", ", playlists));
+								Util.showChatMessage("§6Playlists: §3" + String.join(", ", playlists));
 							}
 							return true;
 						}
 						List<String> playlistIndex = Playlist.listSongs(playlistDir);
-						SongPlayer.addChatMessage("§6------------------------------");
+						Util.showChatMessage("§6------------------------------");
 						int index = 0;
 						for (String songName : playlistIndex) {
 							index++;
-							SongPlayer.addChatMessage(String.format("§6%d. §3%s", index, songName));
+							Util.showChatMessage(String.format("§6%d. §3%s", index, songName));
 						}
-						SongPlayer.addChatMessage("§6------------------------------");
+						Util.showChatMessage("§6------------------------------");
 						return true;
 					}
 					case "addsong": {
 						if (split.length < 3) return false;
 						String location = String.join(" ", Arrays.copyOfRange(split, 2, split.length));
 						Playlist.addSong(playlistDir, SongPlayer.SONG_DIR.resolve(location));
-						SongPlayer.addChatMessage(String.format("§6Added §3%s §6to §3%s", location, split[1]));
+						Util.showChatMessage(String.format("§6Added §3%s §6to §3%s", location, split[1]));
 						return true;
 					}
 					case "removesong": {
 						if (split.length < 3) return false;
 						String location = String.join(" ", Arrays.copyOfRange(split, 2, split.length));
 						Playlist.removeSong(playlistDir, location);
-						SongPlayer.addChatMessage(String.format("§6Removed §3%s §6from §3%s", location, split[1]));
+						Util.showChatMessage(String.format("§6Removed §3%s §6from §3%s", location, split[1]));
 						return true;
 					}
 					case "renamesong": {
@@ -605,11 +602,11 @@ public class CommandProcessor {
 							index = Integer.parseInt(split[2]);
 						}
 						catch (Exception e) {
-							SongPlayer.addChatMessage(String.format("§cIndex must be an integer"));
+							Util.showChatMessage(String.format("§cIndex must be an integer"));
 							return true;
 						}
 						String oldName = Playlist.renameSong(playlistDir, index-1, location);
-						SongPlayer.addChatMessage(String.format("§6Renamed §3%s §6to §3%s", oldName, location));
+						Util.showChatMessage(String.format("§6Renamed §3%s §6to §3%s", oldName, location));
 						return true;
 					}
 					case "loop": {
@@ -617,9 +614,9 @@ public class CommandProcessor {
 						Config.getConfig().loopPlaylists = !Config.getConfig().loopPlaylists;
 						SongHandler.getInstance().setPlaylistLoop(Config.getConfig().loopPlaylists);
 						if (Config.getConfig().loopPlaylists) {
-							SongPlayer.addChatMessage("§6Enabled playlist looping");
+							Util.showChatMessage("§6Enabled playlist looping");
 						} else {
-							SongPlayer.addChatMessage("§6Disabled playlist looping");
+							Util.showChatMessage("§6Disabled playlist looping");
 						}
 						Config.saveConfigWithErrorHandling();
 						return true;
@@ -629,9 +626,9 @@ public class CommandProcessor {
 						Config.getConfig().shufflePlaylists = !Config.getConfig().shufflePlaylists;
 						SongHandler.getInstance().setPlaylistShuffle(Config.getConfig().shufflePlaylists);
 						if (Config.getConfig().shufflePlaylists) {
-							SongPlayer.addChatMessage("§6Enabled playlist shuffling");
+							Util.showChatMessage("§6Enabled playlist shuffling");
 						} else {
-							SongPlayer.addChatMessage("§6Disabled playlist shuffling");
+							Util.showChatMessage("§6Disabled playlist shuffling");
 						}
 						Config.saveConfigWithErrorHandling();
 						return true;
@@ -642,7 +639,7 @@ public class CommandProcessor {
 				}
 			}
 			catch (IOException e) {
-				SongPlayer.addChatMessage("§c" + e.getMessage());
+				Util.showChatMessage("§c" + e.getMessage());
 				return true;
 			}
 		}
@@ -740,7 +737,7 @@ public class CommandProcessor {
 				} else {
 					Config.getConfig().creativeCommand = args;
 				}
-				SongPlayer.addChatMessage("§6Set creative command to §3/" + Config.getConfig().creativeCommand);
+				Util.showChatMessage("§6Set creative command to §3/" + Config.getConfig().creativeCommand);
 				Config.saveConfigWithErrorHandling();
 				return true;
 			}
@@ -770,7 +767,7 @@ public class CommandProcessor {
 				} else {
 					Config.getConfig().survivalCommand = args;
 				}
-				SongPlayer.addChatMessage("§6Set survival command to §3/" + Config.getConfig().survivalCommand);
+				Util.showChatMessage("§6Set survival command to §3/" + Config.getConfig().survivalCommand);
 				Config.saveConfigWithErrorHandling();
 				return true;
 			}
@@ -797,7 +794,7 @@ public class CommandProcessor {
 			if (args.length() == 0) {
 				Config.getConfig().creativeCommand = "gmc";
 				Config.getConfig().survivalCommand = "gms";
-				SongPlayer.addChatMessage("§6Now using essentials gamemode commands");
+				Util.showChatMessage("§6Now using essentials gamemode commands");
 				Config.saveConfigWithErrorHandling();
 				return true;
 			}
@@ -824,7 +821,7 @@ public class CommandProcessor {
 			if (args.length() == 0) {
 				Config.getConfig().creativeCommand = "gamemode creative";
 				Config.getConfig().survivalCommand = "gamemode survival";
-				SongPlayer.addChatMessage("§6Now using vanilla gamemode commands");
+				Util.showChatMessage("§6Now using vanilla gamemode commands");
 				Config.saveConfigWithErrorHandling();
 				return true;
 			}
@@ -851,10 +848,10 @@ public class CommandProcessor {
 			if (args.length() == 0) {
 				Config.getConfig().showFakePlayer = !Config.getConfig().showFakePlayer;
 				if (Config.getConfig().showFakePlayer) {
-					SongPlayer.addChatMessage("§6Enabled fake player");
+					Util.showChatMessage("§6Enabled fake player");
 				}
 				else {
-					SongPlayer.addChatMessage("§6Disabled fake player");
+					Util.showChatMessage("§6Disabled fake player");
 				}
 				Config.saveConfigWithErrorHandling();
 				return true;
@@ -883,11 +880,11 @@ public class CommandProcessor {
 				try {
 					Stage.StageType stageType = Stage.StageType.valueOf(args.toUpperCase(Locale.ROOT));
 					Config.getConfig().stageType = stageType;
-					SongPlayer.addChatMessage("§6Set stage type to §3" + stageType.name());
+					Util.showChatMessage("§6Set stage type to §3" + stageType.name());
 					Config.saveConfigWithErrorHandling();
 				}
 				catch (IllegalArgumentException e) {
-					SongPlayer.addChatMessage("§cInvalid stage type");
+					Util.showChatMessage("§cInvalid stage type");
 				}
 				return true;
 			}
@@ -931,22 +928,22 @@ public class CommandProcessor {
 					try {
 						speed = Double.parseDouble(split[1]);
 					} catch (NumberFormatException e) {
-						SongPlayer.addChatMessage("§cSpeed must be a number");
+						Util.showChatMessage("§cSpeed must be a number");
 						return true;
 					}
 					if (speed <= 0) {
-						SongPlayer.addChatMessage("§cSpeed must be greater than 0");
+						Util.showChatMessage("§cSpeed must be greater than 0");
 						return true;
 					}
 					Config.getConfig().breakSpeed = speed;
 					Config.saveConfigWithErrorHandling();
-					SongPlayer.addChatMessage("§6Set block breaking speed to §3" + Config.getConfig().breakSpeed + " §6blocks/sec");
+					Util.showChatMessage("§6Set block breaking speed to §3" + Config.getConfig().breakSpeed + " §6blocks/sec");
 					return true;
 				case "reset":
 					if (split.length != 1) return false;
 					Config.getConfig().breakSpeed = 40;
 					Config.saveConfigWithErrorHandling();
-					SongPlayer.addChatMessage("§6Reset block breaking speed to §3" + Config.getConfig().breakSpeed + " §6blocks/sec");
+					Util.showChatMessage("§6Reset block breaking speed to §3" + Config.getConfig().breakSpeed + " §6blocks/sec");
 					return true;
 				default:
 					return false;
@@ -991,22 +988,22 @@ public class CommandProcessor {
 					try {
 						speed = Double.parseDouble(split[1]);
 					} catch (NumberFormatException e) {
-						SongPlayer.addChatMessage("§cSpeed must be a number");
+						Util.showChatMessage("§cSpeed must be a number");
 						return true;
 					}
 					if (speed <= 0) {
-						SongPlayer.addChatMessage("§cSpeed must be greater than 0");
+						Util.showChatMessage("§cSpeed must be greater than 0");
 						return true;
 					}
 					Config.getConfig().placeSpeed = speed;
 					Config.saveConfigWithErrorHandling();
-					SongPlayer.addChatMessage("§6Set block placement speed to §3" + Config.getConfig().placeSpeed + " §6blocks/sec");
+					Util.showChatMessage("§6Set block placement speed to §3" + Config.getConfig().placeSpeed + " §6blocks/sec");
 					return true;
 				case "reset":
 					if (split.length != 1) return false;
 					Config.getConfig().placeSpeed = 20;
 					Config.saveConfigWithErrorHandling();
-					SongPlayer.addChatMessage("§6Reset block placement speed to §3" + Config.getConfig().placeSpeed + " §6blocks/sec");
+					Util.showChatMessage("§6Reset block placement speed to §3" + Config.getConfig().placeSpeed + " §6blocks/sec");
 					return true;
 				default:
 					return false;
@@ -1043,20 +1040,20 @@ public class CommandProcessor {
 				case "swing":
 					Config.getConfig().swing = !Config.getConfig().swing;
 					if (Config.getConfig().swing) {
-						SongPlayer.addChatMessage("§6Enabled arm swinging");
+						Util.showChatMessage("§6Enabled arm swinging");
 					}
 					else {
-						SongPlayer.addChatMessage("§6Disabled arm swinging");
+						Util.showChatMessage("§6Disabled arm swinging");
 					}
 					Config.saveConfigWithErrorHandling();
 					return true;
 				case "rotate":
 					Config.getConfig().rotate = !Config.getConfig().rotate;
 					if (Config.getConfig().rotate) {
-						SongPlayer.addChatMessage("§6Enabled player rotation");
+						Util.showChatMessage("§6Enabled player rotation");
 					}
 					else {
-						SongPlayer.addChatMessage("§6Disabled player rotation");
+						Util.showChatMessage("§6Disabled player rotation");
 					}
 					Config.saveConfigWithErrorHandling();
 					return true;
@@ -1092,11 +1089,11 @@ public class CommandProcessor {
 				try {
 					int threshold = Integer.parseInt(args);
 					if (threshold < 0 || threshold > 100) {
-						SongPlayer.addChatMessage("§cVelocity threshold must be a value between 0 and 100");
+						Util.showChatMessage("§cVelocity threshold must be a value between 0 and 100");
 						return true;
 					}
 					Config.getConfig().velocityThreshold = threshold;
-					SongPlayer.addChatMessage("§6Set velocity threshold to " + threshold);
+					Util.showChatMessage("§6Set velocity threshold to " + threshold);
 					Config.saveConfigWithErrorHandling();
 					return true;
 				} catch (NumberFormatException e) {
@@ -1125,10 +1122,10 @@ public class CommandProcessor {
 			if (args.length() == 0) {
 				Config.getConfig().autoCleanup = !Config.getConfig().autoCleanup;
 				if (Config.getConfig().autoCleanup) {
-					SongPlayer.addChatMessage("§6Enabled automatic cleanup");
+					Util.showChatMessage("§6Enabled automatic cleanup");
 				}
 				else {
-					SongPlayer.addChatMessage("§6Disabled automatic cleanup");
+					Util.showChatMessage("§6Disabled automatic cleanup");
 				}
 				Config.saveConfigWithErrorHandling();
 				return true;
@@ -1156,11 +1153,11 @@ public class CommandProcessor {
 			if (args.length() == 0) {
 				Stage lastStage = SongHandler.getInstance().lastStage;
 				if (!SongHandler.getInstance().isIdle()) {
-					SongPlayer.addChatMessage("§cYou cannot start cleanup if you are in the middle of another action");
+					Util.showChatMessage("§cYou cannot start cleanup if you are in the middle of another action");
 					return true;
 				}
 				if (lastStage == null || SongHandler.getInstance().originalBlocks.size() == 0 || !lastStage.serverIdentifier.equals(Util.getServerIdentifier())) {
-					SongPlayer.addChatMessage("§6There is nothing to clean up");
+					Util.showChatMessage("§6There is nothing to clean up");
 					return true;
 				}
 				if (MC.player.getPos().squaredDistanceTo(lastStage.getOriginBottomCenter()) > 3*3 || !lastStage.worldName.equals(Util.getWorldName())) {
@@ -1168,7 +1165,7 @@ public class CommandProcessor {
 							"%d %d %d",
 							lastStage.position.getX(), lastStage.position.getY(), lastStage.position.getZ()
 					);
-					SongPlayer.addChatMessage("§6You must be within §33 §6blocks of the center of your stage to start cleanup.");
+					Util.showChatMessage("§6You must be within §33 §6blocks of the center of your stage to start cleanup.");
 					MutableText coordText = Util.joinTexts(null,
 							Text.literal("This is at ").setStyle(Style.EMPTY.withColor(Formatting.GOLD)),
 							Text.literal(coordStr).setStyle(
@@ -1181,7 +1178,7 @@ public class CommandProcessor {
 							Text.literal(" in world ").setStyle(Style.EMPTY.withColor(Formatting.GOLD)),
 							Text.literal(lastStage.worldName).setStyle(Style.EMPTY.withColor(Formatting.DARK_AQUA))
 					);
-					SongPlayer.addChatMessage(coordText);
+					Util.showChatMessage(coordText);
 					return true;
 				}
 
@@ -1215,23 +1212,23 @@ public class CommandProcessor {
 				case "enable":
 					if (split.length != 1) return false;
 					Config.getConfig().doAnnouncement = true;
-					SongPlayer.addChatMessage("§6Enabled song announcements");
+					Util.showChatMessage("§6Enabled song announcements");
 					Config.saveConfigWithErrorHandling();
 					return true;
 				case "disable":
 					if (split.length != 1) return false;
 					Config.getConfig().doAnnouncement = false;
-					SongPlayer.addChatMessage("§6Disabled song announcements");
+					Util.showChatMessage("§6Disabled song announcements");
 					Config.saveConfigWithErrorHandling();
 					return true;
 				case "getmessage":
 					if (split.length != 1) return false;
-					SongPlayer.addChatMessage("§6Current announcement message is §r" + Config.getConfig().announcementMessage);
+					Util.showChatMessage("§6Current announcement message is §r" + Config.getConfig().announcementMessage);
 					return true;
 				case "setmessage":
 					if (split.length != 2) return false;
 					Config.getConfig().announcementMessage = split[1];
-					SongPlayer.addChatMessage("§6Set announcement message to §r" + split[1]);
+					Util.showChatMessage("§6Set announcement message to §r" + split[1]);
 					Config.saveConfigWithErrorHandling();
 					return true;
 				default:
@@ -1264,16 +1261,16 @@ public class CommandProcessor {
 		public boolean processCommand(String args) {
 			if (args.length() == 0) {
 				if (!SongHandler.getInstance().isIdle()) {
-					SongPlayer.addChatMessage("§cYou cannot change this setting while playing or building");
+					Util.showChatMessage("§cYou cannot change this setting while playing or building");
 					return true;
 				}
 
 				Config.getConfig().survivalOnly = !Config.getConfig().survivalOnly;
 				if (Config.getConfig().survivalOnly) {
-					SongPlayer.addChatMessage("§6Enabled survival only mode");
+					Util.showChatMessage("§6Enabled survival only mode");
 				}
 				else {
-					SongPlayer.addChatMessage("§6Disabled survival only mode");
+					Util.showChatMessage("§6Disabled survival only mode");
 				}
 				Config.saveConfigWithErrorHandling();
 				return true;
@@ -1301,10 +1298,10 @@ public class CommandProcessor {
 			if (args.length() == 0) {
 				Config.getConfig().flightNoclip = !Config.getConfig().flightNoclip;
 				if (Config.getConfig().flightNoclip) {
-					SongPlayer.addChatMessage("§6Enabled flight noclip");
+					Util.showChatMessage("§6Enabled flight noclip");
 				}
 				else {
-					SongPlayer.addChatMessage("§6Disabled flight noclip");
+					Util.showChatMessage("§6Disabled flight noclip");
 				}
 				Config.saveConfigWithErrorHandling();
 				return true;
@@ -1337,7 +1334,7 @@ public class CommandProcessor {
 			}
 
 			if (MC.interactionManager.getCurrentGameMode() != GameMode.CREATIVE) {
-				SongPlayer.addChatMessage("§cYou must be in creative mode to use this command");
+				Util.showChatMessage("§cYou must be in creative mode to use this command");
 				return true;
 			}
 
@@ -1351,7 +1348,7 @@ public class CommandProcessor {
 					try {
 						(new SongItemCreatorThread(location)).start();
 					} catch (IOException e) {
-						SongPlayer.addChatMessage("§cError creating song item: §4" + e.getMessage());
+						Util.showChatMessage("§cError creating song item: §4" + e.getMessage());
 					}
 					return true;
 				case "setsongname":
@@ -1363,10 +1360,10 @@ public class CommandProcessor {
 						SongItemUtils.addSongItemDisplay(stack);
 						MC.player.setStackInHand(Hand.MAIN_HAND, stack);
 						MC.interactionManager.clickCreativeStack(MC.player.getStackInHand(Hand.MAIN_HAND), 36 + MC.player.getInventory().getSelectedSlot());
-						SongPlayer.addChatMessage("§6Set song display name to §3" + name);
+						Util.showChatMessage("§6Set song display name to §3" + name);
 						return true;
 					} else {
-						SongPlayer.addChatMessage("§cYou must be holding a song item");
+						Util.showChatMessage("§cYou must be holding a song item");
 						return true;
 					}
 				default:

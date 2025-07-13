@@ -29,6 +29,8 @@ import java.util.stream.Stream;
 public class Util {
     static final MinecraftClient MC = MinecraftClient.getInstance();
 
+    // IO
+
     public static void createDirectoriesSilently(Path path) {
         try {
             Files.createDirectories(path);
@@ -80,6 +82,8 @@ public class Util {
         }
     }
 
+    // Time
+
     public static String formatTime(long milliseconds) {
         long temp = Math.abs(milliseconds);
         temp /= 1000;
@@ -120,6 +124,8 @@ public class Util {
             throw new IOException("Invalid time pattern");
         }
     }
+
+    // Command Suggestions
 
     public static CompletableFuture<Suggestions> giveSongSuggestions(String arg, SuggestionsBuilder suggestionsBuilder) {
         int lastSlash = arg.lastIndexOf("/");
@@ -219,6 +225,8 @@ public class Util {
         return CommandSource.suggestMatching(suggestions, suggestionsBuilder);
     }
 
+    // Text
+
     public static MutableText getStyledText(String str, Style style) {
         MutableText text = MutableText.of(PlainTextContent.of(str));
         text.setStyle(style);
@@ -243,6 +251,8 @@ public class Util {
         return base;
     }
 
+    // Server and World
+
     public static String getWorldName() {
         return MC.world.getRegistryKey().getValue().toString();
     }
@@ -250,5 +260,22 @@ public class Util {
     public static String getServerIdentifier() {
         if (MC.isInSingleplayer()) return "local;" + MC.getServer().getSavePath(WorldSavePath.ROOT).getParent().getFileName().toString();
         else return "remote;" + MC.getCurrentServerEntry().address;
+    }
+
+    // Chat
+    public static void showChatMessage(String message) {
+        MC.player.sendMessage(Text.of(message), false);
+    }
+
+    public static void showChatMessage(Text text) {
+        MC.player.sendMessage(text, false);
+    }
+
+    public static void sendChatMessage(String message) {
+        MC.player.networkHandler.sendChatMessage(message);
+    }
+
+    public static void sendCommand(String command) {
+        MC.player.networkHandler.sendChatCommand(command);
     }
 }

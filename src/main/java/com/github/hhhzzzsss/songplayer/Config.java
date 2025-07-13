@@ -69,7 +69,7 @@ public class Config {
         }
         catch (IOException e) {
             if (SongPlayer.MC.world != null) {
-                SongPlayer.addChatMessage("§cFailed to save config file");
+                Util.showChatMessage("§cFailed to save config file");
             }
             e.printStackTrace();
         }

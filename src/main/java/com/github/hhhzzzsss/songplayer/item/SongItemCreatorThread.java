@@ -1,6 +1,7 @@
 package com.github.hhhzzzsss.songplayer.item;
 
 import com.github.hhhzzzsss.songplayer.SongPlayer;
+import com.github.hhhzzzsss.songplayer.Util;
 import com.github.hhhzzzsss.songplayer.conversion.SPConverter;
 import com.github.hhhzzzsss.songplayer.song.SongLoaderThread;
 import net.minecraft.component.DataComponentTypes;
@@ -29,7 +30,7 @@ public class SongItemCreatorThread extends SongLoaderThread {
         try {
             songData = SPConverter.getBytesFromSong(song);
         } catch (IOException e) {
-            SongPlayer.addChatMessage("§cError creating song item: §4" + e.getMessage());
+            Util.showChatMessage("§cError creating song item: §4" + e.getMessage());
             return;
         }
         SongPlayer.MC.execute(() -> {
@@ -37,7 +38,7 @@ public class SongItemCreatorThread extends SongLoaderThread {
                 return;
             }
             if (!SongPlayer.MC.player.getInventory().getStack(slotId).equals(stack)) {
-                SongPlayer.addChatMessage("§cCould not create song item because item has moved");
+                Util.showChatMessage("§cCould not create song item because item has moved");
             }
             ItemStack newStack;
             if (stack.isEmpty()) {
@@ -51,7 +52,7 @@ public class SongItemCreatorThread extends SongLoaderThread {
             newStack = SongItemUtils.createSongItem(newStack, songData, filename, song.name);
             SongPlayer.MC.player.getInventory().setStack(slotId, newStack);
             SongPlayer.MC.interactionManager.clickCreativeStack(SongPlayer.MC.player.getStackInHand(Hand.MAIN_HAND), 36 + slotId);
-            SongPlayer.addChatMessage(Text.literal("§6Successfully assigned song data to §3").append(newStack.getItem().getName()));
+            Util.showChatMessage(Text.literal("§6Successfully assigned song data to §3").append(newStack.getItem().getName()));
         });
     }
 }

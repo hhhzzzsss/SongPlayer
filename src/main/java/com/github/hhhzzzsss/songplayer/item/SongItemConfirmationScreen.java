@@ -1,6 +1,6 @@
 package com.github.hhhzzzsss.songplayer.item;
 
-import com.github.hhhzzzsss.songplayer.SongPlayer;
+import com.github.hhhzzzsss.songplayer.Util;
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.gui.DrawContext;
@@ -11,8 +11,6 @@ import net.minecraft.text.Text;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class SongItemConfirmationScreen extends Screen {
     private ItemStack stack;
@@ -59,7 +57,7 @@ public class SongItemConfirmationScreen extends Screen {
 
         if (!loaderThread.isAlive()) {
             if (loaderThread.exception != null) {
-                SongPlayer.addChatMessage("§cError loading song item: §4" + loaderThread.exception.getMessage());
+                Util.showChatMessage("§cError loading song item: §4" + loaderThread.exception.getMessage());
                 this.client.setScreen(null);
                 return;
             }

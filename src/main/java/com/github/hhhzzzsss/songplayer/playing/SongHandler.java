@@ -10,12 +10,14 @@ import net.minecraft.block.*;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.BlockStateComponent;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.state.property.Property;
-import net.minecraft.text.*;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -46,6 +48,7 @@ public class SongHandler {
     public Playlist currentPlaylist = null;
     public Stage stage = null; // Only exists when playing
     public Stage lastStage = null; // Stays around even after playing
+    public FakePlayerEntity fakePlayer;
     public HashMap<BlockPos, BlockState> originalBlocks = new HashMap<>();
     public boolean building = false;
     public boolean cleaningUp = false;
@@ -63,15 +66,15 @@ public class SongHandler {
                 if (!playlistChecked) {
                     playlistChecked = true;
                     if (currentPlaylist.songsFailedToLoad.size() > 0) {
-                        SongPlayer.addChatMessage("§cFailed to load the following songs from the playlist: §4" + String.join(" ", currentPlaylist.songsFailedToLoad));
+                        Util.showChatMessage("§cFailed to load the following songs from the playlist: §4" + String.join(" ", currentPlaylist.songsFailedToLoad));
                     }
                 }
                 Song nextSong = currentPlaylist.getNext();
                 if (currentPlaylist.songs.size() == 0) {
-                    SongPlayer.addChatMessage("§cPlaylist has no playable songs");
+                    Util.showChatMessage("§cPlaylist has no playable songs");
                     currentPlaylist = null;
                 } else if (nextSong == null) {
-                    SongPlayer.addChatMessage("§6Playlist has finished playing");
+                    Util.showChatMessage("§6Playlist has finished playing");
                     currentPlaylist = null;
                 } else {
                     nextSong.reset();
@@ -87,7 +90,7 @@ public class SongHandler {
             // Check if loader thread is finished and handle accordingly
             if (loaderThread != null && !loaderThread.isAlive()) {
                 if (loaderThread.exception != null) {
-                    SongPlayer.addChatMessage("§cFailed to load song: §4" + loaderThread.exception.getMessage());
+                    Util.showChatMessage("§cFailed to load song: §4" + loaderThread.exception.getMessage());
                 } else {
                     if (currentSong == null) {
                         setSong(loaderThread.song);
@@ -105,15 +108,15 @@ public class SongHandler {
         // If either playing or doing cleanup
         if (cleaningUp || currentSong != null) {
             // Handle creating/removing fake player depending on settings
-            if (Config.getConfig().showFakePlayer && SongPlayer.fakePlayer == null) {
-                SongPlayer.fakePlayer = new FakePlayerEntity();
-                SongPlayer.fakePlayer.copyStagePosAndPlayerLook();
+            if (Config.getConfig().showFakePlayer && fakePlayer == null) {
+                fakePlayer = new FakePlayerEntity();
+                fakePlayer.copyStagePosAndPlayerLook();
             }
-            if (!Config.getConfig().showFakePlayer && SongPlayer.fakePlayer != null) {
-                SongPlayer.removeFakePlayer();
+            if (!Config.getConfig().showFakePlayer && fakePlayer != null) {
+                removeFakePlayer();
             }
-            if (SongPlayer.fakePlayer != null) {
-                SongPlayer.fakePlayer.getInventory().clone(SongPlayer.MC.player.getInventory());
+            if (fakePlayer != null) {
+                fakePlayer.getInventory().clone(SongPlayer.MC.player.getInventory());
             }
 
             // Maintain flying status
@@ -133,7 +136,7 @@ public class SongHandler {
         else if (currentSong != null) {
             // This should never happen, but I left this check in just in case.
             if (stage == null) {
-                SongPlayer.addChatMessage("§cStage is null! This should not happen!");
+                Util.showChatMessage("§cStage is null! This should not happen!");
                 reset();
                 return;
             }
@@ -165,28 +168,28 @@ public class SongHandler {
 
     public void loadSong(String location) {
         if (loaderThread != null) {
-            SongPlayer.addChatMessage("§cAlready loading a song, cannot load another");
+            Util.showChatMessage("§cAlready loading a song, cannot load another");
         }
         else if (currentPlaylist != null) {
-            SongPlayer.addChatMessage("§cCannot load a song while a playlist is playing");
+            Util.showChatMessage("§cCannot load a song while a playlist is playing");
         }
         else {
             try {
                 loaderThread = new SongLoaderThread(location);
-                SongPlayer.addChatMessage("§6Loading §3" + location);
+                Util.showChatMessage("§6Loading §3" + location);
                 loaderThread.start();
             } catch (IOException e) {
-                SongPlayer.addChatMessage("§cFailed to load song: §4" + e.getMessage());
+                Util.showChatMessage("§cFailed to load song: §4" + e.getMessage());
             }
         }
     }
 
     public void loadSong(SongLoaderThread thread) {
         if (loaderThread != null) {
-            SongPlayer.addChatMessage("§cAlready loading a song, cannot load another");
+            Util.showChatMessage("§cAlready loading a song, cannot load another");
         }
         else if (currentPlaylist != null) {
-            SongPlayer.addChatMessage("§cCannot load a song while a playlist is playing");
+            Util.showChatMessage("§cCannot load a song while a playlist is playing");
         }
         else {
             loaderThread = thread;
@@ -204,17 +207,17 @@ public class SongHandler {
         }
         if (!Config.getConfig().survivalOnly) getAndSaveBuildSlot();
         prepareStage();
-        SongPlayer.addChatMessage("§6Building noteblocks");
+        Util.showChatMessage("§6Building noteblocks");
     }
 
     private void queueSong(Song song) {
         songQueue.add(song);
-        SongPlayer.addChatMessage("§6Added song to queue: §3" + song.name);
+        Util.showChatMessage("§6Added song to queue: §3" + song.name);
     }
 
     public void setPlaylist(Path playlist) {
         if (loaderThread != null || currentSong != null || !songQueue.isEmpty()) {
-            SongPlayer.addChatMessage("§cCannot start playing a playlist while something else is playing");
+            Util.showChatMessage("§cCannot start playing a playlist while something else is playing");
         }
         else {
             currentPlaylist = new Playlist(playlist, Config.getConfig().loopPlaylists, Config.getConfig().shufflePlaylists);
@@ -287,7 +290,7 @@ public class SongHandler {
                 restoreBuildSlot();
             }
             stage.sendMovementPacketToStagePosition();
-            SongPlayer.addChatMessage("§6Now playing §3" + currentSong.name);
+            Util.showChatMessage("§6Now playing §3" + currentSong.name);
         }
 
         if (!Config.getConfig().survivalOnly) { // Regular mode
@@ -370,7 +373,7 @@ public class SongHandler {
                     try {
                         stage.checkSurvivalBuildStatus(currentSong);
                     } catch (Stage.NotEnoughInstrumentsException e) {
-                        SongPlayer.addChatMessage("§6Stopped because stage is missing instruments required for song.");
+                        Util.showChatMessage("§6Stopped because stage is missing instruments required for song.");
                         restoreStateAndReset();
                         return;
                     }
@@ -389,7 +392,7 @@ public class SongHandler {
                     System.out.println("Missing note: " + Instrument.getInstrumentFromId(instrumentId).name() + ":" + pitch);
                 }
                 if (!Config.getConfig().survivalOnly) getAndSaveBuildSlot();
-                SongPlayer.addChatMessage("§6Stage was altered. Rebuilding!");
+                Util.showChatMessage("§6Stage was altered. Rebuilding!");
                 return;
             }
         }
@@ -413,7 +416,7 @@ public class SongHandler {
         }
 
         if (currentSong.finished()) {
-            SongPlayer.addChatMessage("§6Done playing §3" + currentSong.name);
+            Util.showChatMessage("§6Done playing §3" + currentSong.name);
             currentSong = null;
         }
     }
@@ -476,9 +479,9 @@ public class SongHandler {
                 int cleanupHash = 31 * cleanupBreakList.hashCode() + cleanupPlaceList.hashCode();
                 if (cleanupHash == lastCleanupHash) { // If loop is detected, stop
                     cleaningUp = false;
-                    SongPlayer.addChatMessage("§6Stopped restoring original blocks due to infinite loop being detected");
+                    Util.showChatMessage("§6Stopped restoring original blocks due to infinite loop being detected");
                     if (!cleanupUnplaceableBlocks.isEmpty()) {
-                        SongPlayer.addChatMessage(String.format("§3%d §6blocks could not be restored", cleanupUnplaceableBlocks.size()));
+                        Util.showChatMessage(String.format("§3%d §6blocks could not be restored", cleanupUnplaceableBlocks.size()));
                     }
                     return;
                 } else {
@@ -516,9 +519,9 @@ public class SongHandler {
         } else {
             originalBlocks.clear();
             cleaningUp = false;
-            SongPlayer.addChatMessage("§6Finished restoring original blocks");
+            Util.showChatMessage("§6Finished restoring original blocks");
             if (!cleanupUnplaceableBlocks.isEmpty()) {
-                SongPlayer.addChatMessage(String.format("§3%d §6blocks could not be restored", cleanupUnplaceableBlocks.size()));
+                Util.showChatMessage(String.format("§3%d §6blocks could not be restored", cleanupUnplaceableBlocks.size()));
             }
         }
     }
@@ -662,7 +665,7 @@ public class SongHandler {
         songQueue.clear();
         stage = null;
         buildSlot = -1;
-        SongPlayer.removeFakePlayer();
+        removeFakePlayer();
         cleaningUp = false;
         dirty = false;
     }
@@ -697,6 +700,13 @@ public class SongHandler {
         startCleanup();
     }
 
+    public void removeFakePlayer() {
+        if (fakePlayer != null) {
+            fakePlayer.remove(Entity.RemovalReason.DISCARDED);
+            fakePlayer = null;
+        }
+    }
+
     // Runs every frame when player is not ingame
     public void onNotIngame() {
         currentSong = null;
@@ -729,16 +739,16 @@ public class SongHandler {
     private void checkCommandCache() {
         long currentTime = System.currentTimeMillis();
         if (currentTime >= lastCommandTime + 1500 && cachedCommand != null) {
-            SongPlayer.MC.getNetworkHandler().sendCommand(cachedCommand);
+            Util.sendCommand(cachedCommand);
             cachedCommand = null;
             lastCommandTime = currentTime;
         }
         else if (currentTime >= lastCommandTime + 500 && cachedMessage != null) {
             if (cachedMessage.startsWith("/")) {
-                SongPlayer.MC.getNetworkHandler().sendCommand(cachedMessage.substring(1));
+                Util.sendCommand(cachedMessage.substring(1));
             }
             else {
-                SongPlayer.MC.getNetworkHandler().sendChatMessage(cachedMessage);
+                Util.sendChatMessage(cachedMessage);
             }
             cachedMessage = null;
             lastCommandTime = currentTime;
@@ -854,11 +864,12 @@ public class SongHandler {
             double g = Math.sqrt(d * d + f * f);
             float pitch = MathHelper.wrapDegrees((float) (-(MathHelper.atan2(e, g) * 57.2957763671875)));
             float yaw = MathHelper.wrapDegrees((float) (MathHelper.atan2(f, d) * 57.2957763671875) - 90.0f);
-            if (SongPlayer.fakePlayer != null) {
-                SongPlayer.fakePlayer.setPitch(pitch);
-                SongPlayer.fakePlayer.setYaw(yaw);
-                SongPlayer.fakePlayer.setHeadYaw(yaw);
+            if (fakePlayer != null) {
+                fakePlayer.setPitch(pitch);
+                fakePlayer.setYaw(yaw);
+                fakePlayer.setHeadYaw(yaw);
             }
+            // Send on ClientConnection instead of networkHandler because mixin overrides sendPacket on networkHandler
             SongPlayer.MC.player.networkHandler.getConnection().send(new PlayerMoveC2SPacket.Full(
                     lastStage.position.getX() + 0.5, lastStage.position.getY(), lastStage.position.getZ() + 0.5,
                     yaw, pitch,
@@ -868,8 +879,8 @@ public class SongHandler {
     private void doSwingIfNeeded() {
         if (Config.getConfig().swing) {
             SongPlayer.MC.player.swingHand(Hand.MAIN_HAND);
-            if (SongPlayer.fakePlayer != null) {
-                SongPlayer.fakePlayer.swingHand(Hand.MAIN_HAND);
+            if (fakePlayer != null) {
+                fakePlayer.swingHand(Hand.MAIN_HAND);
             }
         }
     }

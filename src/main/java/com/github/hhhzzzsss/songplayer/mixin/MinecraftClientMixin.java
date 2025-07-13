@@ -1,13 +1,11 @@
 package com.github.hhhzzzsss.songplayer.mixin;
 
 import com.github.hhhzzzsss.songplayer.SongPlayer;
+import com.github.hhhzzzsss.songplayer.Util;
 import com.github.hhhzzzsss.songplayer.item.SongItemConfirmationScreen;
 import com.github.hhhzzzsss.songplayer.item.SongItemUtils;
 import com.github.hhhzzzsss.songplayer.playing.ProgressDisplay;
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -24,8 +22,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.io.IOException;
 
 @Mixin(MinecraftClient.class)
 public class MinecraftClientMixin {
@@ -76,7 +72,7 @@ public class MinecraftClientMixin {
 			try {
 				SongPlayer.MC.setScreen(new SongItemConfirmationScreen(stack));
 			} catch (Exception e) {
-				SongPlayer.addChatMessage("§cFailed to load song item: §4" + e.getMessage());
+				Util.showChatMessage("§cFailed to load song item: §4" + e.getMessage());
 			}
 			itemUseCooldown = 4;
 			ci.cancel();
