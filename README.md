@@ -79,16 +79,16 @@ Create, edit, delete, or play playlists. You can also toggle looping or shufflin
 ### $setCreativeCommand \<command>
 *aliases: `$sc`*
 
-By default, the client uses /gmc to go into creative mode.
-However, /gmc does not work on all servers.
+By default, the client uses /gamemode creative to go into creative mode.
+However, /gamemode creative does not work on all servers.
 If the creative command is different, set it with this command.
 For example, if the server uses vanilla commands, do `$setCreativeCommand /gamemode creative`.
 
 ### $setSurvivalCommand \<command>
 *aliases: `$ss`*
 
-By default, the client uses /gms to go into survival mode.
-However, /gms does not work on all servers.
+By default, the client uses /gamemode survival to go into survival mode.
+However, /gamemode survival does not work on all servers.
 If the survival command is different, set it with this command.
 For example, if the server uses vanilla commands, do `$setSurvivalCommand /gamemode survival`.
 

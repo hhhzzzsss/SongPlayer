@@ -16,8 +16,8 @@ public class Config {
     private static final Gson gson = new Gson();
 
     public String prefix = "$";
-    public String creativeCommand = "gmc";
-    public String survivalCommand = "gms";
+    public String creativeCommand = "gamemode creative";
+    public String survivalCommand = "gamemode survival";
     public boolean showFakePlayer = false;
     public boolean loopPlaylists = false;
     public boolean shufflePlaylists = false;
