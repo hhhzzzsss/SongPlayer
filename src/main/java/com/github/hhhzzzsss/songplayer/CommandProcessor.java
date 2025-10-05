@@ -266,7 +266,6 @@ public class CommandProcessor {
 		}
 	}
 
-
 	private static class stopCommand extends Command {
 		public String getName() {
 			return "stop";
