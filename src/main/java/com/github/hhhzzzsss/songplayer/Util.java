@@ -166,7 +166,7 @@ public class Util {
             }
         }
         Stream<String> suggestions = suggestionsList.stream()
-                .filter(str -> str.startsWith(arg))
+                .filter(str -> str.toLowerCase().startsWith(arg.toLowerCase()))
                 .map(str -> str.substring(clipStart));
         return CommandSource.suggestMatching(suggestions, suggestionsBuilder);
     }
