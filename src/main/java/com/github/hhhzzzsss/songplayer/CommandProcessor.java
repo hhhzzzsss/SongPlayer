@@ -36,6 +36,7 @@ public class CommandProcessor {
 		commands.add(new helpCommand());
 		commands.add(new setPrefixCommand());
 		commands.add(new playCommand());
+		commands.add(new playNextCommand());
 		commands.add(new stopCommand());
 		commands.add(new skipCommand());
 		commands.add(new gotoCommand());
@@ -235,6 +236,36 @@ public class CommandProcessor {
 			return Util.giveSongSuggestions(args, suggestionsBuilder);
 		}
 	}
+
+	private static class playNextCommand extends Command {
+		public String getName() {
+			return "playNext";
+		}
+		public String[] getSyntax() {
+			return new String[]{"<song or url>"};
+		}
+		public String getDescription() {
+			return "Adds a song to next in queue (or plays straight away)";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() > 0) {
+				if (Config.getConfig().survivalOnly && SongPlayer.MC.interactionManager.getCurrentGameMode() != GameMode.SURVIVAL) {
+					Util.showChatMessage("§cTo play in survival only mode, you must be in survival mode to start with.");
+					return true;
+				}
+
+				SongHandler.getInstance().loadSongNext(args);
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
+			return Util.giveSongSuggestions(args, suggestionsBuilder);
+		}
+	}
+
 
 	private static class stopCommand extends Command {
 		public String getName() {

@@ -43,6 +43,7 @@ public class SongHandler {
     private SongHandler() {}
 
     public SongLoaderThread loaderThread = null;
+    private boolean loadSongNext = false;
     public LinkedList<Song> songQueue = new LinkedList<>();
     public Song currentSong = null;
     public Playlist currentPlaylist = null;
@@ -92,13 +93,26 @@ public class SongHandler {
                 if (loaderThread.exception != null) {
                     Util.showChatMessage("§cFailed to load song: §4" + loaderThread.exception.getMessage());
                 } else {
-                    if (currentSong == null) {
-                        setSong(loaderThread.song);
+                    if (currentPlaylist != null) {
+                        if (loadSongNext) {
+                            currentPlaylist.queueSongNext(loaderThread.song);
+                        } else {
+                            currentPlaylist.queueSong(loaderThread.song);
+                        }
                     } else {
-                        queueSong(loaderThread.song);
+                        if (currentSong == null) {
+                            setSong(loaderThread.song);
+                        } else {
+                            if (loadSongNext) {
+                                queueSongNext(loaderThread.song);
+                            } else {
+                                queueSong(loaderThread.song);
+                            }
+                        }
                     }
                 }
                 loaderThread = null;
+                loadSongNext = false;
             }
         }
 
@@ -170,12 +184,25 @@ public class SongHandler {
         if (loaderThread != null) {
             Util.showChatMessage("§cAlready loading a song, cannot load another");
         }
-        else if (currentPlaylist != null) {
-            Util.showChatMessage("§cCannot load a song while a playlist is playing");
+        else {
+            try {
+                loaderThread = new SongLoaderThread(location);
+                Util.showChatMessage("§6Loading §3" + location);
+                loaderThread.start();
+            } catch (IOException e) {
+                Util.showChatMessage("§cFailed to load song: §4" + e.getMessage());
+            }
+        }
+    }
+
+    public void loadSongNext(String location) {
+        if (loaderThread != null) {
+            Util.showChatMessage("§cAlready loading a song, cannot load another");
         }
         else {
             try {
                 loaderThread = new SongLoaderThread(location);
+                loadSongNext = true;
                 Util.showChatMessage("§6Loading §3" + location);
                 loaderThread.start();
             } catch (IOException e) {
@@ -213,6 +240,11 @@ public class SongHandler {
     private void queueSong(Song song) {
         songQueue.add(song);
         Util.showChatMessage("§6Added song to queue: §3" + song.name);
+    }
+
+    private void queueSongNext(Song song) {
+        songQueue.add(0, song);
+        Util.showChatMessage("§6Playing song next: §3" + song.name);
     }
 
     public void setPlaylist(Path playlist) {

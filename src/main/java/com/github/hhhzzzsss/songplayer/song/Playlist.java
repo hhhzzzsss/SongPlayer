@@ -32,6 +32,8 @@ public class Playlist {
     public boolean loaded = false;
     public ArrayList<String> songsFailedToLoad = new ArrayList<>();
 
+    public LinkedList<Song> songQueue = new LinkedList<>();
+
     public Playlist(Path directory, boolean loop, boolean shuffle) {
         this.name = directory.getFileName().toString();
         this.loop = loop;
@@ -92,6 +94,11 @@ public class Playlist {
     }
 
     public Song getNext() {
+        if (!songQueue.isEmpty()) {
+            return songQueue.poll();
+        }
+
+        
         if (songs.isEmpty()) return null;
 
         if (songNumber >= songs.size()) {
@@ -103,6 +110,16 @@ public class Playlist {
         }
 
         return songs.get(ordering.get(songNumber++));
+    }
+
+    public void queueSong(Song song) {
+        songQueue.add(song);
+        Util.showChatMessage("§6Added song to queue: §3" + song.name);
+    }
+
+    public void queueSongNext(Song song) {
+        songQueue.add(0, song);
+        Util.showChatMessage("§6Playing song next: §3" + song.name);
     }
 
     private static List<String> validateAndLoadIndex(Path directory) {
