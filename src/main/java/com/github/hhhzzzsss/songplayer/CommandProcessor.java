@@ -36,6 +36,7 @@ public class CommandProcessor {
 		commands.add(new helpCommand());
 		commands.add(new setPrefixCommand());
 		commands.add(new playCommand());
+		commands.add(new playNextCommand());
 		commands.add(new stopCommand());
 		commands.add(new skipCommand());
 		commands.add(new gotoCommand());
@@ -54,6 +55,7 @@ public class CommandProcessor {
 		commands.add(new placeSpeedCommand());
 		commands.add(new toggleMovementCommand());
 		commands.add(new setVelocityThresholdCommand());
+		commands.add(new setBuildDelayCommand());
 		commands.add(new toggleAutoCleanupCommand());
 		commands.add(new cleanupLastStageCommand());
 		commands.add(new announcementCommand());
@@ -225,6 +227,35 @@ public class CommandProcessor {
 				}
 
 				SongHandler.getInstance().loadSong(args);
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		public CompletableFuture<Suggestions> getSuggestions(String args, SuggestionsBuilder suggestionsBuilder) {
+			return Util.giveSongSuggestions(args, suggestionsBuilder);
+		}
+	}
+
+	private static class playNextCommand extends Command {
+		public String getName() {
+			return "playNext";
+		}
+		public String[] getSyntax() {
+			return new String[]{"<song or url>"};
+		}
+		public String getDescription() {
+			return "Adds a song to next in queue (or plays straight away)";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() > 0) {
+				if (Config.getConfig().survivalOnly && SongPlayer.MC.interactionManager.getCurrentGameMode() != GameMode.SURVIVAL) {
+					Util.showChatMessage("§cTo play in survival only mode, you must be in survival mode to start with.");
+					return true;
+				}
+
+				SongHandler.getInstance().loadSongNext(args);
 				return true;
 			}
 			else {
@@ -1094,6 +1125,42 @@ public class CommandProcessor {
 					}
 					Config.getConfig().velocityThreshold = threshold;
 					Util.showChatMessage("§6Set velocity threshold to " + threshold);
+					Config.saveConfigWithErrorHandling();
+					return true;
+				} catch (NumberFormatException e) {
+					return false;
+				}
+			} else {
+				return false;
+			}
+        }
+	}
+	
+	private static class setBuildDelayCommand extends Command {
+		public String getName() {
+			return "setBuildDelay";
+		}
+		public String[] getAliases() {
+			return new String[]{"buildDelay", "delay"};
+		}
+		public String[] getSyntax() {
+			return new String[]{"<delay>"};
+		}
+		public String getDescription() {
+			return "Sets (in ticks) how long is waited after building to start playing";
+		}
+		public boolean processCommand(String args) {
+			if (args.length() > 0) {
+				try {
+					int delay = Integer.parseInt(args);
+					if (delay < 0) {
+						Util.showChatMessage("§cDelay must be 0 or greater");
+						return true;
+					} else if (delay > 60) {
+						Util.showChatMessage("§cHigh build delays will cause a significant pause between building and playing the song");
+					}
+					Config.getConfig().buildDelay = delay;
+					Util.showChatMessage("§6Set build delay to " + delay);
 					Config.saveConfigWithErrorHandling();
 					return true;
 				} catch (NumberFormatException e) {

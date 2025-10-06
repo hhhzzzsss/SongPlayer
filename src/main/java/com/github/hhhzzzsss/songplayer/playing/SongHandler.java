@@ -43,6 +43,7 @@ public class SongHandler {
     private SongHandler() {}
 
     public SongLoaderThread loaderThread = null;
+    private boolean loadSongNext = false;
     public LinkedList<Song> songQueue = new LinkedList<>();
     public Song currentSong = null;
     public Playlist currentPlaylist = null;
@@ -92,13 +93,26 @@ public class SongHandler {
                 if (loaderThread.exception != null) {
                     Util.showChatMessage("§cFailed to load song: §4" + loaderThread.exception.getMessage());
                 } else {
-                    if (currentSong == null) {
-                        setSong(loaderThread.song);
+                    if (currentPlaylist != null) {
+                        if (loadSongNext) {
+                            currentPlaylist.queueSongNext(loaderThread.song);
+                        } else {
+                            currentPlaylist.queueSong(loaderThread.song);
+                        }
                     } else {
-                        queueSong(loaderThread.song);
+                        if (currentSong == null) {
+                            setSong(loaderThread.song);
+                        } else {
+                            if (loadSongNext) {
+                                queueSongNext(loaderThread.song);
+                            } else {
+                                queueSong(loaderThread.song);
+                            }
+                        }
                     }
                 }
                 loaderThread = null;
+                loadSongNext = false;
             }
         }
 
@@ -170,12 +184,25 @@ public class SongHandler {
         if (loaderThread != null) {
             Util.showChatMessage("§cAlready loading a song, cannot load another");
         }
-        else if (currentPlaylist != null) {
-            Util.showChatMessage("§cCannot load a song while a playlist is playing");
+        else {
+            try {
+                loaderThread = new SongLoaderThread(location);
+                Util.showChatMessage("§6Loading §3" + location);
+                loaderThread.start();
+            } catch (IOException e) {
+                Util.showChatMessage("§cFailed to load song: §4" + e.getMessage());
+            }
+        }
+    }
+
+    public void loadSongNext(String location) {
+        if (loaderThread != null) {
+            Util.showChatMessage("§cAlready loading a song, cannot load another");
         }
         else {
             try {
                 loaderThread = new SongLoaderThread(location);
+                loadSongNext = true;
                 Util.showChatMessage("§6Loading §3" + location);
                 loaderThread.start();
             } catch (IOException e) {
@@ -213,6 +240,11 @@ public class SongHandler {
     private void queueSong(Song song) {
         songQueue.add(song);
         Util.showChatMessage("§6Added song to queue: §3" + song.name);
+    }
+
+    private void queueSongNext(Song song) {
+        songQueue.add(0, song);
+        Util.showChatMessage("§6Playing song next: §3" + song.name);
     }
 
     public void setPlaylist(Path playlist) {
@@ -301,7 +333,7 @@ public class SongHandler {
                     BlockPos bp = stage.requiredBreaks.poll();
                     attackBlock(bp);
                 }
-                buildEndDelay = 20;
+                buildEndDelay = Config.getConfig().buildDelay;
             } else if (!stage.missingNotes.isEmpty()) {
                 incrementPlaceAllowance();
                 while (consumePlaceAllowance()) {
@@ -321,7 +353,7 @@ public class SongHandler {
                         placeBlock(bp);
                     }
                 }
-                buildEndDelay = 20;
+                buildEndDelay = Config.getConfig().buildDelay;
             }
         } else { // Survival only mode
             if (!stage.requiredClicks.isEmpty()) {
@@ -329,7 +361,7 @@ public class SongHandler {
                 if (SongPlayer.MC.world.getBlockState(bp).getBlock() == Blocks.NOTE_BLOCK) {
                     placeBlock(bp);
                 }
-                buildEndDelay = 20;
+                buildEndDelay = Config.getConfig().buildDelay;
             }
         }
     }
@@ -384,7 +416,7 @@ public class SongHandler {
                 if (!Config.getConfig().survivalOnly) setCreativeIfNeeded();
                 stage.sendMovementPacketToStagePosition();
                 currentSong.pause();
-                buildStartDelay = 20;
+                buildStartDelay = Config.getConfig().buildDelay;
                 System.out.println("Total missing notes: " + stage.missingNotes.size());
                 for (int note : stage.missingNotes) {
                     int pitch = note % 25;
@@ -499,7 +531,7 @@ public class SongHandler {
                 BlockPos bp = cleanupBreakList.poll();
                 attackBlock(bp);
             }
-            buildEndDelay = 20;
+            buildEndDelay = Config.getConfig().buildDelay;
         } else if (!cleanupPlaceList.isEmpty()) {
             incrementPlaceAllowance();
             while (consumePlaceAllowance()) {
@@ -515,7 +547,7 @@ public class SongHandler {
                     placeBlock(bp);
                 }
             }
-            buildEndDelay = 20;
+            buildEndDelay = Config.getConfig().buildDelay;
         } else {
             originalBlocks.clear();
             cleaningUp = false;
@@ -738,7 +770,7 @@ public class SongHandler {
     }
     private void checkCommandCache() {
         long currentTime = System.currentTimeMillis();
-        if (currentTime >= lastCommandTime + 1500 && cachedCommand != null) {
+        if (currentTime >= lastCommandTime + Config.getConfig().commandDelay && cachedCommand != null) {
             Util.sendCommand(cachedCommand);
             cachedCommand = null;
             lastCommandTime = currentTime;

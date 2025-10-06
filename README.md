@@ -132,6 +132,11 @@ Sets the block placement speed in blocks/sec.
 
 Toggles whether you swing your arm when hitting a noteblock and rotate to look at the noteblocks you are hitting.
 
+### $setBuildDelay <threshold>
+*aliases: `$buildDelay` `$delay`*
+
+Sets (in ticks) how long is waited after building to start playing.
+
 ### $setVelocityThreshold <threshold>
 *aliases: `$velocityThreshold` `$threshold`*
 
