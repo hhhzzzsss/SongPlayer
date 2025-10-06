@@ -33,6 +33,7 @@ public class Config {
     public boolean autoCleanup = false;
     public boolean survivalOnly = false;
     public boolean flightNoclip = false;
+    public int commandDelay = 250;
 
     public static Config getConfig() {
         if (config == null) {

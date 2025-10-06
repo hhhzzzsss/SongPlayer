@@ -770,7 +770,7 @@ public class SongHandler {
     }
     private void checkCommandCache() {
         long currentTime = System.currentTimeMillis();
-        if (currentTime >= lastCommandTime + 1500 && cachedCommand != null) {
+        if (currentTime >= lastCommandTime + Config.getConfig().commandDelay && cachedCommand != null) {
             Util.sendCommand(cachedCommand);
             cachedCommand = null;
             lastCommandTime = currentTime;
