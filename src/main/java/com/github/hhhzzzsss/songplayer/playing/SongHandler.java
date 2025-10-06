@@ -333,7 +333,7 @@ public class SongHandler {
                     BlockPos bp = stage.requiredBreaks.poll();
                     attackBlock(bp);
                 }
-                buildEndDelay = 20;
+                buildEndDelay = Config.getConfig().buildDelay;
             } else if (!stage.missingNotes.isEmpty()) {
                 incrementPlaceAllowance();
                 while (consumePlaceAllowance()) {
@@ -353,7 +353,7 @@ public class SongHandler {
                         placeBlock(bp);
                     }
                 }
-                buildEndDelay = 20;
+                buildEndDelay = Config.getConfig().buildDelay;
             }
         } else { // Survival only mode
             if (!stage.requiredClicks.isEmpty()) {
@@ -361,7 +361,7 @@ public class SongHandler {
                 if (SongPlayer.MC.world.getBlockState(bp).getBlock() == Blocks.NOTE_BLOCK) {
                     placeBlock(bp);
                 }
-                buildEndDelay = 20;
+                buildEndDelay = Config.getConfig().buildDelay;
             }
         }
     }
@@ -416,7 +416,7 @@ public class SongHandler {
                 if (!Config.getConfig().survivalOnly) setCreativeIfNeeded();
                 stage.sendMovementPacketToStagePosition();
                 currentSong.pause();
-                buildStartDelay = 20;
+                buildStartDelay = Config.getConfig().buildDelay;
                 System.out.println("Total missing notes: " + stage.missingNotes.size());
                 for (int note : stage.missingNotes) {
                     int pitch = note % 25;
@@ -531,7 +531,7 @@ public class SongHandler {
                 BlockPos bp = cleanupBreakList.poll();
                 attackBlock(bp);
             }
-            buildEndDelay = 20;
+            buildEndDelay = Config.getConfig().buildDelay;
         } else if (!cleanupPlaceList.isEmpty()) {
             incrementPlaceAllowance();
             while (consumePlaceAllowance()) {
@@ -547,7 +547,7 @@ public class SongHandler {
                     placeBlock(bp);
                 }
             }
-            buildEndDelay = 20;
+            buildEndDelay = Config.getConfig().buildDelay;
         } else {
             originalBlocks.clear();
             cleaningUp = false;

@@ -25,6 +25,7 @@ public class Config {
     public boolean swing = false;
     public boolean rotate = false;
     public int velocityThreshold = 0;
+    public int buildDelay = 20;
     public boolean doAnnouncement = false;
     public String announcementMessage = "&6Now playing: &3[name]";
     public double breakSpeed = 40.0;
