@@ -87,7 +87,7 @@ public class ClientPlayNetworkHandlerMixin {
 		}
 	}
 
-	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;setVelocityClient(DDD)V"), method = "onEntityVelocityUpdate", cancellable = true)
+	@Inject(at = @At("HEAD"), method = "onEntityVelocityUpdate(Lnet/minecraft/network/packet/s2c/play/EntityVelocityUpdateS2CPacket;)V", cancellable = true)
 	public void onOnEntityVelocityUpdate(EntityVelocityUpdateS2CPacket packet, CallbackInfo ci) {
 		if (!SongHandler.getInstance().isIdle() && packet.getEntityId() == SongPlayer.MC.player.getId()) {
 			ci.cancel();
