@@ -1160,7 +1160,7 @@ public class CommandProcessor {
 					Util.showChatMessage("§6There is nothing to clean up");
 					return true;
 				}
-				if (MC.player.getPos().squaredDistanceTo(lastStage.getOriginBottomCenter()) > 3*3 || !lastStage.worldName.equals(Util.getWorldName())) {
+				if (MC.player.getEntityPos().squaredDistanceTo(lastStage.getOriginBottomCenter()) > 3*3 || !lastStage.worldName.equals(Util.getWorldName())) {
 					String coordStr = String.format(
 							"%d %d %d",
 							lastStage.position.getX(), lastStage.position.getY(), lastStage.position.getZ()

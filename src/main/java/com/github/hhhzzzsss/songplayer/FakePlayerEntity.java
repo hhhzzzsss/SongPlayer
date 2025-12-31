@@ -26,8 +26,8 @@ public class FakePlayerEntity extends OtherClientPlayerEntity {
 		
 		getInventory().clone(player.getInventory());
 		
-		Byte playerModel = player.getDataTracker().get(PlayerEntity.PLAYER_MODEL_PARTS);
-		getDataTracker().set(PlayerEntity.PLAYER_MODEL_PARTS, playerModel);
+		Byte playerModel = player.getDataTracker().get(PlayerEntity.PLAYER_MODE_CUSTOMIZATION_ID);
+		getDataTracker().set(PlayerEntity.PLAYER_MODE_CUSTOMIZATION_ID, playerModel);
 		
 		headYaw = player.headYaw;
 		bodyYaw = player.bodyYaw;
@@ -37,9 +37,9 @@ public class FakePlayerEntity extends OtherClientPlayerEntity {
 			setPose(EntityPose.CROUCHING);
 		}
 
-		capeX = getX();
-		capeY = getY();
-		capeZ = getZ();
+//		capeX = getX();
+//		capeY = getY();
+//		capeZ = getZ();
 		
 		world.addEntity(this);
 	}
@@ -60,8 +60,8 @@ public class FakePlayerEntity extends OtherClientPlayerEntity {
 	}
 
 	private static GameProfile getProfile() {
-		GameProfile profile = new GameProfile(FAKE_PLAYER_UUID, SongPlayer.MC.player.getGameProfile().getName());
-		profile.getProperties().putAll(SongPlayer.MC.player.getGameProfile().getProperties());
+		GameProfile profile = new GameProfile(FAKE_PLAYER_UUID, SongPlayer.MC.player.getGameProfile().name());
+		profile.properties().putAll(SongPlayer.MC.player.getGameProfile().properties());
 		PlayerListEntry playerListEntry = new PlayerListEntry(SongPlayer.MC.player.getGameProfile(), false);
 		((ClientPlayNetworkHandlerAccessor)SongPlayer.MC.getNetworkHandler()).getPlayerListEntries().put(FAKE_PLAYER_UUID, playerListEntry);
 		return profile;

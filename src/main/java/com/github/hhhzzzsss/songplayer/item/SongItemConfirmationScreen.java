@@ -70,7 +70,7 @@ public class SongItemConfirmationScreen extends Screen {
                 Text[] messageList = Arrays.stream(loadedMessages).map(Text::literal).toArray(Text[]::new);
                 this.loadedText = MultilineText.create(this.textRenderer, messageList);
 
-                int loadedTextHeight = this.loadedText.count() * this.textRenderer.fontHeight;
+                int loadedTextHeight = this.loadedText.getLineCount() * this.textRenderer.fontHeight;
                 addButtons(60 + loadedTextHeight + 12);
 
                 loaded = true;
@@ -78,10 +78,10 @@ public class SongItemConfirmationScreen extends Screen {
         }
 
         if (loaded) {
-            loadedText.drawCenterWithShadow(context, this.width / 2, 60);
+            loadedText.draw(context, MultilineText.Alignment.CENTER, this.width / 2, 60, 9, true, -1);
         }
         else {
-            unloadedText.drawCenterWithShadow(context, this.width / 2, 60);
+            unloadedText.draw(context, MultilineText.Alignment.CENTER, this.width / 2, 60, 9, true, -1);
         }
     }
 
