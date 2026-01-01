@@ -4,6 +4,7 @@ import com.github.hhhzzzsss.songplayer.mixin.ClientPlayNetworkHandlerAccessor;
 import com.github.hhhzzzsss.songplayer.playing.SongHandler;
 import com.github.hhhzzzsss.songplayer.playing.Stage;
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
@@ -60,8 +61,11 @@ public class FakePlayerEntity extends OtherClientPlayerEntity {
 	}
 
 	private static GameProfile getProfile() {
-		GameProfile profile = new GameProfile(FAKE_PLAYER_UUID, SongPlayer.MC.player.getGameProfile().name());
-		profile.properties().putAll(SongPlayer.MC.player.getGameProfile().properties());
+		GameProfile profile = new GameProfile(
+				FAKE_PLAYER_UUID,
+				SongPlayer.MC.player.getGameProfile().name(),
+				SongPlayer.MC.getGameProfile().properties()
+		);
 		PlayerListEntry playerListEntry = new PlayerListEntry(SongPlayer.MC.player.getGameProfile(), false);
 		((ClientPlayNetworkHandlerAccessor)SongPlayer.MC.getNetworkHandler()).getPlayerListEntries().put(FAKE_PLAYER_UUID, playerListEntry);
 		return profile;
